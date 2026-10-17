@@ -3,14 +3,16 @@ import React from 'react';
 export const skillCategories = [
   {
     category: "Frontend",
-    description: "Building responsive, modern, and accessible user interfaces",
+    description: "Building responsive, modern, 3D and accessible user interfaces",
     icon: "Layout",
     skills: [
       { name: "HTML5", level: "Advanced" },
       { name: "CSS3", level: "Advanced" },
       { name: "JavaScript", level: "Advanced" },
       { name: "React.js", level: "Advanced" },
-      { name: "Tailwind CSS", level: "Proficient" }
+      { name: "Tailwind CSS", level: "Proficient" },
+      { name: "Three.js", level: "Proficient" },
+      { name: "GSAP", level: "Proficient" }
     ]
   },
   {
@@ -65,6 +67,26 @@ export const techIcons = [
       <svg viewBox="0 0 24 24" className="w-8 h-8">
         <rect width="24" height="24" rx="4" fill="#F7DF1E" />
         <path d="M12.5 17.5c.5.8 1.3 1.3 2.4 1.3 1.2 0 1.9-.6 1.9-1.5 0-1-.8-1.4-2.2-2-1.9-.8-3.2-1.8-3.2-3.8 0-1.9 1.5-3.3 3.8-3.3 1.6 0 2.8.6 3.6 2l-1.8 1.1c-.4-.7-.9-1.1-1.8-1.1-.9 0-1.5.5-1.5 1.2 0 .8.6 1.2 1.9 1.7 2.1.9 3.5 1.8 3.5 4 0 2.3-1.8 3.5-4.2 3.5-2.3 0-3.8-1.1-4.4-2.5l2-1.1zM6.5 17.6c.4.6.8 1 1.6 1 .9 0 1.5-.4 1.5-1.9V8.5h2.4v8.2c0 2.7-1.6 3.8-3.9 3.8-1.8 0-3.1-.9-3.7-2.3l2.1-1.2z" fill="#000000" />
+      </svg>
+    )
+  },
+  {
+    name: "Three.js",
+    color: "#FFFFFF",
+    svg: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8">
+        <path d="M4 19.5L12 3.5L20 19.5L12 15L4 19.5Z" stroke="#FFFFFF" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M12 3.5V15M20 19.5L12 15M4 19.5L12 15" stroke="#A78BFA" strokeWidth="1.4" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    name: "GSAP",
+    color: "#88CE02",
+    svg: (
+      <svg viewBox="0 0 24 24" className="w-8 h-8">
+        <rect width="24" height="24" rx="6" fill="#0D0E1A" stroke="#88CE02" strokeWidth="1.5" />
+        <text x="12" y="16" fill="#88CE02" fontSize="8.5" fontWeight="900" textAnchor="middle" fontFamily="system-ui, sans-serif" letterSpacing="0.4">GSAP</text>
       </svg>
     )
   },
@@ -169,4 +191,3 @@ export const techIcons = [
     )
   }
 ];
-

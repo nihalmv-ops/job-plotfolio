@@ -39,7 +39,7 @@ export default function Skills() {
               Core Tech Stack
             </h3>
             
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-5 sm:gap-6 justify-items-center items-center">
+            <div className="flex flex-wrap justify-center items-center gap-5 sm:gap-6">
               {techIcons.map((tech) => (
                 <div
                   key={tech.name}

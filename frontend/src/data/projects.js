@@ -8,7 +8,7 @@ export const projects = [
     badge: "MERN Stack",
     // Drop your screenshot into frontend/public/projects/ and set path here:
     // e.g. image: "/projects/smartmart.png"
-    image: "/projects/",
+    image: "/projects/skyline.png",
     liveUrl: "https://smartsh-ai-hrkd.vercel.app/",
     githubUrl: "https://github.com/nihalmv-ops/smartshAI",
     highlights: [
