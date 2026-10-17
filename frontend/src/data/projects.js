@@ -1,16 +1,16 @@
 export const projects = [
   {
     id: "smartmart-ai",
-    title: "SmartMart AI",
-    subtitle: "Supermarket Management & Billing System",
-    description: "A supermarket management and billing application focused on streamlining retail operations, backend API integration, and database connectivity.",
+    title: "SmartMart AI — Supermarket Management & Billing System",
+    subtitle: "Streamlining supermarket retail operations with MERN architecture.",
+    description: "Developed a supermarket management and billing application focused on streamlining retail operations, backend API integration, and database connectivity.",
     technologies: ["React.js", "JavaScript", "Node.js", "Express.js", "MongoDB"],
     badge: "MERN Stack",
-    // Put your image file inside frontend/public/projects/ and set its path here:
+    // Drop your screenshot into frontend/public/projects/ and set path here:
     // e.g. image: "/projects/smartmart.png"
-    image: "",
-    githubUrl: "https://github.com/nihalmv-ops/smartshAI",
+    image: "/projects/",
     liveUrl: "https://smartsh-ai-hrkd.vercel.app/",
+    githubUrl: "https://github.com/nihalmv-ops/smartshAI",
     highlights: [
       "Developed a supermarket management and billing application focused on streamlining retail operations.",
       "Built a responsive user interface using React.js.",
@@ -20,16 +20,16 @@ export const projects = [
   },
   {
     id: "trachmart",
-    title: "TrachMart E-Commerce",
-    subtitle: "TechNest Laptops & Mobiles",
-    description: "A responsive e-commerce website for browsing laptops, mobile phones, and technology products with reusable React components and interactive shopping features.",
+    title: "TrachMart E-Commerce — TechNest Laptops & Mobiles",
+    subtitle: "Responsive e-commerce platform for tech devices and accessories.",
+    description: "Developed a responsive e-commerce website for browsing laptops, mobile phones, and technology products with reusable components and interactive shopping features.",
     technologies: ["React.js", "JavaScript", "Vite", "Tailwind CSS"],
     badge: "E-Commerce",
-    // Put your image file inside frontend/public/projects/ and set its path here:
+    // Drop your screenshot into frontend/public/projects/ and set path here:
     // e.g. image: "/projects/trachmart.png"
     image: "",
-    githubUrl: "https://github.com/nihalmv-ops/trachmartshop",
     liveUrl: "https://trachmartshop.vercel.app/",
+    githubUrl: "https://github.com/nihalmv-ops/trachmartshop",
     highlights: [
       "Developed a responsive e-commerce website for browsing laptops, mobile phones, and other technology products.",
       "Built reusable React components and responsive user interface elements.",
@@ -39,16 +39,16 @@ export const projects = [
   },
   {
     id: "gotravel",
-    title: "GoTravel",
-    subtitle: "Responsive Travel Website",
-    description: "A modern, responsive travel website built with React.js and Tailwind CSS featuring interactive UI components and visual consistency across all devices.",
+    title: "GoTravel — Responsive Travel Website",
+    subtitle: "Modern travel showcase website with responsive layouts.",
+    description: "Developed a responsive travel website using React.js, reusable UI components, and modern layouts with a focus on visual consistency and usability.",
     technologies: ["React.js", "JavaScript", "Tailwind CSS", "HTML5", "CSS3"],
     badge: "Frontend",
-    // Put your image file inside frontend/public/projects/ and set its path here:
+    // Drop your screenshot into frontend/public/projects/ and set path here:
     // e.g. image: "/projects/gotravel.png"
     image: "",
-    githubUrl: "https://github.com/nihalmv-ops/rgotravel",
     liveUrl: "https://rgotravel.vercel.app/",
+    githubUrl: "https://github.com/nihalmv-ops/rgotravel",
     highlights: [
       "Developed a responsive travel website using React.js and modern frontend technologies.",
       "Created reusable UI components and responsive layouts for desktop and mobile devices.",
