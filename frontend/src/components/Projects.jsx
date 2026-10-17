@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, ShoppingBag, BarChart3, Store, ArrowUpRight } from 'lucide-react';
+import { ExternalLink, ArrowUpRight, ImageIcon } from 'lucide-react';
 import { GithubIcon } from './SocialIcons';
 import { projects } from '../data/projects';
 
@@ -8,19 +8,6 @@ export default function Projects() {
 
   const handleImageError = (id) => {
     setImageErrors((prev) => ({ ...prev, [id]: true }));
-  };
-
-  const getProjectIcon = (type) => {
-    switch (type) {
-      case 'shopping-bag':
-        return <ShoppingBag className="w-12 h-12 text-violet-400" />;
-      case 'chart':
-        return <BarChart3 className="w-12 h-12 text-violet-400" />;
-      case 'ai-cart':
-        return <Store className="w-12 h-12 text-violet-400" />;
-      default:
-        return <ShoppingBag className="w-12 h-12 text-violet-400" />;
-    }
   };
 
   return (
@@ -51,91 +38,105 @@ export default function Projects() {
 
         {/* 3 Project Cards in One Row on Desktop, Stack on Mobile */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
-          {projects.map((project) => (
-            <article
-              key={project.id}
-              className="rounded-3xl bg-[#121321] border border-violet-500/15 p-6 sm:p-7 flex flex-col justify-between shadow-xl shadow-black/40 hover:border-violet-500/35 hover:-translate-y-1 hover:shadow-2xl hover:shadow-violet-950/20 transition-all duration-300 group"
-            >
-              <div>
-                {/* Visual Thumbnail Area with Image Support */}
-                <div className="w-full h-48 rounded-2xl bg-[#191a2e]/60 border border-white/5 flex items-center justify-center relative overflow-hidden mb-6 group-hover:border-violet-500/30 transition-colors">
-                  
-                  {project.image && !imageErrors[project.id] ? (
-                    <img
-                      src={project.image}
-                      alt={`${project.title} screenshot preview`}
-                      onError={() => handleImageError(project.id)}
-                      loading="lazy"
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    /* Fallback to Stylized Icon when no image or if image fails to load */
-                    <div className="relative z-10 w-20 h-20 rounded-2xl bg-violet-950/40 border border-violet-500/30 flex items-center justify-center shadow-lg shadow-violet-900/20 group-hover:scale-110 transition-transform duration-300">
-                      {getProjectIcon(project.iconType)}
-                    </div>
+          {projects.map((project) => {
+            const hasImage = project.image && !imageErrors[project.id];
+
+            return (
+              <article
+                key={project.id}
+                className="rounded-3xl bg-[#121321] border border-violet-500/15 p-6 sm:p-7 flex flex-col justify-between shadow-xl shadow-black/40 hover:border-violet-500/35 hover:-translate-y-1 hover:shadow-2xl hover:shadow-violet-950/20 transition-all duration-300 group"
+              >
+                <div>
+                  {/* Dedicated Project Image Space */}
+                  <div className="w-full h-48 rounded-2xl bg-[#151728] border border-white/5 relative overflow-hidden mb-6 flex items-center justify-center group-hover:border-violet-500/30 transition-colors">
+                    {hasImage ? (
+                      /* User's Project Image */
+                      <img
+                        src={project.image}
+                        alt={`${project.title} preview`}
+                        onError={() => handleImageError(project.id)}
+                        loading="lazy"
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      /* Clean, Minimalist Image Placeholder Slot for User */
+                      <div className="w-full h-full flex flex-col items-center justify-center p-4 border border-dashed border-violet-500/25 rounded-2xl bg-violet-950/10 text-center">
+                        <div className="w-12 h-12 rounded-xl bg-violet-900/30 border border-violet-500/30 flex items-center justify-center text-violet-400 mb-2.5 shadow-sm">
+                          <ImageIcon size={22} aria-hidden="true" />
+                        </div>
+                        <span className="text-xs font-semibold text-slate-300">
+                          Project Screenshot
+                        </span>
+                        <span className="text-[11px] text-slate-500 mt-0.5">
+                          Add your image here
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Gradient overlay for contrast */}
+                    {hasImage && (
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#121321] via-transparent to-black/20 pointer-events-none" />
+                    )}
+
+                    {/* Category Pill Tag */}
+                    <span className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-black/60 backdrop-blur-md text-violet-300 border border-violet-500/30 z-10">
+                      {project.badge}
+                    </span>
+                  </div>
+
+                  {/* Project Details */}
+                  <h3 className="text-xl font-bold text-white mb-2.5 group-hover:text-violet-300 transition-colors">
+                    {project.title}
+                  </h3>
+
+                  <p className="text-sm text-slate-400 leading-relaxed mb-6">
+                    {project.description}
+                  </p>
+
+                  {/* Tech Badges */}
+                  <div className="flex flex-wrap gap-2 mb-8" aria-label="Technologies used">
+                    {project.technologies.map((tech) => (
+                      <span
+                        key={tech}
+                        className="px-2.5 py-1 rounded-md text-xs font-semibold bg-white/5 text-slate-300 border border-white/10"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons: Live Demo & GitHub */}
+                <div className="pt-4 border-t border-white/5 flex items-center justify-between gap-3 text-sm font-semibold">
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-violet-400 hover:text-violet-300 transition-colors"
+                      aria-label={`Open live demo for ${project.title}`}
+                    >
+                      <span>Live Demo</span>
+                      <ExternalLink size={15} aria-hidden="true" />
+                    </a>
                   )}
 
-                  {/* Gradient Overlay for Text Legibility & Contrast */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#121321] via-transparent to-black/20 pointer-events-none" />
-                  
-                  {/* Category Pill Tag */}
-                  <span className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-black/60 backdrop-blur-md text-violet-300 border border-violet-500/30 z-10">
-                    {project.badge}
-                  </span>
-                </div>
-
-                {/* Project Details */}
-                <h3 className="text-xl font-bold text-white mb-2.5 group-hover:text-violet-300 transition-colors">
-                  {project.title}
-                </h3>
-
-                <p className="text-sm text-slate-400 leading-relaxed mb-6">
-                  {project.description}
-                </p>
-
-                {/* Tech Badges */}
-                <div className="flex flex-wrap gap-2 mb-8" aria-label="Technologies used">
-                  {project.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2.5 py-1 rounded-md text-xs font-semibold bg-white/5 text-slate-300 border border-white/10"
+                  {project.githubUrl && (
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors ml-auto"
+                      aria-label={`Open GitHub repository for ${project.title}`}
                     >
-                      {tech}
-                    </span>
-                  ))}
+                      <GithubIcon size={16} aria-hidden="true" />
+                      <span>GitHub</span>
+                    </a>
+                  )}
                 </div>
-              </div>
-
-              {/* Action Buttons: Live Demo & GitHub */}
-              <div className="pt-4 border-t border-white/5 flex items-center justify-between gap-3 text-sm font-semibold">
-                {project.liveUrl && (
-                  <a
-                    href={project.liveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-violet-400 hover:text-violet-300 transition-colors"
-                    aria-label={`Open live demo for ${project.title}`}
-                  >
-                    <span>Live Demo</span>
-                    <ExternalLink size={15} aria-hidden="true" />
-                  </a>
-                )}
-
-                {project.githubUrl && (
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors ml-auto"
-                    aria-label={`Open GitHub repository for ${project.title}`}
-                  >
-                    <GithubIcon size={16} aria-hidden="true" />
-                    <span>GitHub</span>
-                  </a>
-                )}
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
 
       </div>

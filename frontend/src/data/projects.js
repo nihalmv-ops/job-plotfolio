@@ -6,15 +6,11 @@ export const projects = [
     description: "A modern e-commerce frontend with product listings, shopping cart functionality, and a responsive user interface.",
     technologies: ["React", "JavaScript", "Tailwind CSS", "Context API"],
     badge: "E-Commerce",
-    image: "/projects/trachmart.svg",
-    iconType: "shopping-bag",
+    // Put your image file inside frontend/public/projects/ and set its path here:
+    // e.g. image: "/projects/trachmart.png"
+    image: "",
     githubUrl: "https://github.com/nihalmv-ops/trachmartshop",
-    liveUrl: "https://trachmartshop.vercel.app/",
-    highlights: [
-      "Dynamic product catalog with category filtering",
-      "Global cart state management with React Context API",
-      "Mobile-optimized responsive design with fast page loads"
-    ]
+    liveUrl: "https://trachmartshop.vercel.app/"
   },
   {
     id: "budget-insights",
@@ -23,15 +19,11 @@ export const projects = [
     description: "A personal finance application for managing income, expenses, transaction categories, and budget insights.",
     technologies: ["React", "JavaScript", "Tailwind CSS", "Chart.js"],
     badge: "FinTech",
-    image: "/projects/budget-insights.svg",
-    iconType: "chart",
+    // Put your image file inside frontend/public/projects/ and set its path here:
+    // e.g. image: "/projects/budget-insights.png"
+    image: "",
     githubUrl: "https://github.com/nihalmv-ops",
-    liveUrl: "https://github.com/nihalmv-ops",
-    highlights: [
-      "Real-time expense & income calculation",
-      "Visual financial breakdown using interactive charts",
-      "Category-based expense tagging and search"
-    ]
+    liveUrl: "https://github.com/nihalmv-ops"
   },
   {
     id: "smartmart-ai",
@@ -40,14 +32,10 @@ export const projects = [
     description: "A supermarket management and billing application designed to support product management, sales tracking, and point-of-sale operations.",
     technologies: ["React", "Node.js", "Express.js", "MongoDB"],
     badge: "MERN Stack",
-    image: "/projects/smartmart-ai.svg",
-    iconType: "ai-cart",
+    // Put your image file inside frontend/public/projects/ and set its path here:
+    // e.g. image: "/projects/smartmart.png"
+    image: "",
     githubUrl: "https://github.com/nihalmv-ops/smartshAI",
-    liveUrl: "https://github.com/nihalmv-ops/smartshAI",
-    highlights: [
-      "Full MERN stack POS system with REST API architecture",
-      "MongoDB database modeling for products and billing logs",
-      "Real-time cashier checkout and inventory stock tracking"
-    ]
+    liveUrl: "https://github.com/nihalmv-ops/smartshAI"
   }
 ];
