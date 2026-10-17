@@ -70,3 +70,4 @@ export const handleContactSubmission = async (req, res) => {
     });
   }
 };
+

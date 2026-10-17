@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="100%" fill="none">
+  <defs>
+    <linearGradient id="biBg" x1="0" y1="0" x2="800" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0b0d1a"/>
+      <stop offset="1" stop-color="#12162d"/>
+    </linearGradient>
+    <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#8b5cf6" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="emeraldGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#10b981"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="roseGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f43f5e"/>
+      <stop offset="1" stop-color="#e11d48"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="480" fill="url(#biBg)"/>
+
+  <!-- Top App Bar -->
+  <rect x="50" y="40" width="700" height="50" rx="12" fill="#171a33" stroke="#2a2e52" stroke-width="1.5"/>
+  <circle cx="80" cy="65" r="7" fill="#ef4444" opacity="0.8"/>
+  <circle cx="102" cy="65" r="7" fill="#f59e0b" opacity="0.8"/>
+  <circle cx="124" cy="65" r="7" fill="#10b981" opacity="0.8"/>
+  <text x="160" y="70" fill="#ffffff" font-family="system-ui, sans-serif" font-size="16" font-weight="bold">Budget Insights &amp; Analytics</text>
+  <rect x="610" y="52" width="110" height="26" rx="8" fill="#252a4e"/>
+  <text x="665" y="69" fill="#c4b5fd" font-family="system-ui, sans-serif" font-size="11" font-weight="600" text-anchor="middle">October 2026 ▾</text>
+
+  <!-- Metric Summary Cards -->
+  <!-- Income Card -->
+  <rect x="50" y="110" width="220" height="90" rx="14" fill="#171a33" stroke="#252a4e" stroke-width="1.5"/>
+  <text x="75" y="140" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Total Income</text>
+  <text x="75" y="175" fill="#34d399" font-family="system-ui, sans-serif" font-size="24" font-weight="800">+₹58,450</text>
+
+  <!-- Expense Card -->
+  <rect x="290" y="110" width="220" height="90" rx="14" fill="#171a33" stroke="#252a4e" stroke-width="1.5"/>
+  <text x="315" y="140" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Total Expenses</text>
+  <text x="315" y="175" fill="#fb7185" font-family="system-ui, sans-serif" font-size="24" font-weight="800">-₹22,180</text>
+
+  <!-- Net Savings Card -->
+  <rect x="530" y="110" width="220" height="90" rx="14" fill="#171a33" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="555" y="140" fill="#a78bfa" font-family="system-ui, sans-serif" font-size="12" font-weight="600">Net Savings</text>
+  <text x="555" y="175" fill="#ffffff" font-family="system-ui, sans-serif" font-size="24" font-weight="800">₹36,270</text>
+
+  <!-- Main Chart Section -->
+  <rect x="50" y="220" width="460" height="220" rx="14" fill="#171a33" stroke="#252a4e" stroke-width="1.5"/>
+  <text x="75" y="250" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Expense Trends (Monthly)</text>
+
+  <!-- Chart Area Grid Lines -->
+  <line x1="80" y1="280" x2="480" y2="280" stroke="#252a4e" stroke-dasharray="4"/>
+  <line x1="80" y1="320" x2="480" y2="320" stroke="#252a4e" stroke-dasharray="4"/>
+  <line x1="80" y1="360" x2="480" y2="360" stroke="#252a4e" stroke-dasharray="4"/>
+  <line x1="80" y1="400" x2="480" y2="400" stroke="#2d3257"/>
+
+  <!-- Wave Chart -->
+  <path d="M 80 380 Q 140 290 200 330 T 320 270 T 440 290 L 480 310 L 480 400 L 80 400 Z" fill="url(#purpleGradient)"/>
+  <path d="M 80 380 Q 140 290 200 330 T 320 270 T 440 290 L 480 310" stroke="#a78bfa" stroke-width="3" fill="none"/>
+  <circle cx="320" cy="270" r="5" fill="#ffffff" stroke="#8b5cf6" stroke-width="3"/>
+
+  <!-- Category Breakdown Card -->
+  <rect x="530" y="220" width="220" height="220" rx="14" fill="#171a33" stroke="#252a4e" stroke-width="1.5"/>
+  <text x="555" y="250" fill="#ffffff" font-family="system-ui, sans-serif" font-size="14" font-weight="bold">Top Categories</text>
+
+  <!-- Ring chart or bars -->
+  <rect x="555" y="275" width="170" height="10" rx="5" fill="#202442"/>
+  <rect x="555" y="275" width="115" height="10" rx="5" fill="#8b5cf6"/>
+  <text x="555" y="305" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Housing &amp; Rent (45%)</text>
+
+  <rect x="555" y="325" width="170" height="10" rx="5" fill="#202442"/>
+  <rect x="555" y="325" width="75" height="10" rx="5" fill="#3b82f6"/>
+  <text x="555" y="355" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Food &amp; Groceries (25%)</text>
+
+  <rect x="555" y="375" width="170" height="10" rx="5" fill="#202442"/>
+  <rect x="555" y="375" width="45" height="10" rx="5" fill="#10b981"/>
+  <text x="555" y="405" fill="#94a3b8" font-family="system-ui, sans-serif" font-size="11">Utilities &amp; Subscriptions (15%)</text>
+</svg>

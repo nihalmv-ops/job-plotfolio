@@ -40,3 +40,4 @@ export function LinkedinIcon({ size = 20, className = '' }) {
     </svg>
   );
 }
+

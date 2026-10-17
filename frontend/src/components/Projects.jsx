@@ -1,9 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ExternalLink, ShoppingBag, BarChart3, Store, ArrowUpRight } from 'lucide-react';
 import { GithubIcon } from './SocialIcons';
 import { projects } from '../data/projects';
 
 export default function Projects() {
+  const [imageErrors, setImageErrors] = useState({});
+
+  const handleImageError = (id) => {
+    setImageErrors((prev) => ({ ...prev, [id]: true }));
+  };
+
   const getProjectIcon = (type) => {
     switch (type) {
       case 'shopping-bag':
@@ -51,19 +57,31 @@ export default function Projects() {
               className="rounded-3xl bg-[#121321] border border-violet-500/15 p-6 sm:p-7 flex flex-col justify-between shadow-xl shadow-black/40 hover:border-violet-500/35 hover:-translate-y-1 hover:shadow-2xl hover:shadow-violet-950/20 transition-all duration-300 group"
             >
               <div>
-                {/* Visual Thumbnail Area matching reference image */}
-                <div className="w-full h-44 rounded-2xl bg-[#191a2e]/60 border border-white/5 flex items-center justify-center relative overflow-hidden mb-6 group-hover:border-violet-500/30 transition-colors">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-violet-600/10 via-transparent to-purple-600/10 opacity-70" />
+                {/* Visual Thumbnail Area with Image Support */}
+                <div className="w-full h-48 rounded-2xl bg-[#191a2e]/60 border border-white/5 flex items-center justify-center relative overflow-hidden mb-6 group-hover:border-violet-500/30 transition-colors">
+                  
+                  {project.image && !imageErrors[project.id] ? (
+                    <img
+                      src={project.image}
+                      alt={`${project.title} screenshot preview`}
+                      onError={() => handleImageError(project.id)}
+                      loading="lazy"
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    /* Fallback to Stylized Icon when no image or if image fails to load */
+                    <div className="relative z-10 w-20 h-20 rounded-2xl bg-violet-950/40 border border-violet-500/30 flex items-center justify-center shadow-lg shadow-violet-900/20 group-hover:scale-110 transition-transform duration-300">
+                      {getProjectIcon(project.iconType)}
+                    </div>
+                  )}
+
+                  {/* Gradient Overlay for Text Legibility & Contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#121321] via-transparent to-black/20 pointer-events-none" />
                   
                   {/* Category Pill Tag */}
-                  <span className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-black/40 backdrop-blur-md text-violet-300 border border-violet-500/20">
+                  <span className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-black/60 backdrop-blur-md text-violet-300 border border-violet-500/30 z-10">
                     {project.badge}
                   </span>
-
-                  {/* Centered Graphic Icon */}
-                  <div className="relative z-10 w-20 h-20 rounded-2xl bg-violet-950/40 border border-violet-500/30 flex items-center justify-center shadow-lg shadow-violet-900/20 group-hover:scale-110 transition-transform duration-300">
-                    {getProjectIcon(project.iconType)}
-                  </div>
                 </div>
 
                 {/* Project Details */}

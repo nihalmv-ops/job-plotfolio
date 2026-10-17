@@ -28,7 +28,7 @@ doc.fontSize(12).font('Helvetica-Bold').fillColor(accentColor).text('MERN STACK 
 doc.moveDown(0.2);
 
 doc.fontSize(9).font('Helvetica').fillColor(mutedColor).text(
-  'Kerala, India  |  Email: nihalmv2004@gmail.com  |  GitHub: github.com/nihalmv-ops  |  LinkedIn: linkedin.com/in/nihal-mv-dev',
+  'Kerala, India  |  Email: nihalmv.dev@gmail.com  |  GitHub: github.com/nihalmv-ops  |  LinkedIn: linkedin.com/in/nihal-mv-dev',
   { align: 'center' }
 );
 doc.moveDown(0.8);
