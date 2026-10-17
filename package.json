@@ -1,0 +1,19 @@
+{
+  "name": "nihal-mv-portfolio",
+  "version": "1.0.0",
+  "description": "ATS-friendly responsive MERN Stack Developer Portfolio for Nihal MV",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\"",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend run start",
+    "generate-resume": "node frontend/generateResume.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "author": "Nihal MV",
+  "license": "MIT"
+}
