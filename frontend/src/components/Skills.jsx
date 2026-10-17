@@ -1,12 +1,14 @@
 import React from 'react';
-import { Layout, Server, Database, Wrench } from 'lucide-react';
+import { Layout, Server, Database, Wrench, Cloud, Sparkles } from 'lucide-react';
 import { skillCategories, techIcons } from '../data/skills.jsx';
 
 const categoryIcons = {
-  Layout: Layout,
-  Server: Server,
-  Database: Database,
-  Wrench: Wrench
+  Layout,
+  Server,
+  Database,
+  Wrench,
+  Cloud,
+  Sparkles
 };
 
 export default function Skills() {
@@ -24,19 +26,19 @@ export default function Skills() {
                 My <span className="text-violet-400">Skills</span>
               </h2>
               <p className="text-sm sm:text-base text-slate-400">
-                Core technologies and tools I utilize to craft performant web applications
+                Core technologies, languages, cloud platforms, and developer tooling
               </p>
             </div>
             
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-950/40 border border-violet-500/25 text-xs font-semibold text-violet-300 self-start sm:self-auto">
-              <span>Full-Stack Ready</span>
+              <span>Full-Stack &amp; Cloud Ready</span>
             </div>
           </div>
 
-          {/* Featured Technology Icons Grid (Recreating reference image) */}
+          {/* Featured Technology Icons Grid */}
           <div className="p-6 sm:p-8 rounded-2xl bg-[#0e0f1b]/80 border border-white/5 mb-12">
             <h3 className="text-xs uppercase tracking-widest text-slate-400 font-bold mb-6 text-center sm:text-left">
-              Core Tech Stack
+              Core Tech Stack &amp; Tools
             </h3>
             
             <div className="flex flex-wrap justify-center items-center gap-5 sm:gap-6">
@@ -56,8 +58,8 @@ export default function Skills() {
             </div>
           </div>
 
-          {/* Categorized Skills Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Categorized Skills Section (6 structured domains) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {skillCategories.map((cat) => {
               const IconComp = categoryIcons[cat.icon] || Layout;
               return (
