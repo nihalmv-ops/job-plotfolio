@@ -85,9 +85,15 @@ export default function Projects() {
                   </div>
 
                   {/* Project Details */}
-                  <h3 className="text-xl font-bold text-white mb-2.5 group-hover:text-violet-300 transition-colors">
+                  <h3 className="text-xl font-bold text-white mb-1 group-hover:text-violet-300 transition-colors">
                     {project.title}
                   </h3>
+
+                  {project.subtitle && (
+                    <p className="text-xs font-semibold text-violet-400/90 mb-3">
+                      {project.subtitle}
+                    </p>
+                  )}
 
                   <p className="text-sm text-slate-400 leading-relaxed mb-6">
                     {project.description}

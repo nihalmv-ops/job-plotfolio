@@ -17,9 +17,9 @@ A high-performance, ATS-optimized, responsive developer portfolio designed with 
 - **Pure Tailwind CSS Architecture**: Ultra-fast utility styling following responsive design principles without bloated stylesheets.
 - **Sleek Dark Navy & Purple Glow Theme**: Inspired by modern developer workstations, featuring a floating 3D-styled code laptop, pill badges, and smooth hover states.
 - **Real Featured Projects**:
-  1. **TrachMart E-Commerce**: React, JavaScript, Tailwind CSS, Context API.
-  2. **Budget Insights & Expense Tracker**: React, JavaScript, Tailwind CSS, Chart.js.
-  3. **SmartMart AI**: Full MERN stack supermarket POS & inventory management system.
+  1. **SmartMart AI — Supermarket Management & Billing System**: React.js, JavaScript, Node.js, Express.js, MongoDB ([Live Demo](https://smartsh-ai-hrkd.vercel.app/) | [GitHub](https://github.com/nihalmv-ops/smartshAI))
+  2. **TrachMart E-Commerce — TechNest Laptops & Mobiles**: React.js, JavaScript, Vite, Tailwind CSS ([Live Demo](https://trachmartshop.vercel.app/) | [GitHub](https://github.com/nihalmv-ops/trachmartshop))
+  3. **GoTravel — Responsive Travel Website**: React.js, JavaScript, Tailwind CSS, HTML5, CSS3 ([Live Demo](https://rgotravel.vercel.app/) | [GitHub](https://github.com/nihalmv-ops/rgotravel))
 - **Interactive Contact Form & Backend API**: Robust `POST /api/contact` endpoint with sanitization, field-level validation, and MongoDB persistence.
 - **Mobile First & Fully Responsive**: Fluid navigation drawer, responsive grids, and touch-friendly interactive targets.
 
