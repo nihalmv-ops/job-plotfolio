@@ -4,8 +4,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { 
   ArrowDown, 
   ArrowUp, 
-  Move3d, 
-  Sparkles
+  Move3d
 } from 'lucide-react';
 
 // ============================================================================
@@ -20,22 +19,29 @@ import {
 // ============================================================================
 export const CAR_SLOTS = [
   { id: 1, name: 'FRAME 01 // BMW M4 COUPE', url: '/firstfream.glb', targetDim: 5.75, bay: 'HERO STUDIO' },
-  { id: 2, name: 'FRAME 02 // PORSCHE 911 TURBO', url: '/secondfream.glb', targetDim: 5.6, bay: 'BAY 01 PHILOSOPHY' },
-  { id: 3, name: 'FRAME 03 // TELEMETRY GT', url: '/thirdfream.glb', targetDim: 5.6, bay: 'BAY 02 TELEMETRY' },
-  { id: 4, name: 'FRAME 04 // TECH HYPERCAR', url: '/forthfream.glb', targetDim: 5.6, bay: 'BAY 03 TECHNOLOGY' },
-  { id: 5, name: 'FRAME 05 // CREATIONS MONSTER', url: '/fifthfream.glb', targetDim: 5.6, bay: 'BAY 04 CREATIONS' },
-  { id: 6, name: 'FRAME 06 // APEX PROTOCOL', url: '/sixthfream.glb', targetDim: 5.6, bay: 'BAY 05 & 06' }
+  { id: 2, name: 'FRAME 02 // PORSCHE 911 TURBO', url: '/secondfream.glb', targetDim: 5.6, bay: 'BAY 01 // PHILOSOPHY' },
+  { id: 3, name: 'FRAME 03 // TELEMETRY GT', url: '/thirdfream.glb', targetDim: 5.6, bay: 'BAY 02 // TELEMETRY' },
+  { id: 4, name: 'FRAME 04 // TECH HYPERCAR', url: '/forthfream.glb', targetDim: 5.6, bay: 'BAY 03 // TECHNOLOGY' },
+  { id: 5, name: 'FRAME 05 // CREATIONS MONSTER', url: '/fifthfream.glb', targetDim: 5.6, bay: 'BAY 04 // CREATIONS' },
+  { id: 6, name: 'FRAME 06 // APEX PROTOCOL', url: '/sixthfream.glb', targetDim: 5.6, bay: 'BAY 05 & 06 // TRANSMISSION' }
 ];
 
 export default function CinematicSequence() {
   const canvasRef = useRef(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [heroProgress, setHeroProgress] = useState(0);
   const [currentFrame, setCurrentFrame] = useState(1);
   const [activeCarSlotIndex, setActiveCarSlotIndex] = useState(0);
   const [activeModelMode, setActiveModelMode] = useState('auto'); // 'auto', or 0..5 for manual lock
   const [loadedCount, setLoadedCount] = useState(0);
   const [loadingStatusText, setLoadingStatusText] = useState('CALIBRATING 3D STUDIO');
+
+  // Dynamic transition state across all 6 frames
+  const [transitionState, setTransitionState] = useState({
+    active: false,
+    fromIndex: 0,
+    toIndex: 1,
+    ratio: 0
+  });
 
   // Live 3D telemetry coordinates state
   const [telemetryCoords, setTelemetryCoords] = useState({ rotX: 0, rotY: 0, rotZ: 0 });
@@ -289,7 +295,7 @@ export default function CinematicSequence() {
       });
     };
 
-    // Progressive Sequential Loader: Slot 1 & 2 load first for instant startup, then 3, 4, 5, 6
+    // Sequential Loader for all 6 models: 0 & 1 stream first for instant view, then 2, 3, 4, 5
     let loadedCounter = 0;
     const loadSlot = (index) => {
       if (index >= CAR_SLOTS.length) return;
@@ -311,13 +317,12 @@ export default function CinematicSequence() {
           setLoadedCount(loadedCounter);
           setLoadingStatusText(`ACTIVE: ${loadedCounter} / 6 CARS`);
 
-          // Load next slot in background
+          // Immediately stream next slot in background
           loadSlot(index + 1);
         },
         undefined,
         (err) => {
           console.warn(`Could not load ${slot.url}:`, err);
-          // Try next slot anyway
           loadSlot(index + 1);
         }
       );
@@ -390,8 +395,12 @@ export default function CinematicSequence() {
     window.addEventListener('touchmove', onTouchMove, { passive: true });
     window.addEventListener('touchend', onTouchEnd);
 
-    // Dynamic Animation Targets for Entire Site Scroll Effect
-    let curHeroProgress = 0;
+    // Animation & Choreography Targets
+    let curActiveIdx = 0;
+    let curNextIdx = 1;
+    let curTransRatio = 0;
+    let curInTrans = false;
+
     let curGlobalProgress = 0;
     let scrollRotY = 0;
     let scrollRotX = 0;
@@ -405,89 +414,25 @@ export default function CinematicSequence() {
     const animate = (time) => {
       animId = requestAnimationFrame(animate);
 
-      const mode = activeModeRef.current;
       const models = loadedModelsRef.current;
 
-      // Determine active target car index & transition state
-      let activeIndex = 0;
-      let nextIndex = 0;
-      let transitionRatio = 0;
-      let inTransition = false;
-
-      if (typeof mode === 'number' && mode >= 0 && mode < CAR_SLOTS.length) {
-        // Manual override mode
-        activeIndex = mode;
-      } else {
-        // Auto Scroll Mode across the 6 Bays:
-        // Hero: 0.00 -> 0.15 (Car 0)
-        // Transition: 0.10 -> 0.16 (Car 0 -> Car 1)
-        // Bay 01: 0.16 -> 0.32 (Car 1)
-        // Transition: 0.30 -> 0.35 (Car 1 -> Car 2)
-        // Bay 02: 0.35 -> 0.52 (Car 2)
-        // Transition: 0.50 -> 0.55 (Car 2 -> Car 3)
-        // Bay 03: 0.55 -> 0.72 (Car 3)
-        // Transition: 0.70 -> 0.75 (Car 3 -> Car 4)
-        // Bay 04: 0.75 -> 0.88 (Car 4)
-        // Transition: 0.86 -> 0.90 (Car 4 -> Car 5)
-        // Bay 05 & 06: 0.90 -> 1.00 (Car 5)
-
-        if (curHeroProgress < 0.28) {
-          activeIndex = 0;
-        } else if (curHeroProgress <= 0.72) {
-          activeIndex = 0;
-          nextIndex = 1;
-          transitionRatio = (curHeroProgress - 0.28) / 0.44;
-          inTransition = true;
-        } else if (curGlobalProgress < 0.30) {
-          activeIndex = 1;
-        } else if (curGlobalProgress < 0.35) {
-          activeIndex = 1;
-          nextIndex = 2;
-          transitionRatio = (curGlobalProgress - 0.30) / 0.05;
-          inTransition = true;
-        } else if (curGlobalProgress < 0.50) {
-          activeIndex = 2;
-        } else if (curGlobalProgress < 0.55) {
-          activeIndex = 2;
-          nextIndex = 3;
-          transitionRatio = (curGlobalProgress - 0.50) / 0.05;
-          inTransition = true;
-        } else if (curGlobalProgress < 0.70) {
-          activeIndex = 3;
-        } else if (curGlobalProgress < 0.75) {
-          activeIndex = 3;
-          nextIndex = 4;
-          transitionRatio = (curGlobalProgress - 0.70) / 0.05;
-          inTransition = true;
-        } else if (curGlobalProgress < 0.86) {
-          activeIndex = 4;
-        } else if (curGlobalProgress < 0.90) {
-          activeIndex = 4;
-          nextIndex = 5;
-          transitionRatio = (curGlobalProgress - 0.86) / 0.04;
-          inTransition = true;
-        } else {
-          activeIndex = 5;
-        }
-      }
-
       // Check if target model is loaded; if not loaded, fallback to closest loaded model
-      let effectiveActive = activeIndex;
+      let effectiveActive = curActiveIdx;
       while (effectiveActive > 0 && !models[effectiveActive]) {
         effectiveActive--;
       }
-      let effectiveNext = nextIndex;
+      let effectiveNext = curNextIdx;
       while (effectiveNext > 0 && !models[effectiveNext]) {
         effectiveNext--;
       }
 
-      // 3D Laser Scan Rig Animation
-      if (inTransition && effectiveActive !== effectiveNext) {
+      // 3D Laser Scan Rig Animation: Active on EVERY frame transition!
+      if (curInTrans && effectiveActive !== effectiveNext) {
         scanRig.visible = true;
-        scanRig.position.z = 2.8 - transitionRatio * 5.6; // Sweeps from front to rear
-        const pulse = Math.sin(transitionRatio * Math.PI);
+        scanRig.position.z = 2.8 - curTransRatio * 5.6; // Sweeps from front bumper across car to rear
+        const pulse = Math.sin(curTransRatio * Math.PI); // Smooth bell curve
         laserBeamMat.opacity = pulse * 0.95;
-        laserCurtainMat.opacity = pulse * 0.40;
+        laserCurtainMat.opacity = pulse * 0.45;
         groundLineMat.opacity = pulse * 0.90;
         laserBeam.scale.y = 1 + Math.sin(time * 0.05) * 0.03;
       } else {
@@ -500,15 +445,15 @@ export default function CinematicSequence() {
       // Model Visibility and Cross-Fade Handling: GUARANTEES STAGE IS NEVER EMPTY OR BLACK!
       models.forEach((m, idx) => {
         if (!m) return;
-        if (inTransition && effectiveActive !== effectiveNext) {
+        if (curInTrans && effectiveActive !== effectiveNext) {
           if (idx === effectiveActive) {
             m.visible = true;
-            m.position.y = transitionRatio * 0.7;
-            setMeshOpacity(m, Math.max(0.08, 1 - transitionRatio));
+            m.position.y = curTransRatio * 0.7;
+            setMeshOpacity(m, Math.max(0.08, 1 - curTransRatio));
           } else if (idx === effectiveNext) {
             m.visible = true;
             m.position.y = 0;
-            setMeshOpacity(m, Math.min(1, transitionRatio * 1.2));
+            setMeshOpacity(m, Math.min(1, curTransRatio * 1.2));
           } else {
             m.visible = false;
           }
@@ -523,7 +468,7 @@ export default function CinematicSequence() {
         }
       });
 
-      // Update state for UI display
+      // Update active slot index for UI display
       setActiveCarSlotIndex(effectiveActive);
 
       // Merge scroll rotation + interactive drag + mouse parallax
@@ -555,8 +500,10 @@ export default function CinematicSequence() {
     animate(0);
 
     // ========================================================================
-    // 🌐 ALL 3D SCROLL EFFECT CHOREOGRAPHY (Continuous across entire page)
+    // 🌐 ALL 6-FRAME SCROLL & SAME MODEL ZOOM EFFECT CHOREOGRAPHY
     // ========================================================================
+    const sectionIds = ['hero', 'philosophy', 'telemetry', 'technology', 'creations', 'education'];
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const winH = window.innerHeight;
@@ -569,73 +516,79 @@ export default function CinematicSequence() {
       const frame = Math.min(240, Math.max(1, Math.floor(globalP * 239) + 1));
       setCurrentFrame(frame);
 
-      // Hero-to-Bay01 Transition Progress
-      const heroThreshold = Math.max(1, winH * 0.85);
-      const heroP = Math.min(1, Math.max(0, scrollY / heroThreshold));
-      curHeroProgress = heroP;
-      setHeroProgress(heroP);
+      let activeIdx = 0;
+      let nextIdx = 0;
+      let transRatio = 0;
+      let transitioning = false;
+
+      // Section boundary measurements
+      for (let i = 0; i < sectionIds.length; i++) {
+        const el = document.getElementById(sectionIds[i]);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+
+        // If this section has crossed above mid-viewport, it is the primary section
+        if (rect.top <= winH * 0.55) {
+          activeIdx = i;
+        }
+
+        // Check transition to next section
+        if (i < sectionIds.length - 1) {
+          const nextEl = document.getElementById(sectionIds[i + 1]);
+          if (nextEl) {
+            const nextRect = nextEl.getBoundingClientRect();
+            // Transition zone: when next section top is between 85% of screen and 15% of screen
+            const zoneStart = winH * 0.85;
+            const zoneEnd = winH * 0.15;
+            if (nextRect.top <= zoneStart && nextRect.top >= zoneEnd) {
+              transitioning = true;
+              activeIdx = i;
+              nextIdx = i + 1;
+              transRatio = 1 - (nextRect.top - zoneEnd) / (zoneStart - zoneEnd);
+              break;
+            }
+          }
+        }
+      }
+
+      // If activeModelMode is manually locked (number), override activeIdx
+      const mode = activeModeRef.current;
+      if (typeof mode === 'number' && mode >= 0 && mode < CAR_SLOTS.length) {
+        activeIdx = mode;
+        transitioning = false;
+      }
+
+      curActiveIdx = activeIdx;
+      curNextIdx = nextIdx;
+      curTransRatio = transRatio;
+      curInTrans = transitioning;
+
+      setTransitionState({
+        active: transitioning,
+        fromIndex: activeIdx,
+        toIndex: nextIdx,
+        ratio: transRatio
+      });
 
       const isDesktop = window.innerWidth >= 1024;
       const baseCamX = isDesktop ? 1.45 : (window.innerWidth >= 768 ? 0.65 : 0);
 
-      // Seamless Multi-Bay 3D Camera & Turntable Choreography:
-      if (heroP < 0.28) {
-        // 1. HERO (Frame 01 Zoom-In)
-        const r1 = heroP / 0.28;
-        const ease1 = r1 * r1 * (3 - 2 * r1);
+      // Signature Zoom-In -> Laser Scan -> Zoom-Out effect across EVERY frame change:
+      if (transitioning) {
+        // Smooth sine bell curve for zoom dip (dips from 5.0 down to 3.2 at peak)
+        const zoomDip = Math.sin(transRatio * Math.PI) * 1.8;
         targetCamX = baseCamX;
-        targetCamZ = 5.0 - ease1 * 1.8; // Zoom in from 5.0 to 3.2
-        targetCamY = 0.85 - ease1 * 0.20;
-        scrollRotY = ease1 * 0.35;
-        scrollRotX = ease1 * 0.02;
-      } else if (heroP <= 0.72) {
-        // 2. 3D LASER TRANSITION (Frame 01 -> Frame 02)
-        const tr = (heroP - 0.28) / 0.44;
-        targetCamX = baseCamX;
-        targetCamZ = 3.2 + tr * 1.8; // Zoom out to 5.0 wide showroom view
-        targetCamY = 0.65 + tr * 0.20;
-        scrollRotY = 0.35 + tr * (Math.PI * 0.45);
-        scrollRotX = 0.02 - tr * 0.01;
-      } else if (globalP < 0.32) {
-        // 3. BAY 01 // CRAFT & PHILOSOPHY (Unveiled Frame 02 Porsche 911 Turbo)
-        const r = (globalP - 0.12) / 0.20;
-        targetCamX = baseCamX;
-        targetCamZ = 5.0;
-        targetCamY = 0.85;
-        scrollRotY = 0.35 + Math.PI * 0.45 + r * (Math.PI * 0.3);
-        scrollRotX = 0.01;
-      } else if (globalP < 0.50) {
-        // 4. BAY 02 // TELEMETRY & BENCHMARKS (Side-Profile Aerodynamic View)
-        const r = (globalP - 0.32) / 0.18;
-        targetCamX = isDesktop ? 1.35 : baseCamX;
-        targetCamZ = 4.4 + r * 0.2;
-        targetCamY = 0.78 + r * 0.08;
-        scrollRotY = 0.35 + Math.PI * 0.75 + r * (Math.PI * 0.45);
-        scrollRotX = 0.01;
-      } else if (globalP < 0.70) {
-        // 5. BAY 03 // TECHNOLOGY ARCHITECTURE (Dynamic Rear-Quarter View)
-        const r = (globalP - 0.50) / 0.20;
-        targetCamX = isDesktop ? 0.95 : baseCamX;
-        targetCamZ = 4.6 + r * 0.2;
-        targetCamY = 0.86 + r * 0.06;
-        scrollRotY = 0.35 + Math.PI * 1.20 + r * (Math.PI * 0.50);
-        scrollRotX = 0.02;
-      } else if (globalP < 0.85) {
-        // 6. BAY 04 // FEATURED CREATIONS (Front 3/4 Showroom Angle)
-        const r = (globalP - 0.70) / 0.15;
-        targetCamX = isDesktop ? 1.30 : baseCamX;
-        targetCamZ = 4.8;
-        targetCamY = 0.82;
-        scrollRotY = 0.35 + Math.PI * 1.70 + r * (Math.PI * 0.40);
+        targetCamZ = 5.0 - zoomDip;
+        targetCamY = 0.85 - Math.sin(transRatio * Math.PI) * 0.20;
+        scrollRotY = activeIdx * 0.70 + transRatio * 0.70;
         scrollRotX = 0.01;
       } else {
-        // 7. BAY 05 & 06 // TIMELINE & TRANSMISSION (Elevated Studio Overview)
-        const r = Math.min(1, (globalP - 0.85) / 0.15);
-        targetCamX = isDesktop ? 0.70 : baseCamX;
-        targetCamZ = 4.8 + r * 0.5;
-        targetCamY = 0.82 + r * 0.65; // High studio perspective
-        scrollRotY = 0.35 + Math.PI * 2.10 + r * 0.35;
-        scrollRotX = r * 0.06;
+        // Settled wide showroom stance for current active car
+        targetCamX = baseCamX;
+        targetCamZ = 5.0;
+        targetCamY = activeIdx === 5 ? 1.25 : 0.85; // slightly elevated overview on final section
+        scrollRotY = activeIdx * 0.70;
+        scrollRotX = 0.01;
       }
     };
 
@@ -690,8 +643,6 @@ export default function CinematicSequence() {
     };
   }, []);
 
-  const isTransitioning = heroProgress >= 0.28 && heroProgress <= 0.72;
-  const isBay01Active = heroProgress > 0.60;
   const formattedFrame = String(currentFrame).padStart(3, '0');
   const activeCar = CAR_SLOTS[activeCarSlotIndex] || CAR_SLOTS[0];
 
@@ -771,37 +722,31 @@ export default function CinematicSequence() {
           </a>
         </nav>
 
-        {/* Right Controls: Model Mode Switcher + Scroll to Top */}
+        {/* Right Controls: 6-Frame Fleet Switcher + Scroll to Top */}
         <div className="flex items-center gap-3">
-          {/* 3D Mode Switcher */}
-          <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-[#111318]/95 border border-zinc-700/60 backdrop-blur-md text-[10px] font-mono tracking-wider uppercase shadow-xl shadow-black/50">
+          {/* 3D Mode Switcher supporting all 6 frames */}
+          <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-[#111318]/95 border border-zinc-700/60 backdrop-blur-md text-[9px] font-mono tracking-wider uppercase shadow-xl shadow-black/50">
             <button
               onClick={() => setActiveModelMode('auto')}
-              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
                 activeModelMode === 'auto' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
               }`}
               title="Auto Dynamic Scroll Mode (Cars 1 - 6)"
             >
               AUTO FLEET
             </button>
-            <button
-              onClick={() => setActiveModelMode(1)}
-              className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                activeModelMode === 1 ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
-              }`}
-              title="Force View Frame 02"
-            >
-              FRAME 02
-            </button>
-            <button
-              onClick={() => setActiveModelMode(0)}
-              className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                activeModelMode === 0 ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
-              }`}
-              title="Force View Frame 01"
-            >
-              FRAME 01
-            </button>
+            {CAR_SLOTS.map((slot, idx) => (
+              <button
+                key={slot.id}
+                onClick={() => setActiveModelMode(idx)}
+                className={`px-2 py-1 rounded-full transition-all cursor-pointer ${
+                  activeModelMode === idx ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
+                }`}
+                title={`Force View ${slot.name}`}
+              >
+                F0{idx + 1}
+              </button>
+            ))}
           </div>
 
           {/* Scroll to Top */}
@@ -817,25 +762,25 @@ export default function CinematicSequence() {
       </header>
 
       {/* ==================================================================== */}
-      {/* 3. TRANSITION EFFECT OVERLAY: 3D Laser Scan Sweeping Across Screen   */}
+      {/* 3. DYNAMIC TRANSITION EFFECT OVERLAY: Works across ALL 6 Frames!      */}
       {/* ==================================================================== */}
-      {isTransitioning && (
+      {transitionState.active && (
         <div className="fixed inset-0 pointer-events-none z-30">
           {/* Glowing Laser Scanline Sweeping Across Viewport */}
           <div
             className="absolute left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_28px_#38bdf8] transition-all duration-75"
-            style={{ top: `${Math.min(95, Math.max(5, ((heroProgress - 0.28) / 0.44) * 100))}%` }}
+            style={{ top: `${Math.min(95, Math.max(5, transitionState.ratio * 100))}%` }}
           />
           {/* Ambient High-Tech Laser Shimmer Wash */}
           <div className="absolute inset-0 bg-cyan-500/[0.04] animate-pulse" />
           {/* Floating Quantum Laser Transition Notification */}
-          <div className="absolute top-24 left-1/2 -translate-x-1/2 flex flex-col items-center">
+          <div className="absolute top-24 left-1/2 -translate-x-1/2 flex flex-col items-center px-4 text-center">
             <div className="px-5 py-2 rounded-full bg-cyan-950/95 border border-cyan-400/70 backdrop-blur-md shadow-[0_0_30px_rgba(56,189,248,0.55)] flex items-center gap-3 text-cyan-200 text-[10px] font-mono tracking-widest uppercase">
               <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#38bdf8] animate-ping" />
-              <span>TRANSITION EFFECT // 3D LASER SCAN: FRAME 01 ➔ FRAME 02</span>
+              <span>TRANSITION EFFECT // 3D LASER SCAN: FRAME 0{transitionState.fromIndex + 1} ➔ FRAME 0{transitionState.toIndex + 1}</span>
             </div>
             <span className="text-[9px] font-mono tracking-[0.3em] text-cyan-300/90 mt-1.5 uppercase drop-shadow-md">
-              CALIBRATING BAY 01 // CRAFT & PHILOSOPHY
+              CALIBRATING {CAR_SLOTS[transitionState.toIndex]?.bay || 'DETAILING BAY'}
             </span>
           </div>
         </div>
@@ -1115,21 +1060,26 @@ export default function CinematicSequence() {
 
         {/* Center Stage Indicators */}
         <div className="hidden md:flex items-center gap-2.5 text-[10px] font-mono uppercase tracking-widest">
-          <span className={`px-2.5 py-1 rounded-full border transition-all ${!isBay01Active ? 'border-white text-white bg-white/10' : 'border-zinc-800 text-zinc-600'}`}>
-            01 // HERO STUDIO
-          </span>
-          <span className="text-cyan-400 font-bold">⚡ LASER SCAN</span>
-          <span className={`px-2.5 py-1 rounded-full border transition-all ${isBay01Active ? 'border-cyan-400 text-cyan-200 bg-cyan-950/60 shadow-[0_0_10px_rgba(56,189,248,0.3)]' : 'border-zinc-800 text-zinc-600'}`}>
-            02 // BAY 01 PHILOSOPHY
-          </span>
+          {CAR_SLOTS.map((slot, idx) => (
+            <span
+              key={slot.id}
+              className={`px-2 py-0.5 rounded-full border transition-all ${
+                activeCarSlotIndex === idx 
+                  ? 'border-cyan-400 text-cyan-200 bg-cyan-950/60 shadow-[0_0_10px_rgba(56,189,248,0.3)]' 
+                  : 'border-zinc-800 text-zinc-600'
+              }`}
+            >
+              0{idx + 1}
+            </span>
+          ))}
         </div>
 
         {/* Right Scroll Indicator */}
         <button
-          onClick={!isBay01Active ? scrollToPhilosophy : scrollToTelemetry}
+          onClick={scrollToTelemetry}
           className="flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest uppercase group cursor-pointer"
         >
-          <span>{!isBay01Active ? 'SCROLL TO BAY 01' : 'SCROLL TO BAY 02'}</span>
+          <span>PROCEED TO NEXT BAY</span>
           <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform animate-bounce" />
         </button>
       </div>

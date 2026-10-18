@@ -107,10 +107,10 @@ export default function Telemetry() {
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-2 border border-zinc-700 px-3.5 py-1 rounded-full bg-zinc-900/60 w-fit">
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-ping" />
-            <span className="text-[10px] font-mono tracking-widest text-slate-300 uppercase">
-              STUDIO TELEMETRY ACTIVE
+          <div className="inline-flex items-center gap-2 border border-cyan-500/40 px-3.5 py-1 rounded-full bg-cyan-950/40 backdrop-blur-md w-fit">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+            <span className="text-[10px] font-mono tracking-widest text-cyan-200 uppercase">
+              FRAME 03 // TELEMETRY GT ACTIVE
             </span>
           </div>
         </div>

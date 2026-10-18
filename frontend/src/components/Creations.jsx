@@ -127,16 +127,19 @@ export default function Creations() {
     >
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Header Line */}
-        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-6 mb-12 sm:mb-16">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800/80 pb-6 mb-12 sm:mb-16 gap-4">
           <div className="flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-slate-300 shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
             <span className="text-xs font-mono tracking-[0.3em] uppercase text-slate-300">
               BAY 04 // FEATURED CREATIONS
             </span>
           </div>
-          <span className="text-xs font-mono tracking-widest text-zinc-500">
-            PRODUCTIONS.DEPLOYED.2026
-          </span>
+          <div className="inline-flex items-center gap-2 border border-cyan-500/40 px-3.5 py-1 rounded-full bg-cyan-950/40 backdrop-blur-md w-fit">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+            <span className="text-[10px] font-mono tracking-widest text-cyan-200 uppercase">
+              FRAME 05 // CREATIONS MONSTER ACTIVE
+            </span>
+          </div>
         </div>
 
         {/* Heading */}
