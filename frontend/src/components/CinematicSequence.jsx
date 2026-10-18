@@ -650,24 +650,54 @@ export default function CinematicSequence() {
               </span>
             </div>
 
-            {/* Chapter Tag Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800/70 border border-zinc-600/40 text-slate-200 text-[10px] font-mono tracking-widest uppercase mb-3">
-              <IconComponent size={13} className="text-zinc-300 shrink-0" />
-              <span>{currentChapterData.tag}</span>
-            </div>
+            {/* Chapter 0: Exact Hero Identity & Font / Subsequent Chapters */}
+            {activeChapter === 0 ? (
+              <div className="mb-6">
+                {/* Status / Greeting Badge matching Hero */}
+                <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-zinc-800/80 border border-zinc-700/80 mb-3 shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-slate-200 shadow-[0_0_8px_#ffffff] animate-pulse" aria-hidden="true" />
+                  <span className="text-xs font-bold tracking-wider uppercase text-slate-200">
+                    Hello, I'm
+                  </span>
+                </div>
 
-            {/* Title & Subtitle */}
-            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mb-1.5">
-              {currentChapterData.title}
-            </h2>
-            <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-4">
-              {currentChapterData.subtitle}
-            </p>
+                {/* Name Heading with EXACT Hero Font: font-extrabold tracking-tight */}
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-1.5">
+                  Nihal <span className="text-slate-300 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">Mv</span>
+                </h1>
 
-            {/* Description */}
-            <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed mb-6">
-              {currentChapterData.description}
-            </p>
+                {/* Professional Title with EXACT Hero Font: font-bold tracking-tight */}
+                <h2 className="text-lg sm:text-xl font-bold text-slate-300 tracking-tight mb-3">
+                  MERN Stack Developer
+                </h2>
+
+                {/* Description */}
+                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
+                  I build modern, responsive and user-friendly web applications using React, Node.js, Express.js and MongoDB.
+                </p>
+              </div>
+            ) : (
+              <div>
+                {/* Chapter Tag Badge */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800/70 border border-zinc-600/40 text-slate-200 text-[10px] font-mono tracking-widest uppercase mb-3">
+                  <IconComponent size={13} className="text-zinc-300 shrink-0" />
+                  <span>{currentChapterData.tag}</span>
+                </div>
+
+                {/* Title & Subtitle with EXACT Font */}
+                <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mb-1.5">
+                  {currentChapterData.title}
+                </h2>
+                <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-4">
+                  {currentChapterData.subtitle}
+                </p>
+
+                {/* Description */}
+                <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed mb-6">
+                  {currentChapterData.description}
+                </p>
+              </div>
+            )}
 
             {/* Live Telemetry Stats Grid in Polished Silver */}
             <div className="grid grid-cols-3 gap-2.5 mb-6">
