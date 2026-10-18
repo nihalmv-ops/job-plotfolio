@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Preloader from './components/Preloader';
 import CustomCursor from './components/CustomCursor';
 import SmoothScroll from './components/SmoothScroll';
@@ -11,10 +11,19 @@ import EducationTimeline from './components/EducationTimeline';
 import Transmission from './components/Transmission';
 
 export default function App() {
+  const [loadKey, setLoadKey] = useState(0);
+
+  const handleReplay = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      setLoadKey((prev) => prev + 1);
+    }, 450);
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col font-sans selection:bg-white/20 selection:text-white relative overflow-x-hidden">
       {/* Aerion Luxury Preloader */}
-      <Preloader />
+      <Preloader key={loadKey} />
 
       {/* Aerion Precision Dual-Ring Cursor */}
       <CustomCursor />
@@ -51,7 +60,7 @@ export default function App() {
         <EducationTimeline />
 
         {/* 06 / Transmission & Contact + Aerion Replay Archive */}
-        <Transmission />
+        <Transmission onReplay={handleReplay} />
       </main>
     </div>
   );

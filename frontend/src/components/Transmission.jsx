@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, ArrowUp, FileText } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './SocialIcons';
 
-export default function Transmission() {
+export default function Transmission({ onReplay }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -331,7 +331,13 @@ export default function Transmission() {
           {/* Replay 3D Experience Button */}
           <div className="mt-12">
             <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              onClick={() => {
+                if (onReplay) {
+                  onReplay();
+                } else {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              }}
               className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.25em] hover:bg-zinc-200 transition-all flex items-center gap-3 shadow-2xl hover:scale-105 active:scale-95"
               aria-label="Replay 3D Experience"
             >
@@ -358,3 +364,4 @@ export default function Transmission() {
     </section>
   );
 }
+

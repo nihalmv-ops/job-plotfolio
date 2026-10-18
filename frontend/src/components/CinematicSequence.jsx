@@ -527,3 +527,4 @@ export default function CinematicSequence({ onExplore }) {
     </div>
   );
 }
+

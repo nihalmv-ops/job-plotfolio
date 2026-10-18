@@ -1,45 +1,68 @@
 import React, { useState, useEffect } from 'react';
 
-export default function Preloader({ onComplete }) {
-  const [progress, setProgress] = useState(12);
-  const [fading, setFading] = useState(false);
-  const [removed, setRemoved] = useState(false);
+export default function Preloader({ onLoaded }) {
+  const [progress, setProgress] = useState(10);
+  const [isFaded, setIsFaded] = useState(false);
+  const [isUnmounted, setIsUnmounted] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => setFading(true), 250);
+    // Lock scroll during loading
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    let animFrame;
+    const startTime = performance.now();
+    const duration = 1800; // 1.8 seconds smooth progress
+
+    const updateProgress = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const ratio = Math.min(1, elapsed / duration);
+      // easeOutCubic curve for smooth realistic loading physics
+      const eased = 1 - Math.pow(1 - ratio, 3);
+      const currentProgress = 10 + eased * 90;
+
+      setProgress(Math.min(100, currentProgress));
+
+      if (ratio < 1) {
+        animFrame = requestAnimationFrame(updateProgress);
+      } else {
+        setProgress(100);
+        // Aerion exact exit sequence: 400ms pause, 700ms fade transition
+        setTimeout(() => {
+          setIsFaded(true);
+          if (onLoaded) onLoaded();
+          document.body.style.overflow = originalOverflow;
+
           setTimeout(() => {
-            setRemoved(true);
-            if (onComplete) onComplete();
-          }, 950);
-          return 100;
-        }
-        const step = Math.floor(Math.random() * 18) + 12;
-        return Math.min(100, prev + step);
-      });
-    }, 120);
+            setIsUnmounted(true);
+          }, 700);
+        }, 400);
+      }
+    };
 
-    return () => clearInterval(interval);
-  }, [onComplete]);
+    animFrame = requestAnimationFrame(updateProgress);
 
-  if (removed) return null;
+    return () => {
+      cancelAnimationFrame(animFrame);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [onLoaded]);
+
+  if (isUnmounted) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#050505] text-white transition-opacity duration-700 ease-out select-none ${
-        fading ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] text-white transition-opacity duration-700 ease-out select-none ${
+        isFaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
+      aria-label="Loading Nihal MV"
       role="status"
-      aria-label="Loading Nihal MV Portfolio"
     >
-      {/* Ambient background glow */}
-      <div className="absolute w-[450px] sm:w-[600px] h-[450px] sm:h-[600px] rounded-full bg-white/[0.02] blur-[140px] pointer-events-none" />
+      {/* Aerion ambient radial blur */}
+      <div className="absolute w-[500px] h-[500px] rounded-full bg-white/[0.02] blur-[140px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center text-center px-6">
-        {/* Geometric Monogram Emblem */}
+        {/* Aerion Pulsing Monogram Emblem */}
         <div className="w-14 h-14 mb-8 flex items-center justify-center animate-pulse">
           <svg viewBox="0 0 100 100" fill="none" className="w-12 h-12">
             <defs>
@@ -60,19 +83,21 @@ export default function Preloader({ onComplete }) {
           </svg>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-[0.35em] uppercase text-white mb-3">
+        {/* Aerion Headline */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-[0.35em] uppercase text-white font-display mb-3">
           NIHAL MV
         </h1>
 
-        <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-zinc-400 font-light mb-8 font-mono">
-          LOADING ARCHITECTURE • {progress}%
+        {/* Aerion Subtitle */}
+        <p className="text-[11px] sm:text-xs uppercase tracking-[0.45em] text-zinc-400 font-light mb-8">
+          LOADING
         </p>
 
-        {/* Progress Bar Line */}
+        {/* Aerion Precision Gradient Loading Line */}
         <div className="w-48 sm:w-64 h-[1px] bg-white/10 relative overflow-hidden rounded-full">
           <div
             className="h-full bg-gradient-to-r from-zinc-500 via-white to-zinc-400 transition-all duration-200 ease-out"
-            style={{ width: `${progress}%` }}
+            style={{ width: `${Math.max(10, Math.min(100, progress))}%` }}
           />
         </div>
       </div>
