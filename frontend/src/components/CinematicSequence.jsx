@@ -3,6 +3,26 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { ArrowDown, ArrowUp, ArrowRight, Gauge, Cpu, Database, Layout, Sparkles, Move3d, ShieldCheck, Wrench } from 'lucide-react';
 
+// ============================================================================
+// 🏎️ 3D CAR SLOTS CONFIGURATION
+// You can easily swap or add ANY other car .glb file here!
+// Just place your new .glb file into frontend/public/ and update the paths below.
+// ============================================================================
+export const CAR_SLOTS = {
+  // Slot 1: First car/frame (Camera zooms in close on initial scroll)
+  frame1: {
+    url: '/firstfream.glb', // 👈 Change to your 1st car, e.g. '/bmw.glb'
+    targetDim: 5.75,
+    name: 'FRAME 01 // PROTOTYPE'
+  },
+  // Slot 2: Second car/frame (Camera zooms out revealing this car on 2nd scroll)
+  frame2: {
+    url: '/secondfream.glb', // 👈 Change to your 2nd car, e.g. '/ferrari.glb'
+    targetDim: 5.6,
+    name: 'FRAME 02 // PORSCHE 911 TURBO'
+  }
+};
+
 export default function CinematicSequence() {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
@@ -16,8 +36,8 @@ export default function CinematicSequence() {
   const [telemetryCoords, setTelemetryCoords] = useState({ rotX: 0, rotY: 0, rotZ: 0 });
 
   // References for cross-scope model and interaction control
-  const coverModelRef = useRef(null);
-  const carModelRef = useRef(null);
+  const coverModelRef = useRef(null); // Slot 1 model
+  const carModelRef = useRef(null);   // Slot 2 model
   const carRootGroupRef = useRef(null);
   const activeModeRef = useRef('auto');
   activeModeRef.current = activeModelMode;
@@ -198,14 +218,14 @@ export default function CinematicSequence() {
       return wrapper;
     };
 
-    // Load secondfream.glb (Porsche 911 Turbo - Main Hero Car)
+    // Load Slot 2 (Second Frame Car - Unveiled Hero Car)
     loader.load(
-      '/secondfream.glb',
+      CAR_SLOTS.frame2.url,
       (gltf) => {
-        const porsche = normalizeModel(gltf.scene, 5.6);
-        porsche.rotation.y = -Math.PI / 2.2; // 3/4 Studio Hero Stance
-        carModelRef.current = porsche;
-        carRootGroup.add(porsche);
+        const car = normalizeModel(gltf.scene, CAR_SLOTS.frame2.targetDim);
+        car.rotation.y = -Math.PI / 2.2; // 3/4 Studio Hero Stance
+        carModelRef.current = car;
+        carRootGroup.add(car);
 
         placeholderGroup.visible = false;
         setModelLoaded(true);
@@ -215,20 +235,20 @@ export default function CinematicSequence() {
           setLoadingPercent(Math.round((xhr.loaded / xhr.total) * 100));
         }
       },
-      (err) => console.warn('Could not load secondfream.glb:', err)
+      (err) => console.warn(`Could not load ${CAR_SLOTS.frame2.url}:`, err)
     );
 
-    // Load firstfream.glb (Covered Prototype - Unveiling Concept)
+    // Load Slot 1 (First Frame Car - Zoom In Focus)
     loader.load(
-      '/firstfream.glb',
+      CAR_SLOTS.frame1.url,
       (gltf) => {
-        const cover = normalizeModel(gltf.scene, 5.75);
-        cover.rotation.y = -Math.PI / 2.2;
-        coverModelRef.current = cover;
-        carRootGroup.add(cover);
+        const firstCar = normalizeModel(gltf.scene, CAR_SLOTS.frame1.targetDim);
+        firstCar.rotation.y = -Math.PI / 2.2;
+        coverModelRef.current = firstCar;
+        carRootGroup.add(firstCar);
       },
       undefined,
-      (err) => console.warn('Could not load firstfream.glb:', err)
+      (err) => console.warn(`Could not load ${CAR_SLOTS.frame1.url}:`, err)
     );
 
     // 7. Interactive Drag to Orbit & Mouse Parallax
@@ -306,31 +326,54 @@ export default function CinematicSequence() {
     const animate = (time) => {
       animId = requestAnimationFrame(animate);
 
-      // Model Unveiling Logic
+      // Model Transition Logic (Frame 1 Zoom In -> Frame 2 Zoom Out)
       const mode = activeModeRef.current;
-      const cover = coverModelRef.current;
-      const car = carModelRef.current;
+      const model1 = coverModelRef.current; // Slot 1 model
+      const model2 = carModelRef.current;   // Slot 2 model
 
-      if (cover && car) {
+      if (model1 && model2) {
         if (mode === 'covered') {
-          cover.visible = true;
-          car.visible = false;
+          model1.visible = true;
+          model2.visible = false;
+          model1.position.y = 0;
+          model1.scale.setScalar(1);
         } else if (mode === 'unveiled') {
-          cover.visible = false;
-          car.visible = true;
+          model1.visible = false;
+          model2.visible = true;
         } else {
-          // 'auto' mode: Smooth lift and unveil as user scrolls past 0.18
+          // 'auto' mode:
+          // 0.00 -> 0.20: Frame 1 is active (camera zooms in close)
+          // 0.20 -> 0.28: Morph / unveil transition right at maximum zoom
+          // 0.28 -> 1.00: Frame 2 is active (camera zooms out and showcases car)
           if (currentScroll < 0.20) {
-            cover.visible = true;
-            const liftRatio = Math.max(0, (currentScroll - 0.12) / 0.08);
-            cover.position.y = liftRatio * 2.8;
-            cover.scale.setScalar(1 + liftRatio * 0.15);
-            car.visible = liftRatio > 0.08;
+            model1.visible = true;
+            model2.visible = false;
+            model1.position.y = 0;
+            model1.scale.setScalar(1);
+            model1.traverse((child) => {
+              if (child.isMesh && child.material) {
+                child.material.transparent = true;
+                child.material.opacity = 1.0;
+              }
+            });
+          } else if (currentScroll < 0.28) {
+            const transitionRatio = (currentScroll - 0.20) / 0.08;
+            model1.visible = true;
+            model2.visible = true;
+            // Smoothly lift and fade out Frame 1 as Frame 2 emerges
+            model1.position.y = transitionRatio * 2.2;
+            model1.scale.setScalar(1 + transitionRatio * 0.1);
+            model1.traverse((child) => {
+              if (child.isMesh && child.material) {
+                child.material.transparent = true;
+                child.material.opacity = Math.max(0, 1 - transitionRatio * 1.25);
+              }
+            });
           } else {
-            cover.visible = false;
-            car.visible = true;
-            cover.position.y = 0;
-            cover.scale.setScalar(1);
+            model1.visible = false;
+            model2.visible = true;
+            model1.position.y = 0;
+            model1.scale.setScalar(1);
           }
         }
       }
@@ -362,7 +405,7 @@ export default function CinematicSequence() {
     };
     animate(0);
 
-    // Scroll listener calculates exact scroll percentage
+    // Scroll listener calculates exact scroll percentage & dynamic zoom
     const handleScroll = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -376,17 +419,35 @@ export default function CinematicSequence() {
       const frame = Math.min(240, Math.max(1, Math.floor(progress * 239) + 1));
       setCurrentFrame(frame);
 
-      // Cinematic 360-degree camera & model choreography in the garage:
-      // Stage 1 (0.00 - 0.18): Hero front 3/4 stance
-      // Stage 2 (0.20 - 0.35): Unveiled side profile & alloy wheels
-      // Stage 3 (0.36 - 0.52): Front hood & headlights inspection
-      // Stage 4 (0.54 - 0.70): Rear ducktail spoiler & dual exhausts
-      // Stage 5 (0.72 - 0.86): Top aerodynamic telemetry angle
-      // Stage 6 (0.88 - 1.00): Full studio showroom pose
-      scrollRotY = progress * Math.PI * 4;
-      scrollRotX = Math.sin(progress * Math.PI * 2) * 0.12;
-      targetCamY = 0.85 + Math.sin(progress * Math.PI * 3) * 0.35;
-      targetCamZ = 4.8 - Math.sin(progress * Math.PI) * 0.8;
+      // Cinematic Camera Choreography:
+      // Stage 1 (0.00 -> 0.22): ZOOM IN TO FIRST FRAME (Camera 5.2 -> 2.65 close-up)
+      // Morph Point (0.20 -> 0.28): At closest focal zoom, Frame 1 transitions into Frame 2
+      // Stage 2 (0.22 -> 0.48): ZOOM OUT TO SECOND FRAME (Camera 2.65 -> 5.0 wide heroic stance)
+      // Stage 3 (0.48 -> 1.00): Full 360° Studio Garage showcase & telemetry orbit
+      if (progress < 0.22) {
+        // Stage 1: Zoom in to First Frame
+        const r1 = progress / 0.22;
+        const ease1 = r1 * r1 * (3 - 2 * r1); // smoothstep
+        targetCamZ = 5.2 - ease1 * 2.55; // from 5.2 down to 2.65 (Close-up Zoom In)
+        targetCamY = 0.82 - ease1 * 0.34; // from 0.82 down to 0.48
+        scrollRotY = ease1 * 0.48; // slight angle to front corner
+        scrollRotX = ease1 * 0.05;
+      } else if (progress < 0.48) {
+        // Stage 2: Zoom out to Second Frame
+        const r2 = (progress - 0.22) / 0.26;
+        const ease2 = r2 * r2 * (3 - 2 * r2); // smoothstep
+        targetCamZ = 2.65 + ease2 * 2.35; // from 2.65 up to 5.0 (Grand Zoom Out)
+        targetCamY = 0.48 + ease2 * 0.37; // from 0.48 up to 0.85
+        scrollRotY = 0.48 + ease2 * (Math.PI * 0.85); // rotates to sweeping 3/4 heroic angle
+        scrollRotX = 0.05 - ease2 * 0.03;
+      } else {
+        // Stage 3: Full 360° Studio Showcase around Second Frame
+        const r3 = (progress - 0.48) / 0.52;
+        targetCamZ = 5.0 - Math.sin(r3 * Math.PI) * 0.8;
+        targetCamY = 0.85 + Math.sin(r3 * Math.PI * 2) * 0.28;
+        scrollRotY = 0.48 + Math.PI * 0.85 + r3 * Math.PI * 2.8;
+        scrollRotX = Math.sin(r3 * Math.PI * 2) * 0.08;
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -431,12 +492,12 @@ export default function CinematicSequence() {
 
   // Determine current chapter / milestone index (0 to 5)
   const getActiveChapter = () => {
-    if (scrollProgress < 0.18) return 0;
-    if (scrollProgress < 0.35) return 1;
-    if (scrollProgress < 0.52) return 2;
-    if (scrollProgress < 0.70) return 3;
-    if (scrollProgress < 0.86) return 4;
-    return 5;
+    if (scrollProgress < 0.22) return 0; // Stage 1: Frame 01 Zoom-In
+    if (scrollProgress < 0.46) return 1; // Stage 2: Frame 02 Unveil & Zoom-Out
+    if (scrollProgress < 0.62) return 2; // Stage 3: Frontend Aerodynamics
+    if (scrollProgress < 0.76) return 3; // Stage 4: Powertrain & APIs
+    if (scrollProgress < 0.88) return 4; // Stage 5: Database & Atlas
+    return 5;                            // Stage 6: Creations Showroom
   };
 
   const activeChapter = getActiveChapter();
@@ -444,30 +505,30 @@ export default function CinematicSequence() {
   const chapters = [
     {
       step: 'BAY 01 / 06',
-      tag: 'CHASSIS & ARCHITECTURE',
-      title: 'NIHAL MV',
-      subtitle: 'MERN STACK DEVELOPER • KERALA, INDIA',
-      description: 'Precision fullstack engineering with React, Node.js, Express, and MongoDB. Hand-built with clean code discipline.',
-      badge: 'BCA 2023–2026',
+      tag: 'STAGE 01 // FRAME 01 ZOOM-IN',
+      title: 'CHASSIS CONTOUR',
+      subtitle: 'FIRST FRAME FOCUS & ZOOM',
+      description: 'Scroll to initiate precision close-up zoom towards Frame 01, examining aerodynamic surfacing and silhouette.',
+      badge: 'SLOT 01 ACTIVE',
       icon: Wrench,
       stats: [
-        { label: 'STACK', val: 'MERN' },
-        { label: 'ENGINEERING', val: 'FULLSTACK' },
-        { label: 'GARAGE BASE', val: 'KERALA' }
+        { label: 'CAMERA', val: 'ZOOM-IN' },
+        { label: 'FOCUS', val: 'FRAME 01' },
+        { label: 'PROXIMITY', val: 'CLOSE-UP' }
       ]
     },
     {
       step: 'BAY 02 / 06',
-      tag: 'RUNTIME TELEMETRY',
-      title: 'PERFORMANCE BENCHMARK',
-      subtitle: 'UNVEILED SYSTEM RIGIDITY',
-      description: 'Sub-second initial paint, zero layout shifts, and non-blocking asynchronous event loop execution.',
-      badge: '99+ LIGHTHOUSE',
+      tag: 'STAGE 02 // FRAME 02 ZOOM-OUT',
+      title: 'UNVEIL & ZOOM-OUT',
+      subtitle: 'SECOND FRAME HERO REVEAL',
+      description: 'At peak zoom, Frame 01 unveils into Frame 02 as the studio camera pulls back into an expansive showroom stance.',
+      badge: 'SLOT 02 REVEALED',
       icon: Gauge,
       stats: [
-        { label: 'FIRST PAINT', val: '0.4 S' },
-        { label: 'UPTIME', val: '99.9%' },
-        { label: 'LATENCY', val: '< 30 MS' }
+        { label: 'CAMERA', val: 'ZOOM-OUT' },
+        { label: 'FOCUS', val: 'FRAME 02' },
+        { label: 'STANCE', val: '3/4 HERO' }
       ]
     },
     {
@@ -595,29 +656,29 @@ export default function CinematicSequence() {
               <button
                 onClick={() => setActiveModelMode('auto')}
                 className={`px-3 py-1 rounded-full transition-all ${
-                  activeModelMode === 'auto' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-bold shadow' : 'text-zinc-400 hover:text-white'
+                  activeModelMode === 'auto' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
-                title="Scroll Unveil Mode"
+                title="Scroll Zoom 1 -> Zoom 2 Mode"
               >
-                AUTO UNVEIL
+                AUTO (ZOOM 1→2)
               </button>
               <button
                 onClick={() => setActiveModelMode('unveiled')}
                 className={`px-3 py-1 rounded-full transition-all ${
-                  activeModelMode === 'unveiled' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-bold shadow' : 'text-zinc-400 hover:text-white'
+                  activeModelMode === 'unveiled' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
-                title="Force Show Porsche 911 Turbo"
+                title="Force View Frame 02"
               >
-                PORSCHE
+                FRAME 02
               </button>
               <button
                 onClick={() => setActiveModelMode('covered')}
                 className={`px-3 py-1 rounded-full transition-all ${
-                  activeModelMode === 'covered' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-bold shadow' : 'text-zinc-400 hover:text-white'
+                  activeModelMode === 'covered' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
-                title="Force Show Covered Prototype"
+                title="Force View Frame 01"
               >
-                COVER
+                FRAME 01
               </button>
             </div>
 
@@ -753,7 +814,9 @@ export default function CinematicSequence() {
         <div className="absolute bottom-6 left-0 right-0 z-30 px-6 sm:px-12 flex items-center justify-between border-t border-zinc-800 pt-4 pointer-events-auto">
           {/* Left Frame Status */}
           <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
-            <span className="text-white font-bold tracking-widest">PORSCHE 911 TURBO</span>
+            <span className="text-white font-medium tracking-widest">
+              {scrollProgress < 0.22 ? 'FRAME 01 // ZOOM-IN FOCUS' : 'FRAME 02 // PORSCHE 911 TURBO'}
+            </span>
             <span>—</span>
             <span>FRAME {formattedFrame} / 240</span>
             {modelLoaded ? (
