@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { ArrowDown, ArrowUp, ArrowRight, Eye, Layers } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowRight, Gauge, Cpu, Database, Layout, Sparkles, Move3d } from 'lucide-react';
 
 export default function CinematicSequence() {
   const containerRef = useRef(null);
@@ -12,9 +12,13 @@ export default function CinematicSequence() {
   const [modelLoaded, setModelLoaded] = useState(false);
   const [loadingPercent, setLoadingPercent] = useState(0);
 
-  // References for cross-scope model control
+  // Live 3D telemetry coordinates state
+  const [telemetryCoords, setTelemetryCoords] = useState({ rotX: 0, rotY: 0, rotZ: 0 });
+
+  // References for cross-scope model and interaction control
   const coverModelRef = useRef(null);
   const carModelRef = useRef(null);
+  const carRootGroupRef = useRef(null);
   const activeModeRef = useRef('auto');
   activeModeRef.current = activeModelMode;
 
@@ -22,7 +26,7 @@ export default function CinematicSequence() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // 1. Renderer with Photorealistic ACES Filmic Tone Mapping for Luxury Automotive Rendering
+    // 1. High-Precision WebGL Renderer with ACES Filmic Tone Mapping
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
@@ -32,77 +36,96 @@ export default function CinematicSequence() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.45;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x050505, 0.04);
+    scene.fog = new THREE.FogExp2(0x07080f, 0.035);
 
     const camera = new THREE.PerspectiveCamera(
-      45,
+      42,
       window.innerWidth / window.innerHeight,
       0.1,
       100
     );
-    camera.position.set(0, 0.8, 6.2);
+    // Camera positioned closer for a much bigger, cinematic 3D presence
+    camera.position.set(1.5, 0.85, 4.8);
 
-    // Parent group that rotates with scroll and mouse
+    // Parent group for 3D car & animations
     const carRootGroup = new THREE.Group();
+    // Offset slightly to the right on desktop for perfect telemetry side-by-side layout
+    if (window.innerWidth >= 1024) {
+      carRootGroup.position.x = 0.9;
+    }
+    carRootGroupRef.current = carRootGroup;
     scene.add(carRootGroup);
 
-    // 2. Studio Automotive Lighting Rig
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
+    // 2. High-Tech Studio Lighting with Violet & Cyan Specular Glows
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
     scene.add(ambientLight);
 
-    // Key Light (Top-Front Overhead Studio Light)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
-    keyLight.position.set(5, 8, 6);
+    // Main Overhead Key Light
+    const keyLight = new THREE.DirectionalLight(0xffffff, 3.8);
+    keyLight.position.set(4, 8, 5);
     scene.add(keyLight);
 
-    // Fill Light (Soft cool reflection)
-    const fillLight = new THREE.DirectionalLight(0xa5b4fc, 2.0);
-    fillLight.position.set(-6, 3, -4);
-    scene.add(fillLight);
+    // Cyber Violet Fill Light (Accentuates curves)
+    const violetLight = new THREE.DirectionalLight(0xa855f7, 2.8);
+    violetLight.position.set(-6, 4, -3);
+    scene.add(violetLight);
 
-    // Rim / Edge Specular Light
-    const rimLight = new THREE.DirectionalLight(0xffffff, 2.8);
-    rimLight.position.set(0, 7, -6);
-    scene.add(rimLight);
+    // Cyber Cyan Rim Light (Accentuates rear ducktail spoiler & roofline)
+    const cyanLight = new THREE.DirectionalLight(0x38bdf8, 3.0);
+    cyanLight.position.set(3, 6, -5);
+    scene.add(cyanLight);
 
-    // Underbody Glow / Ground Bounce
-    const groundBounce = new THREE.DirectionalLight(0x38bdf8, 1.2);
+    // Underbody Ground Neon Bounce
+    const groundBounce = new THREE.DirectionalLight(0x818cf8, 1.5);
     groundBounce.position.set(0, -3, 0);
     scene.add(groundBounce);
 
-    // 3. Ground Studio Mirror Disk
-    const groundGeom = new THREE.CircleGeometry(8, 64);
+    // 3. Ground Studio Mirror Disk & Cyber Grid
+    const groundGeom = new THREE.CircleGeometry(9, 64);
     const groundMat = new THREE.MeshStandardMaterial({
-      color: 0x050505,
-      roughness: 0.25,
-      metalness: 0.8,
+      color: 0x07080f,
+      roughness: 0.2,
+      metalness: 0.85,
       transparent: true,
-      opacity: 0.8
+      opacity: 0.85
     });
     const ground = new THREE.Mesh(groundGeom, groundMat);
     ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -1.1;
+    ground.position.y = -1.15;
     scene.add(ground);
 
-    // 4. Subtle Orbital Dust Particles (700 particles)
-    const particleCount = 650;
+    // Subtle Glowing Grid Ring around the car
+    const gridRingGeom = new THREE.RingGeometry(3.2, 3.25, 64);
+    const gridRingMat = new THREE.MeshBasicMaterial({
+      color: 0xa855f7,
+      transparent: true,
+      opacity: 0.35,
+      side: THREE.DoubleSide
+    });
+    const gridRing = new THREE.Mesh(gridRingGeom, gridRingMat);
+    gridRing.rotation.x = -Math.PI / 2;
+    gridRing.position.y = -1.14;
+    scene.add(gridRing);
+
+    // 4. Floating 3D Telemetry Dust Particles (800 particles)
+    const particleCount = 750;
     const particleGeom = new THREE.BufferGeometry();
     const posArray = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount * 3; i += 3) {
-      posArray[i] = (Math.random() - 0.5) * 16;
+      posArray[i] = (Math.random() - 0.5) * 18;
       posArray[i + 1] = Math.random() * 8 - 1.5;
-      posArray[i + 2] = (Math.random() - 0.5) * 16;
+      posArray[i + 2] = (Math.random() - 0.5) * 18;
     }
     particleGeom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     const particleMat = new THREE.PointsMaterial({
-      size: 0.025,
-      color: 0xd4d4d8,
+      size: 0.026,
+      color: 0xc4b5fd,
       transparent: true,
-      opacity: 0.45,
+      opacity: 0.5,
       blending: THREE.AdditiveBlending
     });
     const particleField = new THREE.Points(particleGeom, particleMat);
@@ -110,22 +133,22 @@ export default function CinematicSequence() {
 
     // 5. Initial Geometric Wireframe Placeholder (while GLB models load)
     const placeholderGroup = new THREE.Group();
-    const wireGeom = new THREE.IcosahedronGeometry(1.6, 1);
+    const wireGeom = new THREE.IcosahedronGeometry(2.0, 1);
     const wireMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
+      color: 0x8b5cf6,
       wireframe: true,
       transparent: true,
-      opacity: 0.3
+      opacity: 0.4
     });
     const wireMesh = new THREE.Mesh(wireGeom, wireMat);
     placeholderGroup.add(wireMesh);
     carRootGroup.add(placeholderGroup);
 
-    // 6. GLTF Loader Setup
+    // 6. GLTF Loader Setup with BIG Model Scaling
     const loader = new GLTFLoader();
 
-    // Helper: Normalize & center any 3D model
-    const normalizeModel = (gltfScene, targetDim = 4.2) => {
+    // Helper: Normalize & center 3D model with LARGER scale
+    const normalizeModel = (gltfScene, targetDim = 5.6) => {
       const box = new THREE.Box3().setFromObject(gltfScene);
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
@@ -134,16 +157,18 @@ export default function CinematicSequence() {
 
       gltfScene.scale.setScalar(scale);
       gltfScene.position.x = -center.x * scale;
-      gltfScene.position.y = -center.y * scale - 0.15;
+      gltfScene.position.y = -center.y * scale - 0.12;
       gltfScene.position.z = -center.z * scale;
 
-      // Enhance materials for realistic reflections
+      // Enhance materials for photorealistic paint & chrome reflections
       gltfScene.traverse((child) => {
         if (child.isMesh && child.material) {
           child.castShadow = true;
           child.receiveShadow = true;
           if (child.material.isMeshStandardMaterial) {
-            child.material.envMapIntensity = 1.5;
+            child.material.envMapIntensity = 2.0;
+            child.material.roughness = Math.max(0.08, child.material.roughness * 0.85);
+            child.material.metalness = Math.min(0.95, child.material.metalness * 1.15);
             child.material.needsUpdate = true;
           }
         }
@@ -158,12 +183,11 @@ export default function CinematicSequence() {
     loader.load(
       '/secondfream.glb',
       (gltf) => {
-        const porsche = normalizeModel(gltf.scene, 4.3);
-        porsche.rotation.y = -Math.PI / 2; // Initial 3/4 front angle
+        const porsche = normalizeModel(gltf.scene, 5.6);
+        porsche.rotation.y = -Math.PI / 2.2; // Majestic 3/4 hero angle
         carModelRef.current = porsche;
         carRootGroup.add(porsche);
 
-        // Hide placeholder wireframe once car is loaded
         placeholderGroup.visible = false;
         setModelLoaded(true);
       },
@@ -175,12 +199,12 @@ export default function CinematicSequence() {
       (err) => console.warn('Could not load secondfream.glb:', err)
     );
 
-    // Load firstfream.glb (Car Cover - Unveiling Concept)
+    // Load firstfream.glb (Covered Prototype - Unveiling Concept)
     loader.load(
       '/firstfream.glb',
       (gltf) => {
-        const cover = normalizeModel(gltf.scene, 4.4);
-        cover.rotation.y = -Math.PI / 2;
+        const cover = normalizeModel(gltf.scene, 5.75);
+        cover.rotation.y = -Math.PI / 2.2;
         coverModelRef.current = cover;
         carRootGroup.add(cover);
       },
@@ -188,30 +212,86 @@ export default function CinematicSequence() {
       (err) => console.warn('Could not load firstfream.glb:', err)
     );
 
-    // Mouse Parallax
+    // 7. Interactive Drag to Orbit & Mouse Parallax
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragRotY = 0;
+    let dragRotX = 0;
     let mouseX = 0;
     let mouseY = 0;
-    const handleMouseMove = (e) => {
+
+    const onMouseDown = (e) => {
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+    };
+
+    const onMouseMove = (e) => {
       mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
       mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-    };
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
-    // Target values for smooth lerp
+      if (isDragging) {
+        const deltaX = e.clientX - dragStartX;
+        const deltaY = e.clientY - dragStartY;
+        dragRotY += deltaX * 0.006;
+        dragRotX += deltaY * 0.004;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+      }
+    };
+
+    const onMouseUp = () => {
+      isDragging = false;
+    };
+
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('mouseup', onMouseUp);
+
+    // Touch support for dragging 3D car on mobile
+    const onTouchStart = (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        dragStartX = e.touches[0].clientX;
+        dragStartY = e.touches[0].clientY;
+      }
+    };
+    const onTouchMove = (e) => {
+      if (isDragging && e.touches.length === 1) {
+        const deltaX = e.touches[0].clientX - dragStartX;
+        const deltaY = e.touches[0].clientY - dragStartY;
+        dragRotY += deltaX * 0.008;
+        dragRotX += deltaY * 0.005;
+        dragStartX = e.touches[0].clientX;
+        dragStartY = e.touches[0].clientY;
+      }
+    };
+    const onTouchEnd = () => {
+      isDragging = false;
+    };
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd);
+
+    // Target animation values
     let currentScroll = 0;
-    let targetRotY = 0;
-    let targetRotX = 0;
-    let targetCamY = 0.8;
-    let targetCamZ = 6.2;
+    let scrollRotY = 0;
+    let scrollRotX = 0;
+    let targetCamY = 0.85;
+    let targetCamZ = 4.8;
 
     let animId;
-    const animate = () => {
+    let lastTelemetryUpdate = 0;
+
+    const animate = (time) => {
       animId = requestAnimationFrame(animate);
 
-      // Particle subtle ambient drift
-      particleField.rotation.y += 0.0003;
+      // Particle subtle ambient motion
+      particleField.rotation.y += 0.0004;
+      gridRing.rotation.z += 0.002;
 
-      // Unveiling Logic between firstfream (Covered) and secondfream (Porsche)
+      // Model Unveiling Logic
       const mode = activeModeRef.current;
       const cover = coverModelRef.current;
       const car = carModelRef.current;
@@ -224,14 +304,13 @@ export default function CinematicSequence() {
           cover.visible = false;
           car.visible = true;
         } else {
-          // 'auto' scroll mode: Unveil as user scrolls past 0.18
+          // 'auto' mode: Smooth lift and unveil as user scrolls past 0.18
           if (currentScroll < 0.20) {
             cover.visible = true;
-            // Cover lifts slightly as it nears 0.20
             const liftRatio = Math.max(0, (currentScroll - 0.12) / 0.08);
-            cover.position.y = liftRatio * 2.5;
+            cover.position.y = liftRatio * 2.8;
             cover.scale.setScalar(1 + liftRatio * 0.15);
-            car.visible = liftRatio > 0.1;
+            car.visible = liftRatio > 0.08;
           } else {
             cover.visible = false;
             car.visible = true;
@@ -241,22 +320,34 @@ export default function CinematicSequence() {
         }
       }
 
-      // Smooth interpolation of car rotation & camera orbit
-      const mouseParallaxX = mouseX * 0.15;
-      const mouseParallaxY = mouseY * 0.10;
+      // Merge scroll rotation + interactive drag + mouse parallax
+      const totalTargetRotY = scrollRotY + dragRotY + mouseX * 0.12;
+      const totalTargetRotX = scrollRotX + dragRotX + mouseY * 0.08;
 
-      carRootGroup.rotation.y += (targetRotY + mouseParallaxX - carRootGroup.rotation.y) * 0.06;
-      carRootGroup.rotation.x += (targetRotX + mouseParallaxY - carRootGroup.rotation.x) * 0.06;
+      carRootGroup.rotation.y += (totalTargetRotY - carRootGroup.rotation.y) * 0.07;
+      carRootGroup.rotation.x += (totalTargetRotX - carRootGroup.rotation.x) * 0.07;
 
-      camera.position.y += (targetCamY - camera.position.y) * 0.06;
-      camera.position.z += (targetCamZ - camera.position.z) * 0.06;
-      camera.lookAt(0, 0.2, 0);
+      camera.position.y += (targetCamY - camera.position.y) * 0.07;
+      camera.position.z += (targetCamZ - camera.position.z) * 0.07;
+      camera.lookAt(carRootGroup.position.x, 0.15, 0);
+
+      // Throttle live telemetry HUD updates
+      if (time - lastTelemetryUpdate > 80) {
+        lastTelemetryUpdate = time;
+        const degY = Math.round((carRootGroup.rotation.y * 180) / Math.PI) % 360;
+        const degX = Math.round((carRootGroup.rotation.x * 180) / Math.PI) % 360;
+        setTelemetryCoords({
+          rotX: degX >= 0 ? degX : 360 + degX,
+          rotY: degY >= 0 ? degY : 360 + degY,
+          rotZ: Math.round(currentScroll * 100)
+        });
+      }
 
       renderer.render(scene, camera);
     };
-    animate();
+    animate(0);
 
-    // Scroll mapping
+    // Scroll listener calculates exact scroll percentage
     const handleScroll = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -270,18 +361,17 @@ export default function CinematicSequence() {
       const frame = Math.min(240, Math.max(1, Math.floor(progress * 239) + 1));
       setCurrentFrame(frame);
 
-      // Cinematic camera flight choreography around the car
-      // 0.00 - 0.16 (Stage 1): Front 3/4 hero view
-      // 0.18 - 0.34 (Stage 2): Side aerodynamic profile
-      // 0.36 - 0.52 (Stage 3): Low-angle front grill & hood
-      // 0.54 - 0.70 (Stage 4): Rear 911 Turbo spoiler & twin exhausts
-      // 0.72 - 0.86 (Stage 5): High cinematic dynamic orbit
-      // 0.88 - 1.00 (Stage 6): Full 360 return to majestic hero stance
-
-      targetRotY = progress * Math.PI * 4; // 2 complete 360-degree rotations
-      targetRotX = Math.sin(progress * Math.PI * 2) * 0.15;
-      targetCamY = 0.8 + Math.sin(progress * Math.PI * 3) * 0.45;
-      targetCamZ = 6.2 - Math.sin(progress * Math.PI) * 1.5;
+      // Cinematic 360-degree camera & model choreography:
+      // Stage 1 (0.00 - 0.18): Hero 3/4 front pose with cover
+      // Stage 2 (0.20 - 0.35): Unveiled front-side profile
+      // Stage 3 (0.36 - 0.52): Dramatic low front quarter
+      // Stage 4 (0.54 - 0.70): Rear 911 Turbo ducktail spoiler & dual exhausts
+      // Stage 5 (0.72 - 0.86): Top aerodynamic telemetry angle
+      // Stage 6 (0.88 - 1.00): Majestic studio pose with full lighting
+      scrollRotY = progress * Math.PI * 4;
+      scrollRotX = Math.sin(progress * Math.PI * 2) * 0.12;
+      targetCamY = 0.85 + Math.sin(progress * Math.PI * 3) * 0.35;
+      targetCamZ = 4.8 - Math.sin(progress * Math.PI) * 0.8;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -291,6 +381,12 @@ export default function CinematicSequence() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+
+      if (window.innerWidth >= 1024) {
+        carRootGroup.position.x = 0.9;
+      } else {
+        carRootGroup.position.x = 0;
+      }
     };
     window.addEventListener('resize', handleResize);
 
@@ -298,10 +394,17 @@ export default function CinematicSequence() {
       cancelAnimationFrame(animId);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
       renderer.dispose();
       groundGeom.dispose();
       groundMat.dispose();
+      gridRingGeom.dispose();
+      gridRingMat.dispose();
       particleGeom.dispose();
       particleMat.dispose();
       wireGeom.dispose();
@@ -309,149 +412,330 @@ export default function CinematicSequence() {
     };
   }, []);
 
-  // Helper for stage opacity & transforms
-  const getStageStyle = (start, end) => {
-    const fadeIn = start;
-    const peakStart = start + 0.03;
-    const peakEnd = end - 0.03;
-    const fadeOut = end;
-
-    let opacity = 0;
-    let translateY = 20;
-
-    if (scrollProgress >= fadeIn && scrollProgress <= fadeOut) {
-      if (scrollProgress < peakStart) {
-        opacity = (scrollProgress - fadeIn) / (peakStart - fadeIn);
-        translateY = 20 * (1 - opacity);
-      } else if (scrollProgress > peakEnd) {
-        opacity = 1 - (scrollProgress - peakEnd) / (fadeOut - peakEnd);
-        translateY = -20 * (1 - opacity);
-      } else {
-        opacity = 1;
-        translateY = 0;
-      }
-    }
-
-    return {
-      opacity: Math.max(0, Math.min(1, opacity)),
-      transform: `translate3d(0, ${translateY}px, 0)`,
-      pointerEvents: opacity > 0.4 ? 'auto' : 'none',
-      visibility: opacity > 0.02 ? 'visible' : 'hidden'
-    };
+  // Determine current chapter / milestone index (0 to 5)
+  const getActiveChapter = () => {
+    if (scrollProgress < 0.18) return 0;
+    if (scrollProgress < 0.35) return 1;
+    if (scrollProgress < 0.52) return 2;
+    if (scrollProgress < 0.70) return 3;
+    if (scrollProgress < 0.86) return 4;
+    return 5;
   };
 
+  const activeChapter = getActiveChapter();
+
+  const chapters = [
+    {
+      step: '01 / 06',
+      tag: 'SYSTEM PROFILE',
+      title: 'NIHAL MV',
+      subtitle: 'MERN STACK DEVELOPER • KERALA, INDIA',
+      description: 'Architecting high-concurrency web applications with React.js, Node.js, Express, and MongoDB.',
+      badge: 'BCA 2023–2026',
+      icon: Cpu,
+      stats: [
+        { label: 'STACK', val: 'MERN' },
+        { label: 'ROLE', val: 'FULLSTACK' },
+        { label: 'LOCATION', val: 'KERALA' }
+      ]
+    },
+    {
+      step: '02 / 06',
+      tag: 'RUNTIME DYNAMICS',
+      title: 'PURE PROPULSION',
+      subtitle: 'UNVEILED SYSTEM PERFORMANCE',
+      description: 'Sub-second initial paint velocity, zero layout shifts, and non-blocking asynchronous event loops.',
+      badge: '99+ LIGHTHOUSE',
+      icon: Gauge,
+      stats: [
+        { label: 'FIRST PAINT', val: '0.4 S' },
+        { label: 'UPTIME', val: '99.9%' },
+        { label: 'LATENCY', val: '< 30 MS' }
+      ]
+    },
+    {
+      step: '03 / 06',
+      tag: 'FRONTEND ARCHITECTURE',
+      title: 'REACT & TAILWIND',
+      subtitle: 'MODULAR UI & ACCESSIBILITY',
+      description: 'Clean component tree, deterministic hook state management, and fluid responsive styling across all devices.',
+      badge: 'REACT 19 + VITE',
+      icon: Layout,
+      stats: [
+        { label: 'FRAME RATE', val: '60/120' },
+        { label: 'RESPONSIVE', val: '100%' },
+        { label: 'BUNDLE', val: '< 50 KB' }
+      ]
+    },
+    {
+      step: '04 / 06',
+      tag: 'BACKEND SERVICES',
+      title: 'NODE & REST APIS',
+      subtitle: 'SECURE ASYNCHRONOUS SERVER',
+      description: 'Modular routing controllers, strict input validation, CORS security, and resilient error boundary handlers.',
+      badge: 'EXPRESS.JS RUNTIME',
+      icon: Cpu,
+      stats: [
+        { label: 'PROTOCOL', val: 'REST' },
+        { label: 'I/O TYPE', val: 'NON-BLOCK' },
+        { label: 'SECURITY', val: 'CORS + ENV' }
+      ]
+    },
+    {
+      step: '05 / 06',
+      tag: 'DATABASE PERSISTENCE',
+      title: 'MONGODB ATLAS',
+      subtitle: 'HIGH-CONCURRENCY STORAGE',
+      description: 'Mongoose document schema modeling, indexing strategies, and automated cloud clustering for retail data.',
+      badge: 'ATLAS CLOUD',
+      icon: Database,
+      stats: [
+        { label: 'SCHEMA', val: 'STRICT' },
+        { label: 'QUERIES', val: 'INDEXED' },
+        { label: 'PERSISTENCE', val: 'ACID' }
+      ]
+    },
+    {
+      step: '06 / 06',
+      tag: 'PRODUCTION ARCHIVE',
+      title: 'FEATURED CREATIONS',
+      subtitle: 'DEPLOYED APPLICATIONS',
+      description: 'Explore SmartMart AI (Billing System), TrachMart (E-Commerce), and GoTravel (Travel Platform).',
+      badge: '3 LIVE APPS',
+      icon: Sparkles,
+      stats: [
+        { label: 'PRODUCTIONS', val: '3+' },
+        { label: 'REPOSITORIES', val: 'PUBLIC' },
+        { label: 'DEPLOYED', val: 'VERCEL' }
+      ]
+    }
+  ];
+
+  const currentChapterData = chapters[activeChapter];
+  const IconComponent = currentChapterData.icon;
   const formattedFrame = String(currentFrame).padStart(3, '0');
 
   return (
     <div
       ref={containerRef}
       id="cinematic-sequence"
-      className="relative w-full h-[650vh] bg-[#050505]"
+      className="relative w-full h-[650vh] bg-[#07080f]"
     >
       {/* Sticky 100dvh Viewport Container */}
-      <div className="sticky top-0 h-[100dvh] w-full flex items-center justify-center overflow-hidden z-10">
+      <div className="sticky top-0 h-[100dvh] w-full flex items-center justify-between overflow-hidden z-10">
         
         {/* Fullscreen 3D WebGL Canvas */}
         <canvas
           ref={canvasRef}
           role="img"
-          aria-label="3D Supercar Architecture Canvas"
-          className="absolute inset-0 w-full h-full block object-cover z-0 pointer-events-none"
+          aria-label="3D Supercar Telemetry Canvas"
+          className="absolute inset-0 w-full h-full block object-cover z-0 cursor-grab active:cursor-grabbing"
         />
 
-        {/* Ambient Vignette Overlay */}
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(5,5,5,0.7)_100%)] z-[1]" />
+        {/* Ambient Dark Studio Vignette */}
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(7,8,15,0.75)_100%)] z-[1]" />
 
-        {/* HUD Top Bar: Brand, Navigation & 3D Model Mode Switcher */}
-        <header className="absolute top-0 left-0 right-0 z-30 px-6 sm:px-12 py-6 flex items-center justify-between pointer-events-auto">
-          <a href="#" className="flex items-center gap-3 group focus:outline-none" aria-label="Nihal MV - Return to top">
-            <span className="w-2 h-2 rounded-full bg-white group-hover:scale-125 transition-transform" />
-            <span className="text-base sm:text-lg font-light tracking-[0.3em] text-white uppercase leading-none group-hover:text-zinc-200 transition-colors">
-              NIHAL MV
-            </span>
+        {/* Top High-Tech HUD Header */}
+        <header className="absolute top-0 left-0 right-0 z-30 px-6 sm:px-12 py-5 flex items-center justify-between pointer-events-auto">
+          {/* Logo & Status */}
+          <a href="#" className="flex items-center gap-3.5 group focus:outline-none" aria-label="Nihal MV - Return to top">
+            <div className="w-8 h-8 rounded-lg bg-violet-600/20 border border-violet-500/40 flex items-center justify-center text-violet-400 group-hover:scale-105 transition-transform shadow-lg shadow-violet-950/40">
+              <span className="text-xs font-mono font-bold">N</span>
+            </div>
+            <div>
+              <span className="text-sm sm:text-base font-semibold tracking-wider text-white uppercase leading-none block">
+                NIHAL MV
+              </span>
+              <span className="text-[9px] font-mono tracking-widest text-violet-400/80 uppercase">
+                MERN ARCHITECT
+              </span>
+            </div>
           </a>
 
-          {/* Center Monospaced Nav Links */}
-          <nav className="hidden md:flex items-center gap-10" aria-label="Main Navigation">
-            <a href="#philosophy" className="text-xs font-mono uppercase tracking-[0.25em] text-zinc-400 hover:text-white transition-colors relative py-1 focus:outline-none focus:text-white">
+          {/* Center Monospaced Navigation */}
+          <nav className="hidden lg:flex items-center gap-8" aria-label="Main Navigation">
+            <a href="#philosophy" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
               PHILOSOPHY
             </a>
-            <a href="#telemetry" className="text-xs font-mono uppercase tracking-[0.25em] text-zinc-400 hover:text-white transition-colors relative py-1 focus:outline-none focus:text-white">
+            <a href="#telemetry" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
               TELEMETRY
             </a>
-            <a href="#technology" className="text-xs font-mono uppercase tracking-[0.25em] text-zinc-400 hover:text-white transition-colors relative py-1 focus:outline-none focus:text-white">
+            <a href="#technology" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
               TECHNOLOGY
             </a>
-            <a href="#creations" className="text-xs font-mono uppercase tracking-[0.25em] text-zinc-400 hover:text-white transition-colors relative py-1 focus:outline-none focus:text-white">
+            <a href="#creations" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
               CREATIONS
             </a>
-            <a href="#contact" className="text-xs font-mono uppercase tracking-[0.25em] text-zinc-400 hover:text-white transition-colors relative py-1 focus:outline-none focus:text-white">
+            <a href="#contact" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
               CONTACT
             </a>
           </nav>
 
-          {/* Right Actions: 3D Model Switcher + Top Button */}
+          {/* Right Controls: 3D Model Mode Switcher + Quick Actions */}
           <div className="flex items-center gap-3">
-            {/* 3D Model State Toggle (Covered / Unveiled) */}
-            <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-black/60 border border-white/10 backdrop-blur-md text-[10px] font-mono tracking-widest uppercase">
+            {/* 3D Model Switcher */}
+            <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-[#0e101d]/90 border border-violet-500/30 backdrop-blur-md text-[10px] font-mono tracking-wider uppercase shadow-lg shadow-black/40">
               <button
                 onClick={() => setActiveModelMode('auto')}
-                className={`px-3 py-1 rounded-full transition-colors ${
-                  activeModelMode === 'auto' ? 'bg-white text-black font-semibold' : 'text-zinc-400 hover:text-white'
+                className={`px-3 py-1 rounded-full transition-all ${
+                  activeModelMode === 'auto' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
-                title="Automatic scroll unveil transition"
+                title="Scroll Unveil Mode"
               >
                 AUTO UNVEIL
               </button>
               <button
                 onClick={() => setActiveModelMode('unveiled')}
-                className={`px-3 py-1 rounded-full transition-colors ${
-                  activeModelMode === 'unveiled' ? 'bg-white text-black font-semibold' : 'text-zinc-400 hover:text-white'
+                className={`px-3 py-1 rounded-full transition-all ${
+                  activeModelMode === 'unveiled' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
-                title="Show 1975 Porsche 911 Turbo"
+                title="Force Show Porsche 911 Turbo"
               >
                 PORSCHE
               </button>
               <button
                 onClick={() => setActiveModelMode('covered')}
-                className={`px-3 py-1 rounded-full transition-colors ${
-                  activeModelMode === 'covered' ? 'bg-white text-black font-semibold' : 'text-zinc-400 hover:text-white'
+                className={`px-3 py-1 rounded-full transition-all ${
+                  activeModelMode === 'covered' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
-                title="Show Covered Prototype"
+                title="Force Show Covered Prototype"
               >
                 COVER
               </button>
             </div>
 
+            {/* Scroll to Top */}
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:border-white/30 text-zinc-300 hover:text-white text-xs font-mono tracking-widest uppercase transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 hover:border-violet-500/40 text-zinc-300 hover:text-white text-xs font-mono tracking-wider uppercase transition-colors"
               aria-label="Scroll to top"
             >
               <span>TOP</span>
-              <ArrowUp className="w-3 h-3" />
+              <ArrowUp size={12} />
             </button>
           </div>
         </header>
 
-        {/* HUD Bottom Bar: Frame Counter & Scroll Guide */}
+        {/* LEFT COLUMN: High-Tech Telemetry HUD Dashboard */}
+        <div className="relative z-20 w-full max-w-lg lg:max-w-md px-6 sm:px-10 lg:pl-12 lg:pr-0 pointer-events-none select-none flex flex-col justify-center">
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#0a0c16]/85 border border-violet-500/25 backdrop-blur-xl shadow-2xl shadow-black/80 pointer-events-auto transition-all duration-300">
+            
+            {/* HUD Status Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+              <div className="flex items-center gap-2.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
+                <span className="text-[10px] font-mono tracking-[0.25em] text-emerald-400 font-bold uppercase">
+                  3D TELEMETRY ACTIVE
+                </span>
+              </div>
+              <span className="text-[10px] font-mono tracking-widest text-zinc-400">
+                {currentChapterData.step}
+              </span>
+            </div>
+
+            {/* Chapter Tag Badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/50 border border-violet-500/30 text-violet-300 text-[10px] font-mono tracking-widest uppercase mb-3">
+              <IconComponent size={13} className="text-violet-400 shrink-0" />
+              <span>{currentChapterData.tag}</span>
+            </div>
+
+            {/* Title & Subtitle */}
+            <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mb-1.5">
+              {currentChapterData.title}
+            </h2>
+            <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-4">
+              {currentChapterData.subtitle}
+            </p>
+
+            {/* Description */}
+            <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed mb-6">
+              {currentChapterData.description}
+            </p>
+
+            {/* Live Telemetry Stats Grid */}
+            <div className="grid grid-cols-3 gap-2.5 mb-6">
+              {currentChapterData.stats.map((stat, i) => (
+                <div key={i} className="p-2.5 rounded-xl bg-black/50 border border-white/10">
+                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                    {stat.label}
+                  </span>
+                  <span className="text-xs sm:text-sm font-bold font-mono text-white">
+                    {stat.val}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Real-time 3D Coordinates Readout */}
+            <div className="pt-4 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-zinc-400">
+              <div className="flex items-center gap-3">
+                <span>YAW: <strong className="text-violet-300">{telemetryCoords.rotY}°</strong></span>
+                <span>PITCH: <strong className="text-violet-300">{telemetryCoords.rotX}°</strong></span>
+              </div>
+              <span className="text-zinc-500">
+                ZOOM: {telemetryCoords.rotZ}%
+              </span>
+            </div>
+
+            {/* Chapter Action CTA (If on stage 6) */}
+            {activeChapter === 5 && (
+              <div className="mt-5 pt-4 border-t border-white/10">
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('creations');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold text-xs uppercase tracking-widest hover:from-violet-500 hover:to-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/40"
+                >
+                  <span>EXPLORE FEATURED PROJECTS</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+            )}
+
+          </div>
+
+          {/* Interactive 3D Hint */}
+          <div className="mt-4 flex items-center gap-2 text-[10px] font-mono text-zinc-500 tracking-wider">
+            <Move3d size={13} className="text-violet-400 animate-pulse" />
+            <span>CLICK & DRAG CAR TO ROTATE 360° IN 3D</span>
+          </div>
+        </div>
+
+        {/* BOTTOM HUD FOOTER: Progress Bar & Frame Counter */}
         <div className="absolute bottom-6 left-0 right-0 z-30 px-6 sm:px-12 flex items-center justify-between border-t border-white/10 pt-4 pointer-events-auto">
-          <div className="flex items-center gap-3 text-xs font-mono text-zinc-500">
-            <span className="text-zinc-300 font-semibold tracking-widest">3D TELEMETRY</span>
+          {/* Left Frame Status */}
+          <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
+            <span className="text-white font-bold tracking-widest">PORSCHE 911 TURBO</span>
             <span>—</span>
             <span>FRAME {formattedFrame} / 240</span>
             {modelLoaded ? (
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-[10px] text-emerald-400">
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-[10px] text-emerald-400 font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                GLB ACTIVE
+                3D GLB ONLINE
               </span>
             ) : (
               <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-500/30 text-[10px] text-amber-400 font-mono">
-                LOADING 3D GLB ({loadingPercent}%)
+                DOWNLOADING 3D MESH ({loadingPercent}%)
               </span>
             )}
           </div>
 
+          {/* Center Visual Chapter Progress Dots */}
+          <div className="hidden md:flex items-center gap-2">
+            {chapters.map((_, idx) => (
+              <div
+                key={idx}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  activeChapter === idx
+                    ? 'w-7 bg-violet-400 shadow-[0_0_8px_#a855f7]'
+                    : 'w-2 bg-white/20'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Right Scroll Indicator */}
           <button
             onClick={() => {
               const target = document.getElementById('philosophy');
@@ -460,208 +744,8 @@ export default function CinematicSequence() {
             className="flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest uppercase"
           >
             <span>SCROLL TO EXPLORE</span>
-            <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
+            <ArrowDown size={14} className="animate-bounce" />
           </button>
-        </div>
-
-        {/* STAGE 01: Hero Intro (0% - 16%) */}
-        <div
-          style={getStageStyle(0.0, 0.16)}
-          className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-7xl mx-auto z-20 items-start text-left transition-opacity duration-300"
-        >
-          <div className="max-w-xl">
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4 sm:mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
-              <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.3em] text-zinc-300 uppercase">
-                01 / CONCEPT DEVELOPER STUDY
-              </span>
-            </div>
-
-            <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-extralight uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white leading-[0.88] drop-shadow-2xl mb-3">
-              NIHAL MV
-            </h1>
-
-            <p className="text-[11px] sm:text-xs md:text-sm font-light tracking-[0.3em] sm:tracking-[0.4em] text-zinc-400 uppercase mb-4">
-              MERN STACK DEVELOPER • KERALA, INDIA
-            </p>
-
-            <p className="text-xs sm:text-sm md:text-base text-zinc-300 font-light leading-relaxed max-w-lg drop-shadow">
-              I build responsive, high-performance web applications using React, Node.js, Express.js and MongoDB.
-            </p>
-          </div>
-        </div>
-
-        {/* STAGE 02: Runtime Dynamics & Unveiled Silhouette (18% - 34%) */}
-        <div
-          style={getStageStyle(0.18, 0.34)}
-          className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-7xl mx-auto z-20 items-end text-right transition-opacity duration-300"
-        >
-          <div className="max-w-xl">
-            <div className="flex items-center justify-end gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] font-mono tracking-[0.3em] text-zinc-400 uppercase mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
-              <span>02 / DYNAMICS & PROPULSION</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight uppercase tracking-tight text-white leading-[0.9] drop-shadow-xl mb-4">
-              PURE PROPULSION.
-            </h2>
-
-            <p className="text-xs sm:text-sm md:text-base text-zinc-300 font-light leading-relaxed max-w-lg drop-shadow mb-6">
-              Unveiled engineering: instantaneous state flow, clean component trees, and sub-second API roundtrips.
-            </p>
-
-            {/* Spec Cards matching Aerion */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <div className="p-2 sm:p-3 rounded-xl bg-black/60 border border-white/10 backdrop-blur-md text-left">
-                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-wider block">
-                  LIGHTHOUSE
-                </span>
-                <span className="text-base sm:text-lg md:text-xl font-bold font-mono text-white">
-                  99+
-                </span>
-              </div>
-              <div className="p-2 sm:p-3 rounded-xl bg-black/60 border border-white/10 backdrop-blur-md text-left">
-                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-wider block">
-                  FIRST PAINT
-                </span>
-                <span className="text-base sm:text-lg md:text-xl font-bold font-mono text-white">
-                  0.4 S
-                </span>
-              </div>
-              <div className="p-2 sm:p-3 rounded-xl bg-black/60 border border-white/10 backdrop-blur-md text-left">
-                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-wider block">
-                  RESPONSIVE
-                </span>
-                <span className="text-base sm:text-lg md:text-xl font-bold font-mono text-white">
-                  100 %
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* STAGE 03: Frontend Rigidity (36% - 52%) */}
-        <div
-          style={getStageStyle(0.36, 0.52)}
-          className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-7xl mx-auto z-20 items-start text-left transition-opacity duration-300"
-        >
-          <div className="max-w-xl">
-            <div className="flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] font-mono tracking-[0.3em] text-zinc-400 uppercase mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
-              <span>03 / FRONTEND RIGIDITY</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight uppercase tracking-tight text-white leading-[0.9] drop-shadow-xl mb-4">
-              REACT & TAILWIND.
-            </h2>
-
-            <p className="text-xs sm:text-sm md:text-base text-zinc-300 font-light leading-relaxed max-w-lg drop-shadow">
-              Modular UI components built with React 19, Vite, and utility-first Tailwind CSS. Structured for fluid transitions and accessibility.
-            </p>
-          </div>
-        </div>
-
-        {/* STAGE 04: Backend Computing & Turbo Aerodynamics (54% - 70%) */}
-        <div
-          style={getStageStyle(0.54, 0.70)}
-          className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-7xl mx-auto z-20 items-center text-center transition-opacity duration-300"
-        >
-          <div className="max-w-xl">
-            <div className="flex items-center justify-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] font-mono tracking-[0.3em] text-zinc-400 uppercase mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
-              <span>04 / SERVER ARCHITECTURE</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight uppercase tracking-tight text-white leading-[0.9] drop-shadow-xl mb-4">
-              NODE.JS & REST APIS.
-            </h2>
-
-            <p className="text-xs sm:text-sm md:text-base text-zinc-300 font-light leading-relaxed max-w-lg drop-shadow">
-              Non-blocking asynchronous Express.js servers fortified with schema validation, CORS security, and modular service controllers.
-            </p>
-          </div>
-        </div>
-
-        {/* STAGE 05: Active Data Pipeline (72% - 86%) */}
-        <div
-          style={getStageStyle(0.72, 0.86)}
-          className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-7xl mx-auto z-20 items-start text-left transition-opacity duration-300"
-        >
-          <div className="max-w-xl">
-            <div className="flex items-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] font-mono tracking-[0.3em] text-zinc-400 uppercase mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
-              <span>05 / ACTIVE DATA PIPELINE</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight uppercase tracking-tight text-white leading-[0.9] drop-shadow-xl mb-4">
-              MONGODB ATLAS.
-            </h2>
-
-            <p className="text-xs sm:text-sm md:text-base text-zinc-300 font-light leading-relaxed max-w-lg drop-shadow mb-6">
-              Document modeling with Mongoose, indexed queries, and resilient database connectivity for retail and e-commerce scale.
-            </p>
-
-            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-              <div className="p-2 sm:p-3 rounded-xl bg-black/60 border border-white/10 backdrop-blur-md">
-                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-wider block">
-                  API LATENCY
-                </span>
-                <span className="text-base sm:text-lg md:text-xl font-bold font-mono text-white">
-                  &lt; 30 MS
-                </span>
-              </div>
-              <div className="p-2 sm:p-3 rounded-xl bg-black/60 border border-white/10 backdrop-blur-md">
-                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-wider block">
-                  VALIDATION
-                </span>
-                <span className="text-base sm:text-lg md:text-xl font-bold font-mono text-white">
-                  STRICT
-                </span>
-              </div>
-              <div className="p-2 sm:p-3 rounded-xl bg-black/60 border border-white/10 backdrop-blur-md">
-                <span className="text-[8px] sm:text-[9px] font-mono text-zinc-500 uppercase tracking-wider block">
-                  CLUSTER
-                </span>
-                <span className="text-base sm:text-lg md:text-xl font-bold font-mono text-white">
-                  ATLAS
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* STAGE 06: Archive & Creations (88% - 100%) */}
-        <div
-          style={getStageStyle(0.88, 1.0)}
-          className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20 max-w-7xl mx-auto z-20 items-center text-center transition-opacity duration-300"
-        >
-          <div className="max-w-xl">
-            <div className="flex items-center justify-center gap-2.5 sm:gap-3 text-[10px] sm:text-[11px] font-mono tracking-[0.3em] text-zinc-400 uppercase mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
-              <span>06 / PORTFOLIO ARCHIVE</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extralight uppercase tracking-tight text-white leading-[0.9] drop-shadow-xl mb-4">
-              THE ART OF CODE.
-            </h2>
-
-            <p className="text-xs sm:text-sm md:text-base text-zinc-300 font-light leading-relaxed max-w-lg drop-shadow mb-8">
-              A study in fullstack architecture, user interfaces, and responsive web systems.
-            </p>
-
-            <div className="pointer-events-auto">
-              <button
-                onClick={() => {
-                  const el = document.getElementById('creations');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="group px-8 py-3.5 rounded-full bg-white text-black font-bold text-xs uppercase tracking-widest hover:bg-zinc-200 transition-all flex items-center gap-3 shadow-2xl hover:scale-105"
-              >
-                <span>EXPLORE CREATIONS</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </div>
         </div>
 
       </div>
