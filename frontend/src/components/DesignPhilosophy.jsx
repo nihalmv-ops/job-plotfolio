@@ -4,20 +4,20 @@ export default function DesignPhilosophy() {
   return (
     <section
       id="philosophy"
-      className="relative min-h-screen w-full bg-[#050505] text-white flex flex-col justify-center px-4 sm:px-6 md:px-16 py-24 sm:py-28 z-20 border-t border-white/5"
+      className="relative min-h-screen w-full bg-[#08090d] text-white flex flex-col justify-center px-4 sm:px-6 md:px-16 py-24 sm:py-28 z-20 border-t border-zinc-800/80"
       aria-label="Design Philosophy"
     >
       <div className="max-w-7xl mx-auto w-full">
-        {/* Section Header Line matching Aerion */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-6 mb-12 sm:mb-16">
+        {/* Studio Detailing Header */}
+        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-6 mb-12 sm:mb-16">
           <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-zinc-400" />
-            <span className="text-xs font-mono tracking-[0.3em] uppercase text-zinc-400">
-              01 / DESIGN PHILOSOPHY
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-300 shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
+            <span className="text-xs font-mono tracking-[0.3em] uppercase text-slate-300">
+              BAY 01 // CRAFT & PHILOSOPHY
             </span>
           </div>
-          <span className="text-xs font-mono tracking-widest text-zinc-600">
-            CODE.ARCHITECTURE.2026
+          <span className="text-xs font-mono tracking-widest text-zinc-500">
+            PRECISION.STUDIO.2026
           </span>
         </div>
 

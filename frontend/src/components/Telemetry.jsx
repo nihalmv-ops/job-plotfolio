@@ -94,23 +94,23 @@ export default function Telemetry() {
   return (
     <section
       id="telemetry"
-      className="relative min-h-screen w-full bg-[#050505] text-white flex flex-col justify-center px-4 sm:px-6 md:px-16 py-24 sm:py-28 z-20 border-t border-white/5"
+      className="relative min-h-screen w-full bg-[#08090d] text-white flex flex-col justify-center px-4 sm:px-6 md:px-16 py-24 sm:py-28 z-20 border-t border-zinc-800/80"
       aria-label="Telemetry & Performance"
     >
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Header Line */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-6 mb-12 sm:mb-16 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800/80 pb-6 mb-12 sm:mb-16 gap-4">
           <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-zinc-400" />
-            <span className="text-xs font-mono tracking-[0.3em] uppercase text-zinc-400">
-              02 / TELEMETRY & PERFORMANCE
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-300 shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
+            <span className="text-xs font-mono tracking-[0.3em] uppercase text-slate-300">
+              BAY 02 // TELEMETRY & BENCHMARKS
             </span>
           </div>
 
-          <div className="inline-flex items-center gap-2 border border-white/20 px-3.5 py-1 rounded-full bg-white/[0.03] w-fit">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-ping" />
-            <span className="text-[10px] font-mono tracking-widest text-zinc-300 uppercase">
-              BENCHMARK SPECIFICATIONS
+          <div className="inline-flex items-center gap-2 border border-zinc-700 px-3.5 py-1 rounded-full bg-zinc-900/60 w-fit">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 animate-ping" />
+            <span className="text-[10px] font-mono tracking-widest text-slate-300 uppercase">
+              STUDIO TELEMETRY ACTIVE
             </span>
           </div>
         </div>

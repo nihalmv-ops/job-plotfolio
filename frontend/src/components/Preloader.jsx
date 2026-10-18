@@ -67,23 +67,23 @@ export default function Preloader({ onLoaded }) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#050505] text-white transition-opacity duration-700 ease-out select-none ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#08090d] text-white transition-opacity duration-700 ease-out select-none ${
         isFaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       aria-label="Welcome to Nihal MV Portfolio"
       role="dialog"
     >
-      {/* Ambient background radial glow */}
-      <div className="absolute w-[500px] h-[500px] rounded-full bg-white/[0.02] blur-[140px] pointer-events-none" />
+      {/* Ambient silver studio light glow */}
+      <div className="absolute w-[500px] h-[500px] rounded-full bg-slate-200/[0.03] blur-[140px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-lg w-full">
-        {/* Name Headline (No "A" logo icon) */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extralight tracking-[0.3em] sm:tracking-[0.35em] uppercase text-white font-display mb-3">
+        {/* Name Headline in Polished Silver */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extralight tracking-[0.3em] sm:tracking-[0.35em] uppercase font-display mb-3 bg-gradient-to-r from-white via-slate-200 to-zinc-400 bg-clip-text text-transparent">
           NIHAL MV
         </h1>
 
         {/* Subtitle */}
-        <p className="text-[10px] sm:text-xs uppercase tracking-[0.45em] text-zinc-400 font-light mb-10">
+        <p className="text-[10px] sm:text-xs uppercase tracking-[0.45em] text-zinc-400 font-light mb-10 font-mono">
           MERN STACK DEVELOPER
         </p>
 

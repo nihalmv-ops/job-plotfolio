@@ -78,19 +78,19 @@ export default function Transmission({ onReplay }) {
   return (
     <section
       id="contact"
-      className="relative min-h-screen w-full bg-[#050505] text-white flex flex-col justify-between px-4 sm:px-6 md:px-16 pt-24 pb-12 z-20 border-t border-white/5"
+      className="relative min-h-screen w-full bg-[#08090d] text-white flex flex-col justify-between px-4 sm:px-6 md:px-16 pt-24 pb-12 z-20 border-t border-zinc-800/80"
       aria-label="Contact and Transmission"
     >
       <div className="max-w-7xl mx-auto w-full">
         {/* Section Header Line */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-6 mb-12 sm:mb-16">
+        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-6 mb-12 sm:mb-16">
           <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-zinc-400" />
-            <span className="text-xs font-mono tracking-[0.3em] uppercase text-zinc-400">
-              06 / TRANSMISSION & INQUIRY
+            <span className="w-2.5 h-2.5 rounded-full bg-slate-300 shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
+            <span className="text-xs font-mono tracking-[0.3em] uppercase text-slate-300">
+              BAY 06 // TRANSMISSION & INQUIRY
             </span>
           </div>
-          <span className="text-xs font-mono tracking-widest text-zinc-600">
+          <span className="text-xs font-mono tracking-widest text-zinc-500">
             CONNECT.DIRECT.2026
           </span>
         </div>
@@ -307,12 +307,12 @@ export default function Transmission({ onReplay }) {
 
         </div>
 
-        {/* Aerion Signature Final Archive Section */}
+        {/* Studio Final Archive Section */}
         <div id="final" className="my-auto text-center flex flex-col items-center pt-8 pb-16">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-zinc-300" />
-            <span className="text-[10px] font-mono tracking-[0.3em] text-zinc-300 uppercase">
-              NIHAL MV ARCHIVE
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-700/80 backdrop-blur-md mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shadow-[0_0_6px_rgba(255,255,255,0.7)]" />
+            <span className="text-[10px] font-mono tracking-[0.3em] text-slate-300 uppercase">
+              GARAGE DETAILING STUDIO ARCHIVE
             </span>
           </div>
 
@@ -338,7 +338,7 @@ export default function Transmission({ onReplay }) {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.25em] hover:bg-zinc-200 transition-all flex items-center gap-3 shadow-2xl hover:scale-105 active:scale-95"
+              className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.25em] hover:bg-zinc-200 transition-all flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
               aria-label="Replay 3D Experience"
             >
               <span>REPLAY EXPERIENCE</span>
@@ -347,10 +347,10 @@ export default function Transmission({ onReplay }) {
           </div>
         </div>
 
-        {/* Aerion Footer Line */}
-        <footer className="w-full border-t border-white/10 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
+        {/* Studio Footer Line */}
+        <footer className="w-full border-t border-zinc-800/80 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
           <div className="flex items-center gap-3">
-            <span className="text-zinc-200 font-bold tracking-widest">NIHAL MV</span>
+            <span className="text-slate-200 font-bold tracking-widest">NIHAL MV</span>
             <span>© 2026</span>
             <span>•</span>
             <span>MERN STACK ARCHITECTURE</span>

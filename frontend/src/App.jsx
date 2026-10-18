@@ -21,11 +21,11 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col font-sans selection:bg-white/20 selection:text-white relative overflow-x-hidden">
-      {/* Aerion Luxury Preloader */}
+    <div className="min-h-screen bg-[#08090d] text-white flex flex-col font-sans selection:bg-zinc-200 selection:text-black relative overflow-x-hidden">
+      {/* Detailing Studio Preloader */}
       <Preloader key={loadKey} />
 
-      {/* Aerion Precision Dual-Ring Cursor */}
+      {/* Precision Dual-Ring Cursor */}
       <CustomCursor />
 
       {/* Lenis Smooth Momentum Scroll Engine */}
@@ -34,16 +34,16 @@ export default function App() {
       {/* Accessibility Skip Link */}
       <a
         href="#philosophy"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[99999] px-4 py-2 bg-white text-black rounded-full font-mono text-xs uppercase tracking-widest outline-none"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[99999] px-4 py-2 bg-white text-black rounded-full font-mono text-xs uppercase tracking-widest outline-none shadow-lg"
       >
         Skip to main content
       </a>
 
-      {/* Flagship Cinematic 650vh Sticky 3D WebGL Sequence */}
+      {/* Flagship Cinematic 650vh Sticky 3D WebGL Detailing Bay Sequence */}
       <CinematicSequence />
 
-      {/* Content Sections matching Aerion */}
-      <main id="main-content" className="relative z-20 bg-[#050505]">
+      {/* Content Sections in Silver & Black Detailing Theme */}
+      <main id="main-content" className="relative z-20 bg-[#08090d]">
         {/* 01 / Design Philosophy */}
         <DesignPhilosophy />
 
@@ -59,7 +59,7 @@ export default function App() {
         {/* 05 / Academic Foundation & Timeline */}
         <EducationTimeline />
 
-        {/* 06 / Transmission & Contact + Aerion Replay Archive */}
+        {/* 06 / Transmission & Contact + Studio Replay Archive */}
         <Transmission onReplay={handleReplay} />
       </main>
     </div>

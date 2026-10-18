@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { ArrowDown, ArrowUp, ArrowRight, Gauge, Cpu, Database, Layout, Sparkles, Move3d } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowRight, Gauge, Cpu, Database, Layout, Sparkles, Move3d, ShieldCheck, Wrench } from 'lucide-react';
 
 export default function CinematicSequence() {
   const containerRef = useRef(null);
@@ -26,7 +26,7 @@ export default function CinematicSequence() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // 1. High-Precision WebGL Renderer with ACES Filmic Tone Mapping
+    // 1. High-Precision WebGL Renderer for Automotive Detailing Studio
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
@@ -36,11 +36,11 @@ export default function CinematicSequence() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.45;
+    renderer.toneMappingExposure = 1.35;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x07080f, 0.035);
+    scene.fog = new THREE.FogExp2(0x08090d, 0.04);
 
     const camera = new THREE.PerspectiveCamera(
       42,
@@ -48,94 +48,113 @@ export default function CinematicSequence() {
       0.1,
       100
     );
-    // Camera positioned closer for a much bigger, cinematic 3D presence
+    // Camera positioned for large studio garage perspective
     camera.position.set(1.5, 0.85, 4.8);
 
-    // Parent group for 3D car & animations
+    // Parent group for car & animations
     const carRootGroup = new THREE.Group();
-    // Offset slightly to the right on desktop for perfect telemetry side-by-side layout
     if (window.innerWidth >= 1024) {
       carRootGroup.position.x = 0.9;
     }
     carRootGroupRef.current = carRootGroup;
     scene.add(carRootGroup);
 
-    // 2. High-Tech Studio Lighting with Violet & Cyan Specular Glows
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
+    // 2. Pure Automotive Detailing Studio Lighting (No Universe/Neon)
+    // Pure Daylight White Ambient Light (5500K Clean Studio)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
     scene.add(ambientLight);
 
-    // Main Overhead Key Light
-    const keyLight = new THREE.DirectionalLight(0xffffff, 3.8);
-    keyLight.position.set(4, 8, 5);
-    scene.add(keyLight);
+    // Overhead Studio Softbox Light (Generates classic roof reflection stripe)
+    const overheadLight = new THREE.DirectionalLight(0xffffff, 4.2);
+    overheadLight.position.set(0, 9, 2);
+    scene.add(overheadLight);
 
-    // Cyber Violet Fill Light (Accentuates curves)
-    const violetLight = new THREE.DirectionalLight(0xa855f7, 2.8);
-    violetLight.position.set(-6, 4, -3);
-    scene.add(violetLight);
+    // Front Left Detailing Light (Polished Chrome & Hood reflections)
+    const leftLight = new THREE.DirectionalLight(0xf1f5f9, 3.0);
+    leftLight.position.set(-6, 4, 4);
+    scene.add(leftLight);
 
-    // Cyber Cyan Rim Light (Accentuates rear ducktail spoiler & roofline)
-    const cyanLight = new THREE.DirectionalLight(0x38bdf8, 3.0);
-    cyanLight.position.set(3, 6, -5);
-    scene.add(cyanLight);
+    // Front Right Studio Light (Passenger side curves & rims)
+    const rightLight = new THREE.DirectionalLight(0xf8fafc, 3.0);
+    rightLight.position.set(6, 4, 4);
+    scene.add(rightLight);
 
-    // Underbody Ground Neon Bounce
-    const groundBounce = new THREE.DirectionalLight(0x818cf8, 1.5);
+    // Rear Edge Specular Light (Highlights ducktail spoiler and rear arches)
+    const rearLight = new THREE.DirectionalLight(0xe2e8f0, 2.6);
+    rearLight.position.set(0, 5, -6);
+    scene.add(rearLight);
+
+    // Low Ground Bounce Light
+    const groundBounce = new THREE.DirectionalLight(0xdbeafe, 1.0);
     groundBounce.position.set(0, -3, 0);
     scene.add(groundBounce);
 
-    // 3. Ground Studio Mirror Disk & Cyber Grid
-    const groundGeom = new THREE.CircleGeometry(9, 64);
-    const groundMat = new THREE.MeshStandardMaterial({
-      color: 0x07080f,
-      roughness: 0.2,
-      metalness: 0.85,
-      transparent: true,
-      opacity: 0.85
+    // 3. Overhead Garage LED Strip Light Rig (Detailing Studio Ceiling Lights)
+    const ceilingRig = new THREE.Group();
+    const stripGeom = new THREE.BoxGeometry(0.06, 0.03, 7.5);
+    const stripMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff
     });
-    const ground = new THREE.Mesh(groundGeom, groundMat);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -1.15;
-    scene.add(ground);
 
-    // Subtle Glowing Grid Ring around the car
-    const gridRingGeom = new THREE.RingGeometry(3.2, 3.25, 64);
-    const gridRingMat = new THREE.MeshBasicMaterial({
-      color: 0xa855f7,
-      transparent: true,
-      opacity: 0.35,
-      side: THREE.DoubleSide
+    // 5 Parallel white LED ceiling strips like modern car detailing bays
+    [-1.8, -0.9, 0, 0.9, 1.8].forEach((xOffset) => {
+      const strip = new THREE.Mesh(stripGeom, stripMat);
+      strip.position.set(xOffset, 4.2, 0);
+      ceilingRig.add(strip);
     });
-    const gridRing = new THREE.Mesh(gridRingGeom, gridRingMat);
-    gridRing.rotation.x = -Math.PI / 2;
-    gridRing.position.y = -1.14;
-    scene.add(gridRing);
+    scene.add(ceilingRig);
 
-    // 4. Floating 3D Telemetry Dust Particles (800 particles)
-    const particleCount = 750;
-    const particleGeom = new THREE.BufferGeometry();
-    const posArray = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      posArray[i] = (Math.random() - 0.5) * 18;
-      posArray[i + 1] = Math.random() * 8 - 1.5;
-      posArray[i + 2] = (Math.random() - 0.5) * 18;
-    }
-    particleGeom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    const particleMat = new THREE.PointsMaterial({
-      size: 0.026,
-      color: 0xc4b5fd,
+    // 4. Polished High-Gloss Dark Epoxy Garage Floor
+    const floorGeom = new THREE.PlaneGeometry(30, 30);
+    const floorMat = new THREE.MeshStandardMaterial({
+      color: 0x0a0b10,
+      roughness: 0.14,
+      metalness: 0.9,
       transparent: true,
-      opacity: 0.5,
-      blending: THREE.AdditiveBlending
+      opacity: 0.95
     });
-    const particleField = new THREE.Points(particleGeom, particleMat);
-    scene.add(particleField);
+    const floor = new THREE.Mesh(floorGeom, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -1.15;
+    scene.add(floor);
 
-    // 5. Initial Geometric Wireframe Placeholder (while GLB models load)
+    // Garage Detailing Bay Floor Lines (Crisp Silver & White Markings)
+    const bayLinesGroup = new THREE.Group();
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0, transparent: true, opacity: 0.6 });
+    
+    // Outer parking bay boundary
+    const boundaryGeom = new THREE.RingGeometry(3.6, 3.63, 64);
+    const boundary = new THREE.Mesh(boundaryGeom, lineMat);
+    boundary.rotation.x = -Math.PI / 2;
+    boundary.position.y = -1.14;
+    bayLinesGroup.add(boundary);
+
+    // Left and Right bay guide marks
+    const sideMarkerGeom = new THREE.PlaneGeometry(0.05, 5.5);
+    const leftMarker = new THREE.Mesh(sideMarkerGeom, lineMat);
+    leftMarker.rotation.x = -Math.PI / 2;
+    leftMarker.position.set(-2.2, -1.14, 0);
+    bayLinesGroup.add(leftMarker);
+
+    const rightMarker = new THREE.Mesh(sideMarkerGeom, lineMat);
+    rightMarker.rotation.x = -Math.PI / 2;
+    rightMarker.position.set(2.2, -1.14, 0);
+    bayLinesGroup.add(rightMarker);
+
+    // Wheel stop markers
+    const stopGeom = new THREE.PlaneGeometry(1.2, 0.08);
+    const frontStop = new THREE.Mesh(stopGeom, lineMat);
+    frontStop.rotation.x = -Math.PI / 2;
+    frontStop.position.set(0, -1.14, 2.5);
+    bayLinesGroup.add(frontStop);
+
+    scene.add(bayLinesGroup);
+
+    // 5. Initial Geometric Placeholder (while GLB models load)
     const placeholderGroup = new THREE.Group();
     const wireGeom = new THREE.IcosahedronGeometry(2.0, 1);
     const wireMat = new THREE.MeshStandardMaterial({
-      color: 0x8b5cf6,
+      color: 0xd4d4d8,
       wireframe: true,
       transparent: true,
       opacity: 0.4
@@ -147,7 +166,7 @@ export default function CinematicSequence() {
     // 6. GLTF Loader Setup with BIG Model Scaling
     const loader = new GLTFLoader();
 
-    // Helper: Normalize & center 3D model with LARGER scale
+    // Helper: Normalize & center 3D model with LARGER scale for high impact
     const normalizeModel = (gltfScene, targetDim = 5.6) => {
       const box = new THREE.Box3().setFromObject(gltfScene);
       const center = box.getCenter(new THREE.Vector3());
@@ -160,15 +179,15 @@ export default function CinematicSequence() {
       gltfScene.position.y = -center.y * scale - 0.12;
       gltfScene.position.z = -center.z * scale;
 
-      // Enhance materials for photorealistic paint & chrome reflections
+      // Enhance materials for realistic paint, glass, chrome and clearcoat
       gltfScene.traverse((child) => {
         if (child.isMesh && child.material) {
           child.castShadow = true;
           child.receiveShadow = true;
           if (child.material.isMeshStandardMaterial) {
-            child.material.envMapIntensity = 2.0;
-            child.material.roughness = Math.max(0.08, child.material.roughness * 0.85);
-            child.material.metalness = Math.min(0.95, child.material.metalness * 1.15);
+            child.material.envMapIntensity = 2.2;
+            child.material.roughness = Math.max(0.06, child.material.roughness * 0.85);
+            child.material.metalness = Math.min(0.96, child.material.metalness * 1.15);
             child.material.needsUpdate = true;
           }
         }
@@ -184,7 +203,7 @@ export default function CinematicSequence() {
       '/secondfream.glb',
       (gltf) => {
         const porsche = normalizeModel(gltf.scene, 5.6);
-        porsche.rotation.y = -Math.PI / 2.2; // Majestic 3/4 hero angle
+        porsche.rotation.y = -Math.PI / 2.2; // 3/4 Studio Hero Stance
         carModelRef.current = porsche;
         carRootGroup.add(porsche);
 
@@ -287,10 +306,6 @@ export default function CinematicSequence() {
     const animate = (time) => {
       animId = requestAnimationFrame(animate);
 
-      // Particle subtle ambient motion
-      particleField.rotation.y += 0.0004;
-      gridRing.rotation.z += 0.002;
-
       // Model Unveiling Logic
       const mode = activeModeRef.current;
       const cover = coverModelRef.current;
@@ -331,7 +346,7 @@ export default function CinematicSequence() {
       camera.position.z += (targetCamZ - camera.position.z) * 0.07;
       camera.lookAt(carRootGroup.position.x, 0.15, 0);
 
-      // Throttle live telemetry HUD updates
+      // Live telemetry coordinates update
       if (time - lastTelemetryUpdate > 80) {
         lastTelemetryUpdate = time;
         const degY = Math.round((carRootGroup.rotation.y * 180) / Math.PI) % 360;
@@ -361,13 +376,13 @@ export default function CinematicSequence() {
       const frame = Math.min(240, Math.max(1, Math.floor(progress * 239) + 1));
       setCurrentFrame(frame);
 
-      // Cinematic 360-degree camera & model choreography:
-      // Stage 1 (0.00 - 0.18): Hero 3/4 front pose with cover
-      // Stage 2 (0.20 - 0.35): Unveiled front-side profile
-      // Stage 3 (0.36 - 0.52): Dramatic low front quarter
-      // Stage 4 (0.54 - 0.70): Rear 911 Turbo ducktail spoiler & dual exhausts
+      // Cinematic 360-degree camera & model choreography in the garage:
+      // Stage 1 (0.00 - 0.18): Hero front 3/4 stance
+      // Stage 2 (0.20 - 0.35): Unveiled side profile & alloy wheels
+      // Stage 3 (0.36 - 0.52): Front hood & headlights inspection
+      // Stage 4 (0.54 - 0.70): Rear ducktail spoiler & dual exhausts
       // Stage 5 (0.72 - 0.86): Top aerodynamic telemetry angle
-      // Stage 6 (0.88 - 1.00): Majestic studio pose with full lighting
+      // Stage 6 (0.88 - 1.00): Full studio showroom pose
       scrollRotY = progress * Math.PI * 4;
       scrollRotX = Math.sin(progress * Math.PI * 2) * 0.12;
       targetCamY = 0.85 + Math.sin(progress * Math.PI * 3) * 0.35;
@@ -401,12 +416,14 @@ export default function CinematicSequence() {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
       renderer.dispose();
-      groundGeom.dispose();
-      groundMat.dispose();
-      gridRingGeom.dispose();
-      gridRingMat.dispose();
-      particleGeom.dispose();
-      particleMat.dispose();
+      floorGeom.dispose();
+      floorMat.dispose();
+      stripGeom.dispose();
+      stripMat.dispose();
+      boundaryGeom.dispose();
+      sideMarkerGeom.dispose();
+      stopGeom.dispose();
+      lineMat.dispose();
       wireGeom.dispose();
       wireMat.dispose();
     };
@@ -426,25 +443,25 @@ export default function CinematicSequence() {
 
   const chapters = [
     {
-      step: '01 / 06',
-      tag: 'SYSTEM PROFILE',
+      step: 'BAY 01 / 06',
+      tag: 'CHASSIS & ARCHITECTURE',
       title: 'NIHAL MV',
       subtitle: 'MERN STACK DEVELOPER • KERALA, INDIA',
-      description: 'Architecting high-concurrency web applications with React.js, Node.js, Express, and MongoDB.',
+      description: 'Precision fullstack engineering with React, Node.js, Express, and MongoDB. Hand-built with clean code discipline.',
       badge: 'BCA 2023–2026',
-      icon: Cpu,
+      icon: Wrench,
       stats: [
         { label: 'STACK', val: 'MERN' },
-        { label: 'ROLE', val: 'FULLSTACK' },
-        { label: 'LOCATION', val: 'KERALA' }
+        { label: 'ENGINEERING', val: 'FULLSTACK' },
+        { label: 'GARAGE BASE', val: 'KERALA' }
       ]
     },
     {
-      step: '02 / 06',
-      tag: 'RUNTIME DYNAMICS',
-      title: 'PURE PROPULSION',
-      subtitle: 'UNVEILED SYSTEM PERFORMANCE',
-      description: 'Sub-second initial paint velocity, zero layout shifts, and non-blocking asynchronous event loops.',
+      step: 'BAY 02 / 06',
+      tag: 'RUNTIME TELEMETRY',
+      title: 'PERFORMANCE BENCHMARK',
+      subtitle: 'UNVEILED SYSTEM RIGIDITY',
+      description: 'Sub-second initial paint, zero layout shifts, and non-blocking asynchronous event loop execution.',
       badge: '99+ LIGHTHOUSE',
       icon: Gauge,
       stats: [
@@ -454,22 +471,22 @@ export default function CinematicSequence() {
       ]
     },
     {
-      step: '03 / 06',
-      tag: 'FRONTEND ARCHITECTURE',
+      step: 'BAY 03 / 06',
+      tag: 'FRONTEND AERODYNAMICS',
       title: 'REACT & TAILWIND',
       subtitle: 'MODULAR UI & ACCESSIBILITY',
-      description: 'Clean component tree, deterministic hook state management, and fluid responsive styling across all devices.',
+      description: 'Single-source-of-truth component state, fluid responsive breakpoints, and strict semantic markup.',
       badge: 'REACT 19 + VITE',
       icon: Layout,
       stats: [
         { label: 'FRAME RATE', val: '60/120' },
         { label: 'RESPONSIVE', val: '100%' },
-        { label: 'BUNDLE', val: '< 50 KB' }
+        { label: 'BUNDLE GZIP', val: '< 50 KB' }
       ]
     },
     {
-      step: '04 / 06',
-      tag: 'BACKEND SERVICES',
+      step: 'BAY 04 / 06',
+      tag: 'POWERTRAIN SERVICES',
       title: 'NODE & REST APIS',
       subtitle: 'SECURE ASYNCHRONOUS SERVER',
       description: 'Modular routing controllers, strict input validation, CORS security, and resilient error boundary handlers.',
@@ -477,27 +494,27 @@ export default function CinematicSequence() {
       icon: Cpu,
       stats: [
         { label: 'PROTOCOL', val: 'REST' },
-        { label: 'I/O TYPE', val: 'NON-BLOCK' },
-        { label: 'SECURITY', val: 'CORS + ENV' }
+        { label: 'I/O PIPELINE', val: 'NON-BLOCK' },
+        { label: 'SECURITY', val: 'STRICT' }
       ]
     },
     {
-      step: '05 / 06',
-      tag: 'DATABASE PERSISTENCE',
+      step: 'BAY 05 / 06',
+      tag: 'DATA STORAGE & RETRIEVAL',
       title: 'MONGODB ATLAS',
-      subtitle: 'HIGH-CONCURRENCY STORAGE',
+      subtitle: 'TRANSACTIONAL DATA PIPELINE',
       description: 'Mongoose document schema modeling, indexing strategies, and automated cloud clustering for retail data.',
       badge: 'ATLAS CLOUD',
       icon: Database,
       stats: [
         { label: 'SCHEMA', val: 'STRICT' },
         { label: 'QUERIES', val: 'INDEXED' },
-        { label: 'PERSISTENCE', val: 'ACID' }
+        { label: 'AVAILABILITY', val: '99.99%' }
       ]
     },
     {
-      step: '06 / 06',
-      tag: 'PRODUCTION ARCHIVE',
+      step: 'BAY 06 / 06',
+      tag: 'GARAGE SHOWROOM',
       title: 'FEATURED CREATIONS',
       subtitle: 'DEPLOYED APPLICATIONS',
       description: 'Explore SmartMart AI (Billing System), TrachMart (E-Commerce), and GoTravel (Travel Platform).',
@@ -505,8 +522,8 @@ export default function CinematicSequence() {
       icon: Sparkles,
       stats: [
         { label: 'PRODUCTIONS', val: '3+' },
-        { label: 'REPOSITORIES', val: 'PUBLIC' },
-        { label: 'DEPLOYED', val: 'VERCEL' }
+        { label: 'SOURCE CODE', val: 'GITHUB' },
+        { label: 'HOSTING', val: 'VERCEL' }
       ]
     }
   ];
@@ -519,7 +536,7 @@ export default function CinematicSequence() {
     <div
       ref={containerRef}
       id="cinematic-sequence"
-      className="relative w-full h-[650vh] bg-[#07080f]"
+      className="relative w-full h-[650vh] bg-[#08090d]"
     >
       {/* Sticky 100dvh Viewport Container */}
       <div className="sticky top-0 h-[100dvh] w-full flex items-center justify-between overflow-hidden z-10">
@@ -528,57 +545,57 @@ export default function CinematicSequence() {
         <canvas
           ref={canvasRef}
           role="img"
-          aria-label="3D Supercar Telemetry Canvas"
+          aria-label="3D Supercar Detailing Garage Canvas"
           className="absolute inset-0 w-full h-full block object-cover z-0 cursor-grab active:cursor-grabbing"
         />
 
         {/* Ambient Dark Studio Vignette */}
-        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(7,8,15,0.75)_100%)] z-[1]" />
+        <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(8,9,13,0.85)_100%)] z-[1]" />
 
-        {/* Top High-Tech HUD Header */}
+        {/* Top High-Tech Silver & Black HUD Header */}
         <header className="absolute top-0 left-0 right-0 z-30 px-6 sm:px-12 py-5 flex items-center justify-between pointer-events-auto">
           {/* Logo & Status */}
           <a href="#" className="flex items-center gap-3.5 group focus:outline-none" aria-label="Nihal MV - Return to top">
-            <div className="w-8 h-8 rounded-lg bg-violet-600/20 border border-violet-500/40 flex items-center justify-center text-violet-400 group-hover:scale-105 transition-transform shadow-lg shadow-violet-950/40">
+            <div className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-600/50 flex items-center justify-center text-white group-hover:scale-105 transition-transform shadow-lg shadow-black/60">
               <span className="text-xs font-mono font-bold">N</span>
             </div>
             <div>
               <span className="text-sm sm:text-base font-semibold tracking-wider text-white uppercase leading-none block">
                 NIHAL MV
               </span>
-              <span className="text-[9px] font-mono tracking-widest text-violet-400/80 uppercase">
-                MERN ARCHITECT
+              <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase">
+                MERN GARAGE STUDIO
               </span>
             </div>
           </a>
 
-          {/* Center Monospaced Navigation */}
+          {/* Center Silver Monospaced Navigation */}
           <nav className="hidden lg:flex items-center gap-8" aria-label="Main Navigation">
-            <a href="#philosophy" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
+            <a href="#philosophy" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-colors">
               PHILOSOPHY
             </a>
-            <a href="#telemetry" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
+            <a href="#telemetry" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-colors">
               TELEMETRY
             </a>
-            <a href="#technology" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
+            <a href="#technology" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-colors">
               TECHNOLOGY
             </a>
-            <a href="#creations" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
+            <a href="#creations" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-colors">
               CREATIONS
             </a>
-            <a href="#contact" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-violet-300 transition-colors">
+            <a href="#contact" className="text-xs font-mono uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition-colors">
               CONTACT
             </a>
           </nav>
 
           {/* Right Controls: 3D Model Mode Switcher + Quick Actions */}
           <div className="flex items-center gap-3">
-            {/* 3D Model Switcher */}
-            <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-[#0e101d]/90 border border-violet-500/30 backdrop-blur-md text-[10px] font-mono tracking-wider uppercase shadow-lg shadow-black/40">
+            {/* 3D Model Switcher (Silver & Black Theme) */}
+            <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-[#111318]/95 border border-zinc-700/60 backdrop-blur-md text-[10px] font-mono tracking-wider uppercase shadow-xl shadow-black/50">
               <button
                 onClick={() => setActiveModelMode('auto')}
                 className={`px-3 py-1 rounded-full transition-all ${
-                  activeModelMode === 'auto' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold shadow' : 'text-zinc-400 hover:text-white'
+                  activeModelMode === 'auto' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-bold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
                 title="Scroll Unveil Mode"
               >
@@ -587,7 +604,7 @@ export default function CinematicSequence() {
               <button
                 onClick={() => setActiveModelMode('unveiled')}
                 className={`px-3 py-1 rounded-full transition-all ${
-                  activeModelMode === 'unveiled' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold shadow' : 'text-zinc-400 hover:text-white'
+                  activeModelMode === 'unveiled' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-bold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
                 title="Force Show Porsche 911 Turbo"
               >
@@ -596,7 +613,7 @@ export default function CinematicSequence() {
               <button
                 onClick={() => setActiveModelMode('covered')}
                 className={`px-3 py-1 rounded-full transition-all ${
-                  activeModelMode === 'covered' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold shadow' : 'text-zinc-400 hover:text-white'
+                  activeModelMode === 'covered' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-bold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
                 title="Force Show Covered Prototype"
               >
@@ -607,7 +624,7 @@ export default function CinematicSequence() {
             {/* Scroll to Top */}
             <button
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 hover:border-violet-500/40 text-zinc-300 hover:text-white text-xs font-mono tracking-wider uppercase transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-zinc-700 hover:border-zinc-400 bg-zinc-900/60 text-zinc-300 hover:text-white text-xs font-mono tracking-wider uppercase transition-colors"
               aria-label="Scroll to top"
             >
               <span>TOP</span>
@@ -616,16 +633,16 @@ export default function CinematicSequence() {
           </div>
         </header>
 
-        {/* LEFT COLUMN: High-Tech Telemetry HUD Dashboard */}
+        {/* LEFT COLUMN: Car Care Garage Telemetry HUD Dashboard */}
         <div className="relative z-20 w-full max-w-lg lg:max-w-md px-6 sm:px-10 lg:pl-12 lg:pr-0 pointer-events-none select-none flex flex-col justify-center">
-          <div className="p-6 sm:p-7 rounded-3xl bg-[#0a0c16]/85 border border-violet-500/25 backdrop-blur-xl shadow-2xl shadow-black/80 pointer-events-auto transition-all duration-300">
+          <div className="p-6 sm:p-7 rounded-3xl bg-[#0e1017]/90 border border-zinc-700/60 backdrop-blur-xl shadow-2xl shadow-black/90 pointer-events-auto transition-all duration-300">
             
             {/* HUD Status Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+            <div className="flex items-center justify-between pb-4 border-b border-zinc-800 mb-5">
               <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
-                <span className="text-[10px] font-mono tracking-[0.25em] text-emerald-400 font-bold uppercase">
-                  3D TELEMETRY ACTIVE
+                <span className="w-2 h-2 rounded-full bg-slate-300 shadow-[0_0_8px_#ffffff] animate-pulse" />
+                <span className="text-[10px] font-mono tracking-[0.25em] text-slate-200 font-bold uppercase">
+                  GARAGE DETAILING BAY
                 </span>
               </div>
               <span className="text-[10px] font-mono tracking-widest text-zinc-400">
@@ -634,8 +651,8 @@ export default function CinematicSequence() {
             </div>
 
             {/* Chapter Tag Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-950/50 border border-violet-500/30 text-violet-300 text-[10px] font-mono tracking-widest uppercase mb-3">
-              <IconComponent size={13} className="text-violet-400 shrink-0" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800/70 border border-zinc-600/40 text-slate-200 text-[10px] font-mono tracking-widest uppercase mb-3">
+              <IconComponent size={13} className="text-zinc-300 shrink-0" />
               <span>{currentChapterData.tag}</span>
             </div>
 
@@ -652,14 +669,14 @@ export default function CinematicSequence() {
               {currentChapterData.description}
             </p>
 
-            {/* Live Telemetry Stats Grid */}
+            {/* Live Telemetry Stats Grid in Polished Silver */}
             <div className="grid grid-cols-3 gap-2.5 mb-6">
               {currentChapterData.stats.map((stat, i) => (
-                <div key={i} className="p-2.5 rounded-xl bg-black/50 border border-white/10">
+                <div key={i} className="p-2.5 rounded-xl bg-black/60 border border-zinc-800">
                   <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
                     {stat.label}
                   </span>
-                  <span className="text-xs sm:text-sm font-bold font-mono text-white">
+                  <span className="text-xs sm:text-sm font-bold font-mono text-slate-100">
                     {stat.val}
                   </span>
                 </div>
@@ -667,10 +684,10 @@ export default function CinematicSequence() {
             </div>
 
             {/* Real-time 3D Coordinates Readout */}
-            <div className="pt-4 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-zinc-400">
+            <div className="pt-4 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-400">
               <div className="flex items-center gap-3">
-                <span>YAW: <strong className="text-violet-300">{telemetryCoords.rotY}°</strong></span>
-                <span>PITCH: <strong className="text-violet-300">{telemetryCoords.rotX}°</strong></span>
+                <span>YAW: <strong className="text-slate-200">{telemetryCoords.rotY}°</strong></span>
+                <span>PITCH: <strong className="text-slate-200">{telemetryCoords.rotX}°</strong></span>
               </div>
               <span className="text-zinc-500">
                 ZOOM: {telemetryCoords.rotZ}%
@@ -679,13 +696,13 @@ export default function CinematicSequence() {
 
             {/* Chapter Action CTA (If on stage 6) */}
             {activeChapter === 5 && (
-              <div className="mt-5 pt-4 border-t border-white/10">
+              <div className="mt-5 pt-4 border-t border-zinc-800">
                 <button
                   onClick={() => {
                     const el = document.getElementById('creations');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold text-xs uppercase tracking-widest hover:from-violet-500 hover:to-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-600/40"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-zinc-100 via-slate-200 to-zinc-300 text-black font-bold text-xs uppercase tracking-widest hover:from-white hover:to-zinc-200 transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/60"
                 >
                   <span>EXPLORE FEATURED PROJECTS</span>
                   <ArrowRight size={14} />
@@ -697,25 +714,25 @@ export default function CinematicSequence() {
 
           {/* Interactive 3D Hint */}
           <div className="mt-4 flex items-center gap-2 text-[10px] font-mono text-zinc-500 tracking-wider">
-            <Move3d size={13} className="text-violet-400 animate-pulse" />
-            <span>CLICK & DRAG CAR TO ROTATE 360° IN 3D</span>
+            <Move3d size={13} className="text-slate-300 animate-pulse" />
+            <span>CLICK & DRAG 3D CAR • ROTATE IN STUDIO LIGHT</span>
           </div>
         </div>
 
         {/* BOTTOM HUD FOOTER: Progress Bar & Frame Counter */}
-        <div className="absolute bottom-6 left-0 right-0 z-30 px-6 sm:px-12 flex items-center justify-between border-t border-white/10 pt-4 pointer-events-auto">
+        <div className="absolute bottom-6 left-0 right-0 z-30 px-6 sm:px-12 flex items-center justify-between border-t border-zinc-800 pt-4 pointer-events-auto">
           {/* Left Frame Status */}
           <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
             <span className="text-white font-bold tracking-widest">PORSCHE 911 TURBO</span>
             <span>—</span>
             <span>FRAME {formattedFrame} / 240</span>
             {modelLoaded ? (
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-[10px] text-emerald-400 font-bold">
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-600/50 text-[10px] text-slate-200 font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                3D GLB ONLINE
+                STUDIO GLB ACTIVE
               </span>
             ) : (
-              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-500/30 text-[10px] text-amber-400 font-mono">
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-600/50 text-[10px] text-zinc-300 font-mono">
                 DOWNLOADING 3D MESH ({loadingPercent}%)
               </span>
             )}
@@ -728,8 +745,8 @@ export default function CinematicSequence() {
                 key={idx}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   activeChapter === idx
-                    ? 'w-7 bg-violet-400 shadow-[0_0_8px_#a855f7]'
-                    : 'w-2 bg-white/20'
+                    ? 'w-7 bg-white shadow-[0_0_8px_#ffffff]'
+                    : 'w-2 bg-zinc-700'
                 }`}
               />
             ))}
