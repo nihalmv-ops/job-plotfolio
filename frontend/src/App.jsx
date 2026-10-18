@@ -39,7 +39,7 @@ export default function App() {
         Skip to main content
       </a>
 
-      {/* Flagship Cinematic 650vh Sticky 3D WebGL Detailing Bay Sequence */}
+      {/* Flagship Cinematic Sticky 3D WebGL Detailing Bay Sequence */}
       <CinematicSequence />
 
       {/* Content Sections in Silver & Black Detailing Theme */}
