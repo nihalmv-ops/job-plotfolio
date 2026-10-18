@@ -71,10 +71,14 @@ export default function CinematicSequence() {
     // Camera positioned for large studio garage perspective
     camera.position.set(1.5, 0.85, 4.8);
 
-    // Parent group for car & animations
+    // Parent group for car & round stage placed distinctly in the right side area
     const carRootGroup = new THREE.Group();
     if (window.innerWidth >= 1024) {
-      carRootGroup.position.x = 0.9;
+      carRootGroup.position.x = 1.35; // Anchored in the right side area
+    } else if (window.innerWidth >= 768) {
+      carRootGroup.position.x = 0.6;
+    } else {
+      carRootGroup.position.x = 0;
     }
     carRootGroupRef.current = carRootGroup;
     scene.add(carRootGroup);
@@ -138,37 +142,66 @@ export default function CinematicSequence() {
     floor.position.y = -1.15;
     scene.add(floor);
 
-    // Garage Detailing Bay Floor Lines (Crisp Silver & White Markings)
-    const bayLinesGroup = new THREE.Group();
-    const lineMat = new THREE.MeshBasicMaterial({ color: 0xe2e8f0, transparent: true, opacity: 0.6 });
+    // 5. Photorealistic Automotive Turntable Round Stage
+    const stageGroup = new THREE.Group();
+
+    // Stage Top / Main Cylindrical Disc Platform
+    const stageGeom = new THREE.CylinderGeometry(3.5, 3.65, 0.16, 64);
+    const stageMat = new THREE.MeshStandardMaterial({
+      color: 0x111318,
+      metalness: 0.9,
+      roughness: 0.18,
+      envMapIntensity: 2.2
+    });
+    const stageMesh = new THREE.Mesh(stageGeom, stageMat);
+    stageMesh.position.y = -1.07; // Base rests on floor at -1.15, top surface is at -0.99
+    stageMesh.receiveShadow = true;
+    stageMesh.castShadow = true;
+    stageGroup.add(stageMesh);
+
+    // Beveled Chrome/Silver Outer Bezel Edge Ring
+    const bezelGeom = new THREE.TorusGeometry(3.51, 0.035, 16, 64);
+    const bezelMat = new THREE.MeshStandardMaterial({
+      color: 0xe2e8f0,
+      metalness: 0.98,
+      roughness: 0.08
+    });
+    const bezelMesh = new THREE.Mesh(bezelGeom, bezelMat);
+    bezelMesh.rotation.x = Math.PI / 2;
+    bezelMesh.position.y = -0.99;
+    stageGroup.add(bezelMesh);
+
+    // Stage Surface Concentric Detailing Rings (Brushed Silver)
+    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0xcbd5e1, transparent: true, opacity: 0.5 });
     
-    // Outer parking bay boundary
-    const boundaryGeom = new THREE.RingGeometry(3.6, 3.63, 64);
-    const boundary = new THREE.Mesh(boundaryGeom, lineMat);
-    boundary.rotation.x = -Math.PI / 2;
-    boundary.position.y = -1.14;
-    bayLinesGroup.add(boundary);
+    // Outer accent ring on stage surface
+    const stageRing1Geom = new THREE.RingGeometry(2.5, 2.52, 64);
+    const stageRing1 = new THREE.Mesh(stageRing1Geom, stageRingMat);
+    stageRing1.rotation.x = -Math.PI / 2;
+    stageRing1.position.y = -0.988;
+    stageGroup.add(stageRing1);
 
-    // Left and Right bay guide marks
-    const sideMarkerGeom = new THREE.PlaneGeometry(0.05, 5.5);
-    const leftMarker = new THREE.Mesh(sideMarkerGeom, lineMat);
-    leftMarker.rotation.x = -Math.PI / 2;
-    leftMarker.position.set(-2.2, -1.14, 0);
-    bayLinesGroup.add(leftMarker);
+    // Inner accent ring on stage surface
+    const stageRing2Geom = new THREE.RingGeometry(1.3, 1.315, 64);
+    const stageRing2 = new THREE.Mesh(stageRing2Geom, stageRingMat);
+    stageRing2.rotation.x = -Math.PI / 2;
+    stageRing2.position.y = -0.988;
+    stageGroup.add(stageRing2);
 
-    const rightMarker = new THREE.Mesh(sideMarkerGeom, lineMat);
-    rightMarker.rotation.x = -Math.PI / 2;
-    rightMarker.position.set(2.2, -1.14, 0);
-    bayLinesGroup.add(rightMarker);
+    // Stage LED Halo Underglow Ring on Floor
+    const haloGeom = new THREE.RingGeometry(3.55, 3.7, 64);
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.85
+    });
+    const haloMesh = new THREE.Mesh(haloGeom, haloMat);
+    haloMesh.rotation.x = -Math.PI / 2;
+    haloMesh.position.y = -1.145;
+    stageGroup.add(haloMesh);
 
-    // Wheel stop markers
-    const stopGeom = new THREE.PlaneGeometry(1.2, 0.08);
-    const frontStop = new THREE.Mesh(stopGeom, lineMat);
-    frontStop.rotation.x = -Math.PI / 2;
-    frontStop.position.set(0, -1.14, 2.5);
-    bayLinesGroup.add(frontStop);
-
-    scene.add(bayLinesGroup);
+    // Add round stage directly to carRootGroup so both car and stage turn in harmony
+    carRootGroup.add(stageGroup);
 
     // 5. Initial Geometric Placeholder (while GLB models load)
     const placeholderGroup = new THREE.Group();
@@ -196,8 +229,9 @@ export default function CinematicSequence() {
 
       gltfScene.scale.setScalar(scale);
       gltfScene.position.x = -center.x * scale;
-      gltfScene.position.y = -center.y * scale - 0.12;
       gltfScene.position.z = -center.z * scale;
+      // Precision Grounding: Sets wheels flush on top of the round stage platform at y = -0.99
+      gltfScene.position.y = -box.min.y * scale - 0.99;
 
       // Enhance materials for realistic paint, glass, chrome and clearcoat
       gltfScene.traverse((child) => {
@@ -387,7 +421,7 @@ export default function CinematicSequence() {
 
       camera.position.y += (targetCamY - camera.position.y) * 0.07;
       camera.position.z += (targetCamZ - camera.position.z) * 0.07;
-      camera.lookAt(carRootGroup.position.x, 0.15, 0);
+      camera.lookAt(carRootGroup.position.x, -0.10, 0);
 
       // Live telemetry coordinates update
       if (time - lastTelemetryUpdate > 80) {
@@ -459,7 +493,9 @@ export default function CinematicSequence() {
       renderer.setSize(window.innerWidth, window.innerHeight);
 
       if (window.innerWidth >= 1024) {
-        carRootGroup.position.x = 0.9;
+        carRootGroup.position.x = 1.35; // Anchored in the right side area
+      } else if (window.innerWidth >= 768) {
+        carRootGroup.position.x = 0.6;
       } else {
         carRootGroup.position.x = 0;
       }
@@ -481,10 +517,15 @@ export default function CinematicSequence() {
       floorMat.dispose();
       stripGeom.dispose();
       stripMat.dispose();
-      boundaryGeom.dispose();
-      sideMarkerGeom.dispose();
-      stopGeom.dispose();
-      lineMat.dispose();
+      stageGeom.dispose();
+      stageMat.dispose();
+      bezelGeom.dispose();
+      bezelMat.dispose();
+      stageRing1Geom.dispose();
+      stageRing2Geom.dispose();
+      stageRingMat.dispose();
+      haloGeom.dispose();
+      haloMat.dispose();
       wireGeom.dispose();
       wireMat.dispose();
     };
