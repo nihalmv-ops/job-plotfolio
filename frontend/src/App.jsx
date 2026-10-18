@@ -1,4 +1,7 @@
 import React from 'react';
+import ThreeBackground from './components/ThreeBackground';
+import SmoothScroll from './components/SmoothScroll';
+import GlowCursor from './components/GlowCursor';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -10,7 +13,16 @@ import Footer from './components/Footer';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-[#0b0c14] text-white flex flex-col font-sans selection:bg-violet-700 selection:text-white">
+    <div className="min-h-screen bg-[#0b0c14] text-white flex flex-col font-sans selection:bg-violet-700 selection:text-white relative overflow-x-hidden">
+      {/* Lenis Smooth Scroll Engine */}
+      <SmoothScroll />
+
+      {/* Interactive 3D Three.js Background with constellation & floating wireframe shapes */}
+      <ThreeBackground />
+
+      {/* Dynamic Cursor Violet Glow Orb */}
+      <GlowCursor />
+
       {/* Accessibility Skip Link */}
       <a
         href="#main-content"
@@ -23,7 +35,7 @@ export default function App() {
       <Navbar />
 
       {/* Main Content Sections */}
-      <main id="main-content" className="flex-1">
+      <main id="main-content" className="flex-1 relative z-10">
         <Hero />
         <About />
         <Skills />
