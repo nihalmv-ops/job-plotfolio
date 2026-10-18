@@ -4,48 +4,44 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { 
   ArrowDown, 
   ArrowUp, 
-  ArrowRight, 
   Move3d, 
-  Sparkles, 
-  Layers, 
-  ShieldCheck,
-  Check
+  Sparkles
 } from 'lucide-react';
 
 // ============================================================================
-// 🏎️ 3D CAR SLOTS CONFIGURATION
-// Slot 1: First car (Frame 01 prototype - BMW M4 Coupe)
-// Slot 2: Second car (Frame 02 unveiled hero car - Porsche 911 Turbo)
-// Files reside in frontend/public/
+// 🏎️ 6-BAY 3D CAR FLEET CONFIGURATION
+// All 6 GLB models mapped across the entire portfolio journey:
+// 1. Hero: firstfream.glb (BMW M4 Prototype)
+// 2. Bay 01: secondfream.glb (Porsche 911 Turbo)
+// 3. Bay 02: thirdfream.glb (Telemetry Spec)
+// 4. Bay 03: forthfream.glb (Technology Hypercar)
+// 5. Bay 04: fifthfream.glb (Creations Track Machine)
+// 6. Bay 05 & 06: sixthfream.glb (Apex Masterpiece)
 // ============================================================================
-export const CAR_SLOTS = {
-  frame1: {
-    url: '/firstfream.glb',
-    targetDim: 5.75,
-    name: 'FRAME 01 // BMW M4 COUPE'
-  },
-  frame2: {
-    url: '/secondfream.glb',
-    targetDim: 5.6,
-    name: 'FRAME 02 // PORSCHE 911 TURBO'
-  }
-};
+export const CAR_SLOTS = [
+  { id: 1, name: 'FRAME 01 // BMW M4 COUPE', url: '/firstfream.glb', targetDim: 5.75, bay: 'HERO STUDIO' },
+  { id: 2, name: 'FRAME 02 // PORSCHE 911 TURBO', url: '/secondfream.glb', targetDim: 5.6, bay: 'BAY 01 PHILOSOPHY' },
+  { id: 3, name: 'FRAME 03 // TELEMETRY GT', url: '/thirdfream.glb', targetDim: 5.6, bay: 'BAY 02 TELEMETRY' },
+  { id: 4, name: 'FRAME 04 // TECH HYPERCAR', url: '/forthfream.glb', targetDim: 5.6, bay: 'BAY 03 TECHNOLOGY' },
+  { id: 5, name: 'FRAME 05 // CREATIONS MONSTER', url: '/fifthfream.glb', targetDim: 5.6, bay: 'BAY 04 CREATIONS' },
+  { id: 6, name: 'FRAME 06 // APEX PROTOCOL', url: '/sixthfream.glb', targetDim: 5.6, bay: 'BAY 05 & 06' }
+];
 
 export default function CinematicSequence() {
   const canvasRef = useRef(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [heroProgress, setHeroProgress] = useState(0);
   const [currentFrame, setCurrentFrame] = useState(1);
-  const [activeModelMode, setActiveModelMode] = useState('auto'); // 'auto', 'unveiled', 'covered'
-  const [modelLoaded, setModelLoaded] = useState(false);
-  const [loadingPercent, setLoadingPercent] = useState(0);
+  const [activeCarSlotIndex, setActiveCarSlotIndex] = useState(0);
+  const [activeModelMode, setActiveModelMode] = useState('auto'); // 'auto', or 0..5 for manual lock
+  const [loadedCount, setLoadedCount] = useState(0);
+  const [loadingStatusText, setLoadingStatusText] = useState('CALIBRATING 3D STUDIO');
 
   // Live 3D telemetry coordinates state
   const [telemetryCoords, setTelemetryCoords] = useState({ rotX: 0, rotY: 0, rotZ: 0 });
 
   // References for cross-scope model and interaction control
-  const coverModelRef = useRef(null); // Slot 1 model
-  const carModelRef = useRef(null);   // Slot 2 model
+  const loadedModelsRef = useRef([null, null, null, null, null, null]);
   const carRootGroupRef = useRef(null);
   const activeModeRef = useRef('auto');
   activeModeRef.current = activeModelMode;
@@ -81,9 +77,9 @@ export default function CinematicSequence() {
     // Parent group for car & round stage placed in the right side area on desktop
     const carRootGroup = new THREE.Group();
     if (window.innerWidth >= 1024) {
-      carRootGroup.position.x = 1.45;
+      carRootGroup.position.set(1.45, 0, 0);
     } else if (window.innerWidth >= 768) {
-      carRootGroup.position.x = 0.65;
+      carRootGroup.position.set(0.65, 0, 0);
     } else {
       carRootGroup.position.set(0, -0.2, 0);
     }
@@ -198,7 +194,7 @@ export default function CinematicSequence() {
 
     carRootGroup.add(stageGroup);
 
-    // 6. High-Tech 3D Laser Scanning Beam (Transition Effect between Frame 1 & 2)
+    // 6. High-Tech 3D Laser Scanning Beam (Transition Effect between Cars)
     const scanRig = new THREE.Group();
     scanRig.visible = false;
 
@@ -293,67 +289,42 @@ export default function CinematicSequence() {
       });
     };
 
-    let frame1Loaded = false;
-    let frame2Loaded = false;
-    let frame1Bytes = 0;
-    let frame2Bytes = 0;
-    const totalEst = 59942484 + 21970656;
+    // Progressive Sequential Loader: Slot 1 & 2 load first for instant startup, then 3, 4, 5, 6
+    let loadedCounter = 0;
+    const loadSlot = (index) => {
+      if (index >= CAR_SLOTS.length) return;
+      const slot = CAR_SLOTS[index];
+      setLoadingStatusText(`STREAMING ${slot.name}`);
 
-    const checkLoadingStatus = () => {
-      const pct = Math.min(100, Math.round(((frame1Bytes + frame2Bytes) / totalEst) * 100));
-      setLoadingPercent(pct);
-      if (frame1Loaded || frame2Loaded) {
-        setModelLoaded(true);
-      }
+      loader.load(
+        slot.url,
+        (gltf) => {
+          const modelWrapper = normalizeModel(gltf.scene, slot.targetDim);
+          modelWrapper.rotation.y = -Math.PI / 2.2;
+          modelWrapper.visible = (index === 0);
+          setMeshOpacity(modelWrapper, 1.0);
+
+          loadedModelsRef.current[index] = modelWrapper;
+          carRootGroup.add(modelWrapper);
+
+          loadedCounter++;
+          setLoadedCount(loadedCounter);
+          setLoadingStatusText(`ACTIVE: ${loadedCounter} / 6 CARS`);
+
+          // Load next slot in background
+          loadSlot(index + 1);
+        },
+        undefined,
+        (err) => {
+          console.warn(`Could not load ${slot.url}:`, err);
+          // Try next slot anyway
+          loadSlot(index + 1);
+        }
+      );
     };
 
-    // Load Slot 1 (Frame 01 Car - BMW M4 Prototype)
-    loader.load(
-      CAR_SLOTS.frame1.url,
-      (gltf) => {
-        const firstCar = normalizeModel(gltf.scene, CAR_SLOTS.frame1.targetDim);
-        firstCar.rotation.y = -Math.PI / 2.2;
-        setMeshOpacity(firstCar, 1.0);
-        coverModelRef.current = firstCar;
-        carRootGroup.add(firstCar);
-        frame1Loaded = true;
-        frame1Bytes = 59942484;
-        checkLoadingStatus();
-      },
-      (xhr) => {
-        if (xhr.loaded > 0) frame1Bytes = xhr.loaded;
-        checkLoadingStatus();
-      },
-      (err) => {
-        console.warn(`Could not load ${CAR_SLOTS.frame1.url}:`, err);
-        frame1Loaded = true;
-        checkLoadingStatus();
-      }
-    );
-
-    // Load Slot 2 (Frame 02 Car - Porsche 911 Turbo)
-    loader.load(
-      CAR_SLOTS.frame2.url,
-      (gltf) => {
-        const car = normalizeModel(gltf.scene, CAR_SLOTS.frame2.targetDim);
-        car.rotation.y = -Math.PI / 2.2;
-        setMeshOpacity(car, 1.0);
-        carModelRef.current = car;
-        carRootGroup.add(car);
-        frame2Loaded = true;
-        frame2Bytes = 21970656;
-        checkLoadingStatus();
-      },
-      (xhr) => {
-        if (xhr.loaded > 0) frame2Bytes = xhr.loaded;
-        checkLoadingStatus();
-      },
-      (err) => {
-        console.warn(`Could not load ${CAR_SLOTS.frame2.url}:`, err);
-        frame2Loaded = true;
-        checkLoadingStatus();
-      }
-    );
+    // Kick off progressive loading from Slot 0 (Frame 01)
+    loadSlot(0);
 
     // 8. Interactive Drag to Orbit & Mouse Parallax
     let isDragging = false;
@@ -435,15 +406,86 @@ export default function CinematicSequence() {
       animId = requestAnimationFrame(animate);
 
       const mode = activeModeRef.current;
-      const model1 = coverModelRef.current;
-      const model2 = carModelRef.current;
+      const models = loadedModelsRef.current;
 
-      // 3D Laser Scan Rig Animation (Active in transition window between Hero and Bay 01: 0.28 <= curHeroProgress <= 0.72)
-      if (curHeroProgress >= 0.28 && curHeroProgress <= 0.72 && mode === 'auto') {
+      // Determine active target car index & transition state
+      let activeIndex = 0;
+      let nextIndex = 0;
+      let transitionRatio = 0;
+      let inTransition = false;
+
+      if (typeof mode === 'number' && mode >= 0 && mode < CAR_SLOTS.length) {
+        // Manual override mode
+        activeIndex = mode;
+      } else {
+        // Auto Scroll Mode across the 6 Bays:
+        // Hero: 0.00 -> 0.15 (Car 0)
+        // Transition: 0.10 -> 0.16 (Car 0 -> Car 1)
+        // Bay 01: 0.16 -> 0.32 (Car 1)
+        // Transition: 0.30 -> 0.35 (Car 1 -> Car 2)
+        // Bay 02: 0.35 -> 0.52 (Car 2)
+        // Transition: 0.50 -> 0.55 (Car 2 -> Car 3)
+        // Bay 03: 0.55 -> 0.72 (Car 3)
+        // Transition: 0.70 -> 0.75 (Car 3 -> Car 4)
+        // Bay 04: 0.75 -> 0.88 (Car 4)
+        // Transition: 0.86 -> 0.90 (Car 4 -> Car 5)
+        // Bay 05 & 06: 0.90 -> 1.00 (Car 5)
+
+        if (curHeroProgress < 0.28) {
+          activeIndex = 0;
+        } else if (curHeroProgress <= 0.72) {
+          activeIndex = 0;
+          nextIndex = 1;
+          transitionRatio = (curHeroProgress - 0.28) / 0.44;
+          inTransition = true;
+        } else if (curGlobalProgress < 0.30) {
+          activeIndex = 1;
+        } else if (curGlobalProgress < 0.35) {
+          activeIndex = 1;
+          nextIndex = 2;
+          transitionRatio = (curGlobalProgress - 0.30) / 0.05;
+          inTransition = true;
+        } else if (curGlobalProgress < 0.50) {
+          activeIndex = 2;
+        } else if (curGlobalProgress < 0.55) {
+          activeIndex = 2;
+          nextIndex = 3;
+          transitionRatio = (curGlobalProgress - 0.50) / 0.05;
+          inTransition = true;
+        } else if (curGlobalProgress < 0.70) {
+          activeIndex = 3;
+        } else if (curGlobalProgress < 0.75) {
+          activeIndex = 3;
+          nextIndex = 4;
+          transitionRatio = (curGlobalProgress - 0.70) / 0.05;
+          inTransition = true;
+        } else if (curGlobalProgress < 0.86) {
+          activeIndex = 4;
+        } else if (curGlobalProgress < 0.90) {
+          activeIndex = 4;
+          nextIndex = 5;
+          transitionRatio = (curGlobalProgress - 0.86) / 0.04;
+          inTransition = true;
+        } else {
+          activeIndex = 5;
+        }
+      }
+
+      // Check if target model is loaded; if not loaded, fallback to closest loaded model
+      let effectiveActive = activeIndex;
+      while (effectiveActive > 0 && !models[effectiveActive]) {
+        effectiveActive--;
+      }
+      let effectiveNext = nextIndex;
+      while (effectiveNext > 0 && !models[effectiveNext]) {
+        effectiveNext--;
+      }
+
+      // 3D Laser Scan Rig Animation
+      if (inTransition && effectiveActive !== effectiveNext) {
         scanRig.visible = true;
-        const scanRatio = (curHeroProgress - 0.28) / 0.44; // 0.0 to 1.0
-        scanRig.position.z = 2.8 - scanRatio * 5.6; // Sweeps from front bumper across car to rear
-        const pulse = Math.sin(scanRatio * Math.PI); // Smooth bell curve
+        scanRig.position.z = 2.8 - transitionRatio * 5.6; // Sweeps from front to rear
+        const pulse = Math.sin(transitionRatio * Math.PI);
         laserBeamMat.opacity = pulse * 0.95;
         laserCurtainMat.opacity = pulse * 0.40;
         groundLineMat.opacity = pulse * 0.90;
@@ -455,52 +497,34 @@ export default function CinematicSequence() {
         groundLineMat.opacity = 0;
       }
 
-      // Safe Model Cross-Fade: GUARANTEES THE STAGE IS NEVER EMPTY OR BLACK!
-      if (model1 && model2) {
-        if (mode === 'covered') {
-          model1.visible = true;
-          model2.visible = false;
-          model1.position.y = 0;
-          setMeshOpacity(model1, 1.0);
-        } else if (mode === 'unveiled') {
-          model1.visible = false;
-          model2.visible = true;
-          setMeshOpacity(model2, 1.0);
-        } else {
-          // 'auto' mode:
-          // 0.00 -> 0.28: Frame 01 (Hero Zoom-In)
-          // 0.28 -> 0.72: 3D Laser transition effect
-          // 0.72 -> 1.00+: Frame 02 (BAY 01 and throughout entire portfolio!)
-          if (curHeroProgress < 0.28) {
-            model1.visible = true;
-            model2.visible = false;
-            model1.position.y = 0;
-            setMeshOpacity(model1, 1.0);
-          } else if (curHeroProgress <= 0.72) {
-            const transitionRatio = (curHeroProgress - 0.28) / 0.44;
-            model1.visible = true;
-            model2.visible = true;
-            model1.position.y = transitionRatio * 0.9;
-            setMeshOpacity(model1, Math.max(0.08, 1 - transitionRatio));
-            setMeshOpacity(model2, Math.min(1, transitionRatio * 1.2));
+      // Model Visibility and Cross-Fade Handling: GUARANTEES STAGE IS NEVER EMPTY OR BLACK!
+      models.forEach((m, idx) => {
+        if (!m) return;
+        if (inTransition && effectiveActive !== effectiveNext) {
+          if (idx === effectiveActive) {
+            m.visible = true;
+            m.position.y = transitionRatio * 0.7;
+            setMeshOpacity(m, Math.max(0.08, 1 - transitionRatio));
+          } else if (idx === effectiveNext) {
+            m.visible = true;
+            m.position.y = 0;
+            setMeshOpacity(m, Math.min(1, transitionRatio * 1.2));
           } else {
-            model1.visible = false;
-            model2.visible = true;
-            model1.position.y = 0;
-            setMeshOpacity(model2, 1.0);
+            m.visible = false;
+          }
+        } else {
+          if (idx === effectiveActive) {
+            m.visible = true;
+            m.position.y = 0;
+            setMeshOpacity(m, 1.0);
+          } else {
+            m.visible = false;
           }
         }
-      } else if (model1) {
-        // Fallback: If only model 1 is loaded, keep it visible! NEVER turn pitch black!
-        model1.visible = true;
-        model1.position.y = 0;
-        setMeshOpacity(model1, 1.0);
-      } else if (model2) {
-        // Fallback: If only model 2 is loaded, keep it visible!
-        model2.visible = true;
-        model2.position.y = 0;
-        setMeshOpacity(model2, 1.0);
-      }
+      });
+
+      // Update state for UI display
+      setActiveCarSlotIndex(effectiveActive);
 
       // Merge scroll rotation + interactive drag + mouse parallax
       const totalTargetRotY = scrollRotY + dragRotY + mouseX * 0.12;
@@ -545,7 +569,7 @@ export default function CinematicSequence() {
       const frame = Math.min(240, Math.max(1, Math.floor(globalP * 239) + 1));
       setCurrentFrame(frame);
 
-      // Hero-to-Bay01 Transition Progress (0.00 at top of hero -> 1.00 entering Bay 01)
+      // Hero-to-Bay01 Transition Progress
       const heroThreshold = Math.max(1, winH * 0.85);
       const heroP = Math.min(1, Math.max(0, scrollY / heroThreshold));
       curHeroProgress = heroP;
@@ -669,6 +693,7 @@ export default function CinematicSequence() {
   const isTransitioning = heroProgress >= 0.28 && heroProgress <= 0.72;
   const isBay01Active = heroProgress > 0.60;
   const formattedFrame = String(currentFrame).padStart(3, '0');
+  const activeCar = CAR_SLOTS[activeCarSlotIndex] || CAR_SLOTS[0];
 
   // Smooth scroll directly to BAY 01 // CRAFT & PHILOSOPHY
   const scrollToPhilosophy = (e) => {
@@ -755,23 +780,23 @@ export default function CinematicSequence() {
               className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
                 activeModelMode === 'auto' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
               }`}
-              title="Scroll Zoom 1 -> Zoom 2 Mode"
+              title="Auto Dynamic Scroll Mode (Cars 1 - 6)"
             >
-              AUTO (ZOOM 1→2)
+              AUTO FLEET
             </button>
             <button
-              onClick={() => setActiveModelMode('unveiled')}
-              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                activeModelMode === 'unveiled' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
+              onClick={() => setActiveModelMode(1)}
+              className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                activeModelMode === 1 ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
               }`}
               title="Force View Frame 02"
             >
               FRAME 02
             </button>
             <button
-              onClick={() => setActiveModelMode('covered')}
-              className={`px-3 py-1 rounded-full transition-all cursor-pointer ${
-                activeModelMode === 'covered' ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
+              onClick={() => setActiveModelMode(0)}
+              className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
+                activeModelMode === 0 ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
               }`}
               title="Force View Frame 01"
             >
@@ -921,7 +946,6 @@ export default function CinematicSequence() {
           </div>
 
           {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO PNG IMAGES! */}
-          {/* Transparent floating HUD callout brackets that frame the real-time 3D model */}
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[400px] pointer-events-none select-none">
             <div className="px-4 py-2 rounded-full bg-black/50 border border-zinc-700/60 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
               <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
@@ -930,7 +954,7 @@ export default function CinematicSequence() {
 
             <div className="space-y-2 text-right">
               <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
-                BMW M4 COUPE • CERAMIC CLEARCOAT
+                {activeCar.name}
               </div>
               <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
                 <Move3d size={13} className="text-slate-300 animate-pulse" />
@@ -1047,20 +1071,20 @@ export default function CinematicSequence() {
             {/* Interactive 3D Orbit Hint */}
             <div className="mt-4 flex items-center gap-2 text-[10px] font-mono text-zinc-500 tracking-wider">
               <Move3d size={13} className="text-cyan-300 animate-pulse" />
-              <span>FRAME 02 ACTIVE • DRAG TO ROTATE PORSCHE 360°</span>
+              <span>STAGE 02 ACTIVE • DRAG TO ROTATE 360°</span>
             </div>
           </div>
 
-          {/* Right Column: 100% PURE 3D PORSCHE 911 ON STAGE - ZERO PNG IMAGES! */}
+          {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO PNG IMAGES! */}
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[400px] pointer-events-none select-none">
             <div className="px-4 py-2 rounded-full bg-cyan-950/60 border border-cyan-500/40 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-cyan-200 shadow-2xl">
               <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8] animate-pulse" />
-              <span>STAGE 02 // PORSCHE 911 TURBO UNVEILED</span>
+              <span>STAGE 02 // 360° ROUND TURNTABLE</span>
             </div>
 
             <div className="space-y-2 text-right">
               <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
-                WIDE HEROIC SHOWROOM STANCE
+                {activeCar.name}
               </div>
               <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-cyan-300">
                 <Move3d size={13} className="text-cyan-300 animate-pulse" />
@@ -1079,20 +1103,14 @@ export default function CinematicSequence() {
         {/* Left Frame Status */}
         <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
           <span className="text-white font-light tracking-widest">
-            {!isBay01Active ? 'FRAME 01 // BMW M4 ZOOM-IN' : 'FRAME 02 // PORSCHE 911 TURBO'}
+            {activeCar.name}
           </span>
           <span>—</span>
           <span>FRAME {formattedFrame} / 240</span>
-          {modelLoaded ? (
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-600/50 text-[10px] text-slate-200 font-bold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              STUDIO GLB ACTIVE
-            </span>
-          ) : (
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-600/50 text-[10px] text-zinc-300 font-mono">
-              DOWNLOADING 3D MESH ({loadingPercent}%)
-            </span>
-          )}
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-600/50 text-[10px] text-slate-200 font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            {loadingStatusText}
+          </span>
         </div>
 
         {/* Center Stage Indicators */}
