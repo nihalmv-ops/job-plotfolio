@@ -245,27 +245,8 @@ export default function CinematicSequence({ onExplore }) {
 
         {/* HUD Top Bar: Logo & Navigation */}
         <header className="absolute top-0 left-0 right-0 z-30 px-6 sm:px-12 py-6 flex items-center justify-between pointer-events-auto">
-          <a href="#" className="flex items-center gap-3.5 group focus:outline-none">
-            {/* Aerion Monogram Emblem */}
-            <div className="w-8 h-8 flex items-center justify-center transition-transform group-hover:scale-105">
-              <svg viewBox="0 0 100 100" fill="none" className="w-7 h-7">
-                <defs>
-                  <linearGradient id="nav-sym-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#FFFFFF" />
-                    <stop offset="60%" stopColor="#C5CBD3" />
-                    <stop offset="100%" stopColor="#7B828E" />
-                  </linearGradient>
-                  <linearGradient id="nav-sym-core" x1="100%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#FFFFFF" />
-                    <stop offset="100%" stopColor="#4B5260" />
-                  </linearGradient>
-                </defs>
-                <path d="M50 14 L18 84 L30 84 L50 36 L70 84 L82 84 Z" fill="url(#nav-sym-grad)" />
-                <path d="M50 42 L34 80 L66 80 Z" fill="#050505" />
-                <path d="M50 46 L40 70 L60 70 Z" fill="url(#nav-sym-core)" />
-                <path d="M32 64 L68 64 L65 67 L35 67 Z" fill="#FFFFFF" opacity="0.6" />
-              </svg>
-            </div>
+          <a href="#" className="flex items-center gap-3 group focus:outline-none" aria-label="Nihal MV - Return to top">
+            <span className="w-2 h-2 rounded-full bg-white group-hover:scale-125 transition-transform" />
             <span className="text-base sm:text-lg font-light tracking-[0.3em] text-white uppercase leading-none group-hover:text-zinc-200 transition-colors">
               NIHAL MV
             </span>
