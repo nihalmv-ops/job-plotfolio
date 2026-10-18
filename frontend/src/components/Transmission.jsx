@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, ArrowUp, FileText } from 'lucide-react';
+import { Mail, MapPin, Send, CheckCircle2, AlertCircle, Loader2, ArrowUp, FileText, Move3d } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './SocialIcons';
 
 export default function Transmission({ onReplay }) {
@@ -78,14 +78,14 @@ export default function Transmission({ onReplay }) {
   return (
     <section
       id="contact"
-      className="relative min-h-screen w-full bg-[#08090d]/85 backdrop-blur-md text-white flex flex-col justify-between px-4 sm:px-6 md:px-16 pt-24 pb-12 z-20 border-t border-zinc-800/80"
+      className="relative min-h-screen w-full bg-transparent text-white flex flex-col justify-between px-6 sm:px-12 max-w-7xl mx-auto pt-24 pb-12 z-10 border-t border-zinc-800/60"
       aria-label="Contact and Transmission"
     >
-      <div className="max-w-7xl mx-auto w-full">
+      <div className="w-full">
         {/* Section Header Line */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800/80 pb-6 mb-12 sm:mb-16 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800/80 pb-4 mb-8 gap-3">
           <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-300 shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8] animate-pulse" />
             <span className="text-xs font-mono tracking-[0.3em] uppercase text-slate-300">
               BAY 06 // TRANSMISSION & INQUIRY
             </span>
@@ -98,206 +98,206 @@ export default function Transmission({ onReplay }) {
           </div>
         </div>
 
-        {/* 2-Column Contact Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-24">
+        {/* 2-Column Split: Left holds Form & Channels; Right is 100% Open to 3D Car */}
+        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-12 mb-20">
           
-          {/* Left Column: Form */}
-          <div className="lg:col-span-7 p-8 sm:p-10 rounded-3xl bg-zinc-950/70 border border-white/10 backdrop-blur-md">
-            <h3 className="text-2xl sm:text-3xl font-light uppercase tracking-wider text-white mb-2">
-              INITIATE CONTACT.
-            </h3>
-            <p className="text-xs sm:text-sm text-zinc-400 font-light mb-8 leading-relaxed">
-              Have a fullstack opportunity, frontend role, or engineering project to discuss? Send an inquiry directly.
-            </p>
+          {/* Left Column: Form + Direct Links */}
+          <div className="w-full lg:max-w-xl xl:max-w-2xl flex flex-col gap-6">
+            
+            {/* Contact Form Card */}
+            <div className="p-6 sm:p-8 rounded-2xl bg-[#0e1017]/85 border border-zinc-700/60 backdrop-blur-xl shadow-xl">
+              <h3 className="text-2xl sm:text-3xl font-light uppercase tracking-wider text-white mb-2">
+                INITIATE CONTACT.
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-400 font-light mb-6 leading-relaxed">
+                Have a fullstack opportunity, frontend role, or engineering project to discuss? Send an inquiry directly.
+              </p>
 
-            {formStatus.success && (
-              <div className="mb-6 p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-3 text-emerald-400 text-xs font-mono">
-                <CheckCircle2 size={18} className="shrink-0" />
-                <span>Transmission successful. I will respond to your inquiry shortly.</span>
-              </div>
-            )}
+              {formStatus.success && (
+                <div className="mb-6 p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30 flex items-center gap-3 text-emerald-400 text-xs font-mono">
+                  <CheckCircle2 size={18} className="shrink-0" />
+                  <span>Transmission successful. I will respond to your inquiry shortly.</span>
+                </div>
+              )}
 
-            {formStatus.error && (
-              <div className="mb-6 p-4 rounded-xl bg-rose-950/40 border border-rose-500/30 flex items-center gap-3 text-rose-300 text-xs font-mono">
-                <AlertCircle size={18} className="shrink-0 text-rose-400" />
-                <span>{formStatus.error}</span>
-              </div>
-            )}
+              {formStatus.error && (
+                <div className="mb-6 p-4 rounded-xl bg-rose-950/40 border border-rose-500/30 flex items-center gap-3 text-rose-300 text-xs font-mono">
+                  <AlertCircle size={18} className="shrink-0 text-rose-400" />
+                  <span>{formStatus.error}</span>
+                </div>
+              )}
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5" noValidate>
-              <div>
-                <label htmlFor="name" className="block text-[10px] font-mono tracking-widest uppercase text-zinc-400 mb-2">
-                  FULL NAME *
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="e.g. John Doe"
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+                <div>
+                  <label htmlFor="name" className="block text-[10px] font-mono tracking-widest uppercase text-zinc-400 mb-1.5">
+                    FULL NAME *
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="e.g. John Doe"
+                    disabled={formStatus.submitting}
+                    className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors ${
+                      fieldErrors.name ? 'border-rose-500' : 'border-white/10 focus:border-white/40'
+                    }`}
+                  />
+                  {fieldErrors.name && (
+                    <p className="mt-1 text-xs text-rose-400 font-mono">{fieldErrors.name}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-[10px] font-mono tracking-widest uppercase text-zinc-400 mb-1.5">
+                    EMAIL ADDRESS *
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="e.g. john@company.com"
+                    disabled={formStatus.submitting}
+                    className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors ${
+                      fieldErrors.email ? 'border-rose-500' : 'border-white/10 focus:border-white/40'
+                    }`}
+                  />
+                  {fieldErrors.email && (
+                    <p className="mt-1 text-xs text-rose-400 font-mono">{fieldErrors.email}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-[10px] font-mono tracking-widest uppercase text-zinc-400 mb-1.5">
+                    MESSAGE BODY *
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows="3"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Describe your project, team opportunity, or inquiry..."
+                    disabled={formStatus.submitting}
+                    className={`w-full px-4 py-2.5 rounded-xl bg-black/60 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors resize-none ${
+                      fieldErrors.message ? 'border-rose-500' : 'border-white/10 focus:border-white/40'
+                    }`}
+                  />
+                  {fieldErrors.message && (
+                    <p className="mt-1 text-xs text-rose-400 font-mono">{fieldErrors.message}</p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
                   disabled={formStatus.submitting}
-                  className={`w-full px-4 py-3 rounded-xl bg-black/60 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors ${
-                    fieldErrors.name ? 'border-rose-500' : 'border-white/10 focus:border-white/40'
-                  }`}
-                />
-                {fieldErrors.name && (
-                  <p className="mt-1 text-xs text-rose-400 font-mono">{fieldErrors.name}</p>
-                )}
-              </div>
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-white text-black font-semibold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-all self-start disabled:opacity-50 cursor-pointer"
+                >
+                  {formStatus.submitting ? (
+                    <>
+                      <Loader2 size={15} className="animate-spin" />
+                      <span>TRANSMITTING...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>SEND TRANSMISSION</span>
+                      <Send size={13} />
+                    </>
+                  )}
+                </button>
+              </form>
+            </div>
 
-              <div>
-                <label htmlFor="email" className="block text-[10px] font-mono tracking-widest uppercase text-zinc-400 mb-2">
-                  EMAIL ADDRESS *
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="e.g. john@company.com"
-                  disabled={formStatus.submitting}
-                  className={`w-full px-4 py-3 rounded-xl bg-black/60 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors ${
-                    fieldErrors.email ? 'border-rose-500' : 'border-white/10 focus:border-white/40'
-                  }`}
-                />
-                {fieldErrors.email && (
-                  <p className="mt-1 text-xs text-rose-400 font-mono">{fieldErrors.email}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-[10px] font-mono tracking-widest uppercase text-zinc-400 mb-2">
-                  MESSAGE BODY *
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows="4"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Describe your project, team opportunity, or inquiry..."
-                  disabled={formStatus.submitting}
-                  className={`w-full px-4 py-3 rounded-xl bg-black/60 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors resize-none ${
-                    fieldErrors.message ? 'border-rose-500' : 'border-white/10 focus:border-white/40'
-                  }`}
-                />
-                {fieldErrors.message && (
-                  <p className="mt-1 text-xs text-rose-400 font-mono">{fieldErrors.message}</p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={formStatus.submitting}
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white text-black font-semibold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-all self-start disabled:opacity-50"
+            {/* Direct Channels Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <a
+                href="mailto:nihalmv2004@gmail.com"
+                className="p-4 rounded-xl bg-[#0e1017]/85 border border-zinc-700/60 hover:border-zinc-500 backdrop-blur-xl transition-all flex items-center gap-3 group"
               >
-                {formStatus.submitting ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    <span>TRANSMITTING...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>SEND TRANSMISSION</span>
-                    <Send size={14} />
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
+                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                  <Mail size={16} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
+                    EMAIL
+                  </span>
+                  <span className="text-xs font-mono text-zinc-200 group-hover:text-white transition-colors truncate block">
+                    nihalmv2004@gmail.com
+                  </span>
+                </div>
+              </a>
 
-          {/* Right Column: Verified Details & Resume */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            {/* Email Direct */}
-            <a
-              href="mailto:nihalmv2004@gmail.com"
-              className="p-6 rounded-2xl bg-zinc-950/70 border border-white/10 hover:border-white/30 backdrop-blur-md transition-all flex items-center gap-4 group"
-            >
-              <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
-                <Mail size={18} />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
-                  DIRECT EMAIL
-                </span>
-                <span className="text-sm font-mono text-zinc-200 group-hover:text-white transition-colors">
-                  nihalmv2004@gmail.com
-                </span>
-              </div>
-            </a>
+              <a
+                href="https://github.com/nihalmv-ops"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 rounded-xl bg-[#0e1017]/85 border border-zinc-700/60 hover:border-zinc-500 backdrop-blur-xl transition-all flex items-center gap-3 group"
+              >
+                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                  <GithubIcon size={16} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
+                    GITHUB
+                  </span>
+                  <span className="text-xs font-mono text-zinc-200 group-hover:text-white transition-colors truncate block">
+                    nihalmv-ops
+                  </span>
+                </div>
+              </a>
 
-            {/* GitHub */}
-            <a
-              href="https://github.com/nihalmv-ops"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-6 rounded-2xl bg-zinc-950/70 border border-white/10 hover:border-white/30 backdrop-blur-md transition-all flex items-center gap-4 group"
-            >
-              <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
-                <GithubIcon size={18} />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
-                  GITHUB REPOSITORY
-                </span>
-                <span className="text-sm font-mono text-zinc-200 group-hover:text-white transition-colors">
-                  github.com/nihalmv-ops
-                </span>
-              </div>
-            </a>
+              <a
+                href="https://linkedin.com/in/nihal-mv-dev/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-4 rounded-xl bg-[#0e1017]/85 border border-zinc-700/60 hover:border-zinc-500 backdrop-blur-xl transition-all flex items-center gap-3 group"
+              >
+                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                  <LinkedinIcon size={16} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
+                    LINKEDIN
+                  </span>
+                  <span className="text-xs font-mono text-zinc-200 group-hover:text-white transition-colors truncate block">
+                    nihal-mv-dev
+                  </span>
+                </div>
+              </a>
 
-            {/* LinkedIn */}
-            <a
-              href="https://linkedin.com/in/nihal-mv-dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-6 rounded-2xl bg-zinc-950/70 border border-white/10 hover:border-white/30 backdrop-blur-md transition-all flex items-center gap-4 group"
-            >
-              <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
-                <LinkedinIcon size={18} />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
-                  LINKEDIN NETWORK
-                </span>
-                <span className="text-sm font-mono text-zinc-200 group-hover:text-white transition-colors">
-                  linkedin.com/in/nihal-mv-dev
-                </span>
-              </div>
-            </a>
-
-            {/* Location */}
-            <div className="p-6 rounded-2xl bg-zinc-950/70 border border-white/10 flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300">
-                <MapPin size={18} />
-              </div>
-              <div>
-                <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 block">
-                  BASE LOCATION
-                </span>
-                <span className="text-sm font-mono text-zinc-200">
-                  Kerala, India
-                </span>
+              <div className="p-4 rounded-xl bg-[#0e1017]/85 border border-zinc-700/60 backdrop-blur-xl flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300">
+                  <MapPin size={16} />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
+                    LOCATION
+                  </span>
+                  <span className="text-xs font-mono text-zinc-200 truncate block">
+                    Kerala, India
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Resume Download Action (Space only) */}
+            {/* Resume Download Action */}
             <a
               href="/resume.pdf"
               download="Nihal_MV_Resume.pdf"
-              className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/30 backdrop-blur-md transition-all flex items-center justify-between group"
+              className="p-4 sm:p-5 rounded-xl bg-white/5 border border-zinc-700/60 hover:border-zinc-400 backdrop-blur-xl transition-all flex items-center justify-between group"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
-                  <FileText size={18} />
+              <div className="flex items-center gap-3.5">
+                <div className="w-9 h-9 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
+                  <FileText size={16} />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-400 block">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-400 block">
                     CURRICULUM VITAE
                   </span>
-                  <span className="text-sm font-semibold text-white">
+                  <span className="text-xs sm:text-sm font-semibold text-white">
                     DOWNLOAD RESUME (PDF)
                   </span>
                 </div>
@@ -306,12 +306,31 @@ export default function Transmission({ onReplay }) {
                 ↓
               </span>
             </a>
+
+          </div>
+
+          {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO OVERLAYS! */}
+          <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[560px] pointer-events-none select-none">
+            <div className="px-4 py-2 rounded-full bg-cyan-950/60 border border-cyan-500/40 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-cyan-200 shadow-2xl">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8] animate-pulse" />
+              <span>STAGE 06 // APEX PROTOCOL UNVEILED</span>
+            </div>
+
+            <div className="space-y-2 text-right">
+              <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
+                FRAME 06 // GRAND FINALE SHOWCASE
+              </div>
+              <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-cyan-300">
+                <Move3d size={13} className="text-cyan-300 animate-pulse" />
+                <span>DRAG TO ROTATE 360°</span>
+              </div>
+            </div>
           </div>
 
         </div>
 
         {/* Studio Final Archive Section */}
-        <div id="final" className="my-auto text-center flex flex-col items-center pt-8 pb-16">
+        <div id="final" className="text-center flex flex-col items-center pt-16 pb-12">
           <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-700/80 backdrop-blur-md mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shadow-[0_0_6px_rgba(255,255,255,0.7)]" />
             <span className="text-[10px] font-mono tracking-[0.3em] text-slate-300 uppercase">
@@ -341,7 +360,7 @@ export default function Transmission({ onReplay }) {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.25em] hover:bg-zinc-200 transition-all flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95"
+              className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.25em] hover:bg-zinc-200 transition-all flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 cursor-pointer"
               aria-label="Replay 3D Experience"
             >
               <span>REPLAY EXPERIENCE</span>
@@ -367,4 +386,3 @@ export default function Transmission({ onReplay }) {
     </section>
   );
 }
-

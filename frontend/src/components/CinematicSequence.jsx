@@ -78,41 +78,55 @@ export default function CinematicSequence() {
       0.1,
       100
     );
-    camera.position.set(1.5, 0.85, 5.0);
+    // Camera is framed to highlight the right-side turntable stage on desktop
+    camera.position.set(0.15, 0.85, 5.0);
 
     // Parent group for car & round stage placed in the right side area on desktop
     const carRootGroup = new THREE.Group();
     if (window.innerWidth >= 1024) {
-      carRootGroup.position.set(1.45, 0, 0);
+      carRootGroup.position.set(1.5, 0, 0);
     } else if (window.innerWidth >= 768) {
-      carRootGroup.position.set(0.65, 0, 0);
+      carRootGroup.position.set(0.7, 0, 0);
     } else {
       carRootGroup.position.set(0, -0.2, 0);
     }
     carRootGroupRef.current = carRootGroup;
     scene.add(carRootGroup);
 
+    // Dedicated Car & Stage Studio Key Light directly bound to the turntable
+    const carKeyLight = new THREE.DirectionalLight(0xffffff, 4.2);
+    carKeyLight.position.set(0, 8, 4);
+    carRootGroup.add(carKeyLight);
+
+    const carRimLight = new THREE.DirectionalLight(0xe2e8f0, 3.2);
+    carRimLight.position.set(0, 5, -5);
+    carRootGroup.add(carRimLight);
+
+    const carSideLight = new THREE.DirectionalLight(0xf1f5f9, 2.6);
+    carSideLight.position.set(-5, 4, 2);
+    carRootGroup.add(carSideLight);
+
     // 2. Pure Automotive Detailing Studio Lighting (Clean White & Silver)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.6);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
     scene.add(ambientLight);
 
-    const overheadLight = new THREE.DirectionalLight(0xffffff, 4.5);
+    const overheadLight = new THREE.DirectionalLight(0xffffff, 4.8);
     overheadLight.position.set(0, 9, 2);
     scene.add(overheadLight);
 
-    const leftLight = new THREE.DirectionalLight(0xf1f5f9, 3.2);
+    const leftLight = new THREE.DirectionalLight(0xf1f5f9, 3.4);
     leftLight.position.set(-6, 4, 4);
     scene.add(leftLight);
 
-    const rightLight = new THREE.DirectionalLight(0xf8fafc, 3.2);
+    const rightLight = new THREE.DirectionalLight(0xf8fafc, 3.6);
     rightLight.position.set(6, 4, 4);
     scene.add(rightLight);
 
-    const rearLight = new THREE.DirectionalLight(0xe2e8f0, 2.8);
+    const rearLight = new THREE.DirectionalLight(0xe2e8f0, 3.0);
     rearLight.position.set(0, 5, -6);
     scene.add(rearLight);
 
-    const groundBounce = new THREE.DirectionalLight(0xdbeafe, 1.2);
+    const groundBounce = new THREE.DirectionalLight(0xdbeafe, 1.4);
     groundBounce.position.set(0, -3, 0);
     scene.add(groundBounce);
 
@@ -129,7 +143,7 @@ export default function CinematicSequence() {
     scene.add(ceilingRig);
 
     // 4. Polished High-Gloss Dark Epoxy Garage Floor
-    const floorGeom = new THREE.PlaneGeometry(35, 35);
+    const floorGeom = new THREE.PlaneGeometry(40, 40);
     const floorMat = new THREE.MeshStandardMaterial({
       color: 0x0a0b10,
       roughness: 0.14,
@@ -264,7 +278,7 @@ export default function CinematicSequence() {
           child.castShadow = true;
           child.receiveShadow = true;
           if (child.material.isMeshStandardMaterial) {
-            child.material.envMapIntensity = 2.2;
+            child.material.envMapIntensity = 2.4;
             child.material.roughness = Math.max(0.06, child.material.roughness * 0.85);
             child.material.metalness = Math.min(0.96, child.material.metalness * 1.15);
             child.material.needsUpdate = true;
@@ -277,59 +291,56 @@ export default function CinematicSequence() {
       return wrapper;
     };
 
-    // Helper to safely set mesh opacity without leaving models in an invisible state
+    // Helper to safely set mesh opacity without leaving models in an invisible or sorting-glitched state
     const setMeshOpacity = (obj, opacity) => {
       if (!obj) return;
       obj.traverse((child) => {
         if (child.isMesh && child.material) {
-          if (Array.isArray(child.material)) {
-            child.material.forEach((mat) => {
+          const mats = Array.isArray(child.material) ? child.material : [child.material];
+          mats.forEach((mat) => {
+            if (mat.userData.origTransparent === undefined) {
+              mat.userData.origTransparent = !!mat.transparent;
+              mat.userData.origOpacity = typeof mat.opacity === 'number' ? mat.opacity : 1.0;
+            }
+            if (opacity < 0.98) {
               mat.transparent = true;
-              mat.opacity = opacity;
-            });
-          } else {
-            child.material.transparent = true;
-            child.material.opacity = opacity;
-          }
+              mat.opacity = opacity * (mat.userData.origOpacity || 1.0);
+            } else {
+              mat.transparent = mat.userData.origTransparent;
+              mat.opacity = mat.userData.origOpacity;
+            }
+          });
         }
       });
     };
 
-    // Sequential Loader for all 6 models: 0 & 1 stream first for instant view, then 2, 3, 4, 5
-    let loadedCounter = 0;
-    const loadSlot = (index) => {
-      if (index >= CAR_SLOTS.length) return;
-      const slot = CAR_SLOTS[index];
-      setLoadingStatusText(`STREAMING ${slot.name}`);
+    // Staggered Concurrent Loader: All 6 models start loading immediately with a tiny 200ms stagger
+    CAR_SLOTS.forEach((slot, index) => {
+      setTimeout(() => {
+        loader.load(
+          slot.url,
+          (gltf) => {
+            const modelWrapper = normalizeModel(gltf.scene, slot.targetDim);
+            modelWrapper.rotation.y = -Math.PI / 2.2;
+            modelWrapper.visible = (index === 0);
+            setMeshOpacity(modelWrapper, 1.0);
 
-      loader.load(
-        slot.url,
-        (gltf) => {
-          const modelWrapper = normalizeModel(gltf.scene, slot.targetDim);
-          modelWrapper.rotation.y = -Math.PI / 2.2;
-          modelWrapper.visible = (index === 0);
-          setMeshOpacity(modelWrapper, 1.0);
+            loadedModelsRef.current[index] = modelWrapper;
+            carRootGroup.add(modelWrapper);
 
-          loadedModelsRef.current[index] = modelWrapper;
-          carRootGroup.add(modelWrapper);
-
-          loadedCounter++;
-          setLoadedCount(loadedCounter);
-          setLoadingStatusText(`ACTIVE: ${loadedCounter} / 6 CARS`);
-
-          // Immediately stream next slot in background
-          loadSlot(index + 1);
-        },
-        undefined,
-        (err) => {
-          console.warn(`Could not load ${slot.url}:`, err);
-          loadSlot(index + 1);
-        }
-      );
-    };
-
-    // Kick off progressive loading from Slot 0 (Frame 01)
-    loadSlot(0);
+            setLoadedCount((prev) => {
+              const updated = prev + 1;
+              setLoadingStatusText(`FLEET READY: ${updated} / 6`);
+              return updated;
+            });
+          },
+          undefined,
+          (err) => {
+            console.warn(`Could not load ${slot.url}:`, err);
+          }
+        );
+      }, index * 200);
+    });
 
     // 8. Interactive Drag to Orbit & Mouse Parallax
     let isDragging = false;
@@ -404,7 +415,9 @@ export default function CinematicSequence() {
     let curGlobalProgress = 0;
     let scrollRotY = 0;
     let scrollRotX = 0;
-    let targetCamX = window.innerWidth >= 1024 ? 1.45 : (window.innerWidth >= 768 ? 0.65 : 0);
+    const isDesk = window.innerWidth >= 1024;
+    let targetCamX = isDesk ? 0.15 : 0;
+    let targetLookX = isDesk ? 0.75 : 0;
     let targetCamY = 0.85;
     let targetCamZ = 5.0;
 
@@ -442,14 +455,14 @@ export default function CinematicSequence() {
         groundLineMat.opacity = 0;
       }
 
-      // Model Visibility and Cross-Fade Handling: GUARANTEES STAGE IS NEVER EMPTY OR BLACK!
+      // Model Visibility and Cross-Fade Handling: GUARANTEES STAGE IS ALWAYS OCCUPIED!
       models.forEach((m, idx) => {
         if (!m) return;
         if (curInTrans && effectiveActive !== effectiveNext) {
           if (idx === effectiveActive) {
             m.visible = true;
             m.position.y = curTransRatio * 0.7;
-            setMeshOpacity(m, Math.max(0.08, 1 - curTransRatio));
+            setMeshOpacity(m, Math.max(0.12, 1 - curTransRatio));
           } else if (idx === effectiveNext) {
             m.visible = true;
             m.position.y = 0;
@@ -481,7 +494,7 @@ export default function CinematicSequence() {
       camera.position.x += (targetCamX - camera.position.x) * 0.06;
       camera.position.y += (targetCamY - camera.position.y) * 0.06;
       camera.position.z += (targetCamZ - camera.position.z) * 0.06;
-      camera.lookAt(carRootGroup.position.x, -0.10, 0);
+      camera.lookAt(targetLookX, -0.10, 0);
 
       // Live telemetry coordinates update
       if (time - lastTelemetryUpdate > 80) {
@@ -571,20 +584,19 @@ export default function CinematicSequence() {
       });
 
       const isDesktop = window.innerWidth >= 1024;
-      const baseCamX = isDesktop ? 1.45 : (window.innerWidth >= 768 ? 0.65 : 0);
+      targetCamX = isDesktop ? 0.15 : 0;
+      targetLookX = isDesktop ? 0.75 : 0;
 
       // Signature Zoom-In -> Laser Scan -> Zoom-Out effect across EVERY frame change:
       if (transitioning) {
-        // Smooth sine bell curve for zoom dip (dips from 5.0 down to 3.2 at peak)
-        const zoomDip = Math.sin(transRatio * Math.PI) * 1.8;
-        targetCamX = baseCamX;
+        // Smooth sine bell curve for zoom dip (dips from 5.0 down to 3.4 at peak)
+        const zoomDip = Math.sin(transRatio * Math.PI) * 1.6;
         targetCamZ = 5.0 - zoomDip;
-        targetCamY = 0.85 - Math.sin(transRatio * Math.PI) * 0.20;
+        targetCamY = 0.85 - Math.sin(transRatio * Math.PI) * 0.18;
         scrollRotY = activeIdx * 0.70 + transRatio * 0.70;
         scrollRotX = 0.01;
       } else {
         // Settled wide showroom stance for current active car
-        targetCamX = baseCamX;
         targetCamZ = 5.0;
         targetCamY = activeIdx === 5 ? 1.25 : 0.85; // slightly elevated overview on final section
         scrollRotY = activeIdx * 0.70;
@@ -601,9 +613,9 @@ export default function CinematicSequence() {
       renderer.setSize(window.innerWidth, window.innerHeight);
 
       if (window.innerWidth >= 1024) {
-        carRootGroup.position.set(1.45, 0, 0);
+        carRootGroup.position.set(1.5, 0, 0);
       } else if (window.innerWidth >= 768) {
-        carRootGroup.position.set(0.65, 0, 0);
+        carRootGroup.position.set(0.7, 0, 0);
       } else {
         carRootGroup.position.set(0, -0.2, 0);
       }
@@ -678,13 +690,13 @@ export default function CinematicSequence() {
         className="fixed inset-0 w-full h-full block object-cover z-0 pointer-events-none"
       />
 
-      {/* Ambient Dark Studio Vignette */}
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(8,9,13,0.72)_100%)] z-[1]" />
+      {/* Subtle Studio Vignette (Clear on right side so car is 100% visible) */}
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_30%_50%,transparent_55%,rgba(8,9,13,0.6)_100%)] z-[1]" />
 
       {/* ==================================================================== */}
       {/* 2. FIXED AERION-STYLE TOP HEADER HUD                                 */}
       {/* ==================================================================== */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-6 sm:px-12 py-5 flex items-center justify-between pointer-events-auto bg-gradient-to-b from-[#08090d]/85 via-[#08090d]/40 to-transparent backdrop-blur-xs">
+      <header className="fixed top-0 left-0 right-0 z-40 px-6 sm:px-12 py-5 flex items-center justify-between pointer-events-auto bg-gradient-to-b from-[#08090d]/90 via-[#08090d]/30 to-transparent backdrop-blur-xs">
         {/* Logo & Status */}
         <a href="#" className="flex items-center gap-3.5 group focus:outline-none" aria-label="Nihal MV - Return to top">
           <div className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-600/50 flex items-center justify-center text-white group-hover:scale-105 transition-transform shadow-lg shadow-black/60">
