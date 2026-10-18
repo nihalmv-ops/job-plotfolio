@@ -1,7 +1,13 @@
-import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowRight, ImageIcon } from 'lucide-react';
 
 export default function Hero() {
+  const [imageError, setImageError] = useState(false);
+
+  // Path to your hero image inside frontend/public/
+  // Place your image file at: frontend/public/hero-image.png (or .jpg / .webp)
+  const heroImageSrc = "/hero-image.png";
+
   const scrollToProjects = (e) => {
     e.preventDefault();
     const projectsEl = document.getElementById('projects');
@@ -37,7 +43,7 @@ export default function Hero() {
           
           {/* Left Column: Intro & Call-to-actions */}
           <div className="lg:col-span-6 flex flex-col items-start text-left z-10">
-            {/* Status / Greeting Badge matching reference image */}
+            {/* Status / Greeting Badge */}
             <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-violet-950/40 border border-violet-500/30 mb-6 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_8px_#a78bfa] animate-pulse" aria-hidden="true" />
               <span className="text-xs font-bold tracking-wider uppercase text-violet-300">
@@ -55,12 +61,12 @@ export default function Hero() {
               MERN Stack Developer
             </h2>
 
-            {/* Description matching reference image */}
+            {/* Description */}
             <p className="text-base sm:text-lg text-slate-400 leading-relaxed max-w-xl mb-9">
               I build modern, responsive and user-friendly web applications using React, Node.js, Express.js and MongoDB.
             </p>
 
-            {/* CTA Buttons matching reference image */}
+            {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
               <a
                 href="#projects"
@@ -83,18 +89,41 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right Column: Exact 3D Laptop Design from Reference Image */}
-          <div className="lg:col-span-6 flex flex-col items-center justify-center relative select-none" aria-hidden="true">
+          {/* Right Column: Dedicated Hero Image Space */}
+          <div className="lg:col-span-6 flex flex-col items-center justify-center relative" aria-label="Hero Image Container">
             {/* Ambient Radial Purple Glow Aura */}
-            <div className="absolute w-80 sm:w-[450px] h-80 sm:h-[450px] rounded-full bg-violet-600/25 blur-3xl pointer-events-none -z-10" />
+            <div className="absolute w-80 sm:w-[450px] h-80 sm:h-[450px] rounded-full bg-violet-600/20 blur-3xl pointer-events-none -z-10" />
 
-            {/* Exact Reference Laptop Graphic with Subtle Float & Scale Effect */}
-            <div className="w-full max-w-lg lg:max-w-xl transition-all duration-500 hover:scale-[1.03]">
-              <img
-                src="/hero-laptop.png"
-                alt="Developer Laptop with glowing code screen"
-                className="w-full h-auto object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.8)] pointer-events-none"
-              />
+            {/* Hero Image Space */}
+            <div className="w-full max-w-lg flex items-center justify-center">
+              {!imageError ? (
+                /* When user adds their image to public/hero-image.png */
+                <img
+                  src={heroImageSrc}
+                  alt="Nihal MV - Hero illustration"
+                  onError={() => setImageError(true)}
+                  className="w-full h-auto max-h-[420px] object-contain drop-shadow-[0_20px_45px_rgba(0,0,0,0.8)] transition-transform duration-500 hover:scale-[1.02]"
+                />
+              ) : (
+                /* Clean Placeholder Slot when no image has been added yet */
+                <div className="w-full min-h-[340px] rounded-3xl border-2 border-dashed border-violet-500/30 bg-[#121321]/60 backdrop-blur-md p-8 flex flex-col items-center justify-center text-center transition-all duration-300 hover:border-violet-500/50 group">
+                  <div className="w-16 h-16 rounded-2xl bg-violet-900/30 border border-violet-500/30 flex items-center justify-center text-violet-400 mb-4 shadow-lg shadow-violet-900/20 group-hover:scale-105 transition-transform">
+                    <ImageIcon size={30} aria-hidden="true" />
+                  </div>
+                  
+                  <h3 className="text-base font-bold text-white mb-1">
+                    Hero Image Space
+                  </h3>
+                  
+                  <p className="text-xs text-slate-400 max-w-xs leading-relaxed mb-3">
+                    Add your hero image here
+                  </p>
+
+                  <span className="px-3.5 py-1.5 rounded-full text-[11px] font-mono text-violet-300 bg-violet-950/50 border border-violet-500/30">
+                    public/hero-image.png
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
