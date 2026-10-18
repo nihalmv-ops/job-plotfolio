@@ -77,23 +77,15 @@ export default function Preloader({ onLoaded }) {
       <div className="absolute w-[500px] h-[500px] rounded-full bg-slate-200/[0.03] blur-[140px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-lg w-full">
-        {/* Greeting Badge matching Hero */}
-        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-zinc-900/90 border border-zinc-700/80 mb-5 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-slate-200 shadow-[0_0_8px_#ffffff] animate-pulse" aria-hidden="true" />
-          <span className="text-xs font-bold tracking-wider uppercase text-slate-300">
-            Hello, I'm
-          </span>
-        </div>
-
-        {/* Name Heading with EXACT Hero Font: font-extrabold tracking-tight */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-2">
-          Nihal <span className="text-slate-300 drop-shadow-[0_0_25px_rgba(255,255,255,0.4)]">Mv</span>
+        {/* Name Headline matching Aerion */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-light tracking-[0.35em] uppercase text-white font-display mb-3">
+          NIHAL MV
         </h1>
 
-        {/* Professional Title with EXACT Hero Font: font-bold tracking-tight */}
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-300 tracking-tight mb-8">
-          MERN Stack Developer
-        </h2>
+        {/* Professional Subtitle matching Aerion */}
+        <p className="text-[10px] sm:text-xs uppercase tracking-[0.45em] text-zinc-400 font-light mb-8 font-mono">
+          MERN STACK ARCHITECTURE
+        </p>
 
         {/* Dynamic Action Area: Progress Bar or Enter Button */}
         <div className="h-14 flex items-center justify-center w-full">

@@ -5,13 +5,18 @@
     --bg-main: #08090d;
     --bg-surface: #0e1017;
     --border-silver: rgba(226, 232, 240, 0.15);
+    --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
   }
 
   html {
     scroll-behavior: smooth;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-sans);
     background-color: #08090d;
     color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
@@ -19,6 +24,7 @@
     color: #ffffff;
     min-height: 100vh;
     overflow-x: hidden;
+    font-family: var(--font-sans);
   }
 
   /* Silver & Black Selection */
@@ -49,9 +55,22 @@
   }
 }
 
+/* Aerion Typography Families */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
 /* Garage Monospaced technical typography */
 .font-mono-tag {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   letter-spacing: 0.28em;
   text-transform: uppercase;
 }

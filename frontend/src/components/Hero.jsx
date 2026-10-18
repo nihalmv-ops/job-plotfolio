@@ -47,26 +47,26 @@ export default function Hero() {
           <div className="lg:col-span-6 z-10">
             <ScrollReveal direction="left" delay={100}>
               <div className="flex flex-col items-start text-left">
-                {/* Status / Greeting Badge */}
-                <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-violet-950/40 border border-violet-500/30 mb-6 shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_8px_#a78bfa] animate-pulse" aria-hidden="true" />
-                  <span className="text-xs font-bold tracking-wider uppercase text-violet-300">
-                    Hello, I'm
+                {/* Status / Greeting Badge matching Aerion */}
+                <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6 shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" aria-hidden="true" />
+                  <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-zinc-300">
+                    CONCEPT ARCHITECTURE
                   </span>
                 </div>
 
-                {/* Name Heading */}
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-3">
-                  Nihal <span className="text-violet-400 drop-shadow-[0_0_30px_rgba(167,139,250,0.5)]">Mv</span>
+                {/* Name Heading matching Aerion */}
+                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white font-display leading-[0.88] drop-shadow-2xl mb-4">
+                  NIHAL MV
                 </h1>
 
-                {/* Professional Title */}
-                <h2 className="text-2xl sm:text-3xl font-bold text-slate-200 tracking-tight mb-5">
-                  MERN Stack Developer
+                {/* Professional Title matching Aerion */}
+                <h2 className="text-base sm:text-xl md:text-2xl font-light tracking-[0.2em] sm:tracking-[0.3em] text-zinc-400 uppercase mb-5">
+                  THE ART OF CODE // MERN STACK
                 </h2>
 
-                {/* Description */}
-                <p className="text-base sm:text-lg text-slate-400 leading-relaxed max-w-xl mb-9">
+                {/* Description matching Aerion */}
+                <p className="text-xs sm:text-sm md:text-base text-zinc-300 font-light leading-relaxed max-w-xl mb-9">
                   I build modern, responsive and user-friendly web applications using React, Node.js, Express.js and MongoDB.
                 </p>
 

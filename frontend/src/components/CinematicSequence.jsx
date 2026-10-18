@@ -560,10 +560,10 @@ export default function CinematicSequence() {
               <span className="text-xs font-mono font-bold">N</span>
             </div>
             <div>
-              <span className="text-sm sm:text-base font-semibold tracking-wider text-white uppercase leading-none block">
+              <span className="text-base sm:text-lg font-light tracking-[0.3em] text-white uppercase font-display leading-none group-hover:text-zinc-200 transition-colors block">
                 NIHAL MV
               </span>
-              <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase">
+              <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">
                 MERN GARAGE STUDIO
               </span>
             </div>
@@ -650,49 +650,49 @@ export default function CinematicSequence() {
               </span>
             </div>
 
-            {/* Chapter 0: Exact Hero Identity & Font / Subsequent Chapters */}
+            {/* Chapter 0: Exact Aerion Hero Font & Structure / Subsequent Chapters */}
             {activeChapter === 0 ? (
               <div className="mb-6">
-                {/* Status / Greeting Badge matching Hero */}
-                <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-zinc-800/80 border border-zinc-700/80 mb-3 shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-slate-200 shadow-[0_0_8px_#ffffff] animate-pulse" aria-hidden="true" />
-                  <span className="text-xs font-bold tracking-wider uppercase text-slate-200">
-                    Hello, I'm
+                {/* Concept Study Status Badge matching Aerion */}
+                <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4 pointer-events-auto">
+                  <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
+                  <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.3em] text-zinc-300 uppercase">
+                    GARAGE DETAILING STUDIO
                   </span>
                 </div>
 
-                {/* Name Heading with EXACT Hero Font: font-extrabold tracking-tight */}
-                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-1.5">
-                  Nihal <span className="text-slate-300 drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]">Mv</span>
+                {/* Name Heading matching Aerion: font-extralight uppercase tracking-[0.18em] font-display */}
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extralight uppercase tracking-[0.18em] text-white font-display leading-[0.9] drop-shadow-2xl mb-2">
+                  NIHAL MV
                 </h1>
 
-                {/* Professional Title with EXACT Hero Font: font-bold tracking-tight */}
-                <h2 className="text-lg sm:text-xl font-bold text-slate-300 tracking-tight mb-3">
-                  MERN Stack Developer
-                </h2>
+                {/* Subtitle matching Aerion: font-light tracking-[0.3em] text-zinc-400 */}
+                <p className="mt-2 text-[10px] sm:text-xs font-light tracking-[0.3em] sm:tracking-[0.35em] text-zinc-400 uppercase mb-3">
+                  THE ART OF CODE // MERN ARCHITECTURE
+                </p>
 
-                {/* Description */}
-                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed font-normal">
-                  I build modern, responsive and user-friendly web applications using React, Node.js, Express.js and MongoDB.
+                {/* Description matching Aerion: font-light leading-relaxed text-zinc-300 */}
+                <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed">
+                  A study in speed, responsive form, and fullstack engineering across modern digital interfaces.
                 </p>
               </div>
             ) : (
               <div>
-                {/* Chapter Tag Badge */}
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800/70 border border-zinc-600/40 text-slate-200 text-[10px] font-mono tracking-widest uppercase mb-3">
+                {/* Chapter Tag Badge matching Aerion */}
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300 text-[10px] font-mono tracking-widest uppercase mb-3">
                   <IconComponent size={13} className="text-zinc-300 shrink-0" />
                   <span>{currentChapterData.tag}</span>
                 </div>
 
-                {/* Title & Subtitle with EXACT Font */}
-                <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white mb-1.5">
+                {/* Title & Subtitle matching Aerion: font-extralight font-display */}
+                <h2 className="text-2xl sm:text-3xl font-extralight uppercase tracking-[0.18em] text-white font-display mb-1.5 leading-tight">
                   {currentChapterData.title}
                 </h2>
-                <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-400 mb-4">
+                <p className="text-[11px] font-mono uppercase tracking-[0.25em] text-zinc-400 font-light mb-4">
                   {currentChapterData.subtitle}
                 </p>
 
-                {/* Description */}
+                {/* Description matching Aerion: font-light leading-relaxed */}
                 <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed mb-6">
                   {currentChapterData.description}
                 </p>
