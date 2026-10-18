@@ -43,7 +43,7 @@ export default function App() {
       <CinematicSequence />
 
       {/* Content Sections in Silver & Black Detailing Theme */}
-      <main id="main-content" className="relative z-20 bg-[#08090d]">
+      <main id="main-content" className="relative z-10">
         {/* 02 / Telemetry & Performance Benchmarks */}
         <Telemetry />
 

@@ -22,7 +22,7 @@ export default function EducationTimeline() {
   return (
     <section
       id="education"
-      className="relative min-h-[70vh] w-full bg-[#08090d] text-white flex flex-col justify-center px-4 sm:px-6 md:px-16 py-24 sm:py-28 z-20 border-t border-zinc-800/80"
+      className="relative min-h-[70vh] w-full bg-[#08090d]/85 backdrop-blur-md text-white flex flex-col justify-center px-4 sm:px-6 md:px-16 py-24 sm:py-28 z-20 border-t border-zinc-800/80"
       aria-label="Education & Background"
     >
       <div className="max-w-7xl mx-auto w-full">

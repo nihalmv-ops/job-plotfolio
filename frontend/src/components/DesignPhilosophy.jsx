@@ -35,14 +35,15 @@ export default function DesignPhilosophy() {
               Every interface and server module is engineered around clarity, performance, and predictable state flow. No ornamental bloat — only pure purpose etched into maintainable code.
             </p>
 
-            {/* Hero Visual Slot */}
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/60 overflow-hidden relative group flex items-center justify-center">
-              <img
-                src="/hero-image.png"
-                alt="Nihal MV - Architectural Overview"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                className="w-full h-auto max-h-[300px] object-contain p-4 transition-transform duration-500 group-hover:scale-[1.02]"
-              />
+            {/* 3D Telemetry Architecture Card */}
+            <div className="rounded-2xl border border-white/10 bg-zinc-950/60 p-6 relative group flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 mb-4">
+                <span className="text-slate-200">BAY 01 // ARCHITECTURE</span>
+                <span className="text-emerald-400">99.9% UPTIME</span>
+              </div>
+              <p className="text-xs font-mono text-zinc-300 leading-relaxed">
+                Reactive 3D WebGL rendering pipeline synchronized with page scroll and interactive turntable controls.
+              </p>
             </div>
 
             {/* Spec Box */}

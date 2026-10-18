@@ -6,9 +6,8 @@ import TiltCard from './TiltCard';
 export default function Hero() {
   const [imageError, setImageError] = useState(false);
 
-  // Path to your hero image inside frontend/public/
-  // Place your image file at: frontend/public/hero-image.png (or .jpg / .webp)
-  const heroImageSrc = "/hero-image.png";
+  // Path to your hero asset
+  const heroImageSrc = "";
 
   const scrollToProjects = (e) => {
     e.preventDefault();
@@ -127,7 +126,7 @@ export default function Hero() {
                     </p>
 
                     <span className="px-3.5 py-1.5 rounded-full text-[11px] font-mono text-violet-300 bg-violet-950/50 border border-violet-500/30">
-                      public/hero-image.png
+                      3D WebGL Canvas Active
                     </span>
                   </div>
                 )}
