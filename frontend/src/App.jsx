@@ -3,7 +3,6 @@ import Preloader from './components/Preloader';
 import CustomCursor from './components/CustomCursor';
 import SmoothScroll from './components/SmoothScroll';
 import CinematicSequence from './components/CinematicSequence';
-import DesignPhilosophy from './components/DesignPhilosophy';
 import Telemetry from './components/Telemetry';
 import Technology from './components/Technology';
 import Creations from './components/Creations';
@@ -39,14 +38,12 @@ export default function App() {
         Skip to main content
       </a>
 
-      {/* Flagship Cinematic Sticky 3D WebGL Detailing Bay Sequence */}
+      {/* Flagship Cinematic 3D WebGL Detailing Bay Sequence */}
+      {/* Frame 1: Hero Studio -> 3D Laser Transition Effect -> Frame 2: BAY 01 // CRAFT & PHILOSOPHY */}
       <CinematicSequence />
 
       {/* Content Sections in Silver & Black Detailing Theme */}
       <main id="main-content" className="relative z-20 bg-[#08090d]">
-        {/* 01 / Design Philosophy */}
-        <DesignPhilosophy />
-
         {/* 02 / Telemetry & Performance Benchmarks */}
         <Telemetry />
 

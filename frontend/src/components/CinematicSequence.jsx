@@ -203,7 +203,50 @@ export default function CinematicSequence() {
     // Add round stage directly to carRootGroup so both car and stage turn in harmony
     carRootGroup.add(stageGroup);
 
-    // 5. Initial Geometric Placeholder (while GLB models load)
+    // 5. High-Tech 3D Laser Scanning Beam (Transition Effect between Frame 1 and Frame 2)
+    const scanRig = new THREE.Group();
+    scanRig.visible = false;
+
+    // Glowing laser beam line across the stage width
+    const laserBeamGeom = new THREE.CylinderGeometry(0.018, 0.018, 7.2, 32);
+    const laserBeamMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0
+    });
+    const laserBeam = new THREE.Mesh(laserBeamGeom, laserBeamMat);
+    laserBeam.rotation.z = Math.PI / 2;
+    laserBeam.position.y = 0.05;
+    scanRig.add(laserBeam);
+
+    // Vertical translucent scanning light curtain
+    const laserCurtainGeom = new THREE.PlaneGeometry(7.2, 3.2);
+    const laserCurtainMat = new THREE.MeshBasicMaterial({
+      color: 0x0284c7,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide
+    });
+    const laserCurtain = new THREE.Mesh(laserCurtainGeom, laserCurtainMat);
+    laserCurtain.position.y = 0.65;
+    scanRig.add(laserCurtain);
+
+    // Stage surface contact laser line
+    const groundLineGeom = new THREE.PlaneGeometry(7.2, 0.08);
+    const groundLineMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide
+    });
+    const groundLine = new THREE.Mesh(groundLineGeom, groundLineMat);
+    groundLine.rotation.x = -Math.PI / 2;
+    groundLine.position.y = -0.985;
+    scanRig.add(groundLine);
+
+    carRootGroup.add(scanRig);
+
+    // 6. Initial Geometric Placeholder (while GLB models load)
     const placeholderGroup = new THREE.Group();
     const wireGeom = new THREE.IcosahedronGeometry(2.0, 1);
     const wireMat = new THREE.MeshStandardMaterial({
@@ -394,6 +437,24 @@ export default function CinematicSequence() {
       const model1 = coverModelRef.current; // Slot 1 model
       const model2 = carModelRef.current;   // Slot 2 model
 
+      // 3D Laser Scan Rig Animation (Transition Effect between Frame 1 and Frame 2)
+      // Active in transition window 0.35 <= currentScroll <= 0.62
+      if (currentScroll >= 0.35 && currentScroll <= 0.62) {
+        scanRig.visible = true;
+        const scanRatio = (currentScroll - 0.35) / 0.27; // 0.0 to 1.0
+        scanRig.position.z = 2.8 - scanRatio * 5.6; // Sweeps from front bumper across car to rear
+        const pulse = Math.sin(scanRatio * Math.PI); // Smooth bell curve, 1 at center
+        laserBeamMat.opacity = pulse * 0.95;
+        laserCurtainMat.opacity = pulse * 0.40;
+        groundLineMat.opacity = pulse * 0.90;
+        laserBeam.scale.y = 1 + Math.sin(time * 0.05) * 0.03;
+      } else {
+        scanRig.visible = false;
+        laserBeamMat.opacity = 0;
+        laserCurtainMat.opacity = 0;
+        groundLineMat.opacity = 0;
+      }
+
       if (model1 && model2) {
         if (mode === 'covered') {
           model1.visible = true;
@@ -405,10 +466,10 @@ export default function CinematicSequence() {
           model2.visible = true;
         } else {
           // 'auto' mode:
-          // 0.00 -> 0.40: Frame 1 is active on stage (Camera zooms in close)
-          // 0.40 -> 0.55: Morph / unveil transition right at close zoom
-          // 0.55 -> 1.00: Frame 2 is active on stage (Camera zooms out to grand showcase)
-          if (currentScroll < 0.40) {
+          // 0.00 -> 0.38: Frame 1 is active on stage (Camera zooms in close)
+          // 0.38 -> 0.60: 3D Laser transition effect: Laser sweeps over car, Frame 01 morphs to Frame 02
+          // 0.60 -> 1.00: Frame 2 is active on stage (BAY 01 // CRAFT & PHILOSOPHY)
+          if (currentScroll < 0.38) {
             model1.visible = true;
             model2.visible = false;
             model1.position.y = 0;
@@ -419,17 +480,23 @@ export default function CinematicSequence() {
                 child.material.opacity = 1.0;
               }
             });
-          } else if (currentScroll < 0.55) {
-            const transitionRatio = (currentScroll - 0.40) / 0.15;
+          } else if (currentScroll < 0.60) {
+            const transitionRatio = (currentScroll - 0.38) / 0.22;
             model1.visible = true;
             model2.visible = true;
             // Smoothly lift and fade out Frame 1 as Frame 2 emerges on stage
-            model1.position.y = transitionRatio * 2.2;
-            model1.scale.setScalar(1 + transitionRatio * 0.1);
+            model1.position.y = transitionRatio * 1.8;
+            model1.scale.setScalar(1 + transitionRatio * 0.08);
             model1.traverse((child) => {
               if (child.isMesh && child.material) {
                 child.material.transparent = true;
                 child.material.opacity = Math.max(0, 1 - transitionRatio * 1.25);
+              }
+            });
+            model2.traverse((child) => {
+              if (child.isMesh && child.material) {
+                child.material.transparent = true;
+                child.material.opacity = Math.min(1, transitionRatio * 1.25);
               }
             });
           } else {
@@ -437,6 +504,12 @@ export default function CinematicSequence() {
             model2.visible = true;
             model1.position.y = 0;
             model1.scale.setScalar(1);
+            model2.traverse((child) => {
+              if (child.isMesh && child.material) {
+                child.material.transparent = true;
+                child.material.opacity = 1.0;
+              }
+            });
           }
         }
       } else if (model1) {
@@ -487,31 +560,31 @@ export default function CinematicSequence() {
       setCurrentFrame(frame);
 
       // Cinematic Camera Choreography:
-      // Stage 1 (0.00 -> 0.40): ZOOM IN TO FIRST FRAME (Camera 5.2 -> 2.75 close-up)
-      // Morph Point (0.40 -> 0.55): At closest focal zoom, Frame 1 transitions into Frame 2
-      // Stage 2 (0.40 -> 0.85): ZOOM OUT TO SECOND FRAME (Camera 2.75 -> 5.0 wide heroic stance)
-      // Stage 3 (0.85 -> 1.00): Settled stance as user scrolls directly into BAY 01 // CRAFT & PHILOSOPHY
-      if (progress < 0.40) {
+      // Stage 1 (0.00 -> 0.38): ZOOM IN TO FIRST FRAME (Camera 5.2 -> 2.65 close-up)
+      // Morph Point (0.38 -> 0.62): At closest focal zoom, 3D Laser Scan sweeps over car as Frame 1 transforms into Frame 2
+      // Stage 2 (0.62 -> 0.90): ZOOM OUT TO SECOND FRAME (Camera 2.65 -> 5.0 wide 3/4 heroic showroom stance)
+      // Stage 3 (0.90 -> 1.00): Settled stance as user scrolls directly into BAY 02 // TELEMETRY
+      if (progress < 0.38) {
         // Stage 1: Zoom in to First Frame
-        const r1 = progress / 0.40;
+        const r1 = progress / 0.38;
         const ease1 = r1 * r1 * (3 - 2 * r1); // smoothstep
-        targetCamZ = 5.2 - ease1 * 2.45; // from 5.2 down to 2.75 (Close-up Zoom In)
-        targetCamY = 0.82 - ease1 * 0.30; // from 0.82 down to 0.52
-        scrollRotY = ease1 * 0.38; // slight angle to front corner
+        targetCamZ = 5.2 - ease1 * 2.55; // from 5.2 down to 2.65 (Close-up Zoom In)
+        targetCamY = 0.82 - ease1 * 0.32; // from 0.82 down to 0.50
+        scrollRotY = ease1 * 0.40; // slight angle to front corner
         scrollRotX = ease1 * 0.04;
-      } else if (progress < 0.85) {
+      } else if (progress < 0.90) {
         // Stage 2: Zoom out to Second Frame
-        const r2 = (progress - 0.40) / 0.45;
+        const r2 = (progress - 0.38) / 0.52;
         const ease2 = r2 * r2 * (3 - 2 * r2); // smoothstep
-        targetCamZ = 2.75 + ease2 * 2.25; // from 2.75 up to 5.0 (Grand Zoom Out)
-        targetCamY = 0.52 + ease2 * 0.33; // from 0.52 up to 0.85
-        scrollRotY = 0.38 + ease2 * (Math.PI * 0.85); // rotates to sweeping 3/4 heroic angle
+        targetCamZ = 2.65 + ease2 * 2.35; // from 2.65 up to 5.0 (Grand Zoom Out)
+        targetCamY = 0.50 + ease2 * 0.35; // from 0.50 up to 0.85
+        scrollRotY = 0.40 + ease2 * (Math.PI * 0.85); // rotates to sweeping 3/4 heroic angle
         scrollRotX = 0.04 - ease2 * 0.03;
       } else {
-        // Stage 3: Settled in Hero Stance as user scrolls directly into BAY 01
+        // Stage 3: Settled in Hero Stance as user scrolls directly into BAY 02
         targetCamZ = 5.0;
         targetCamY = 0.85;
-        scrollRotY = 0.38 + Math.PI * 0.85;
+        scrollRotY = 0.40 + Math.PI * 0.85;
         scrollRotX = 0.01;
       }
     };
@@ -560,15 +633,32 @@ export default function CinematicSequence() {
       haloMat.dispose();
       wireGeom.dispose();
       wireMat.dispose();
+      laserBeamGeom.dispose();
+      laserBeamMat.dispose();
+      laserCurtainGeom.dispose();
+      laserCurtainMat.dispose();
+      groundLineGeom.dispose();
+      groundLineMat.dispose();
     };
   }, []);
 
-  // Determine current active stage (0: Frame 01 Zoom-In, 1: Frame 02 Zoom-Out)
-  const isFrame2Active = scrollProgress >= 0.45;
+  // Determine current active stage (0: Frame 01 Hero, 1: Frame 02 BAY 01 // CRAFT & PHILOSOPHY)
+  const isFrame2Active = scrollProgress >= 0.48;
+  const isTransitioning = scrollProgress >= 0.35 && scrollProgress <= 0.62;
   const formattedFrame = String(currentFrame).padStart(3, '0');
 
+  // Smooth scroll to Frame 2 (BAY 01 // CRAFT & PHILOSOPHY)
   const scrollToPhilosophy = () => {
-    const el = document.getElementById('philosophy');
+    if (containerRef.current) {
+      const scrollable = containerRef.current.offsetHeight - window.innerHeight;
+      const targetY = containerRef.current.offsetTop + scrollable * 0.70;
+      window.scrollTo({ top: targetY, behavior: 'smooth' });
+    }
+  };
+
+  // Smooth scroll to BAY 02 // TELEMETRY
+  const scrollToTelemetry = () => {
+    const el = document.getElementById('telemetry');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -578,7 +668,7 @@ export default function CinematicSequence() {
     <div
       ref={containerRef}
       id="cinematic-sequence"
-      className="relative w-full h-[190vh] bg-[#08090d]"
+      className="relative w-full h-[220vh] bg-[#08090d]"
     >
       {/* Sticky 100dvh Viewport Container */}
       <div className="sticky top-0 h-[100dvh] w-full flex items-center justify-between overflow-hidden z-10">
@@ -675,98 +765,210 @@ export default function CinematicSequence() {
           </div>
         </header>
 
-        {/* LEFT COLUMN: Car Care Garage Telemetry HUD Dashboard */}
-        <div className="relative z-20 w-full max-w-lg lg:max-w-md px-6 sm:px-10 lg:pl-12 lg:pr-0 pointer-events-none select-none flex flex-col justify-center">
+        {/* TRANSITION EFFECT: Screen-Space Laser Sweep Beam & HUD Telemetry Overlay */}
+        {isTransitioning && (
+          <>
+            {/* Glowing Laser Scanline Sweeping Across Viewport */}
+            <div
+              className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_24px_#38bdf8] z-30 pointer-events-none transition-all duration-75"
+              style={{ top: `${Math.min(95, Math.max(5, ((scrollProgress - 0.35) / 0.27) * 100))}%` }}
+            />
+            {/* Ambient High-Tech Laser Shimmer Wash */}
+            <div className="absolute inset-0 bg-cyan-500/[0.03] z-20 pointer-events-none animate-pulse" />
+            {/* Floating Quantum Laser Transition Notification */}
+            <div className="absolute top-20 sm:top-24 left-1/2 -translate-x-1/2 z-40 pointer-events-none flex flex-col items-center">
+              <div className="px-4 py-1.5 rounded-full bg-cyan-950/90 border border-cyan-400/60 backdrop-blur-md shadow-[0_0_25px_rgba(56,189,248,0.5)] flex items-center gap-2.5 text-cyan-200 text-[10px] font-mono tracking-widest uppercase">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8] animate-ping" />
+                <span>TRANSITION EFFECT // 3D LASER SCAN: FRAME 01 ➔ FRAME 02</span>
+              </div>
+              <span className="text-[9px] font-mono tracking-[0.3em] text-cyan-300/80 mt-1.5 uppercase">
+                CALIBRATING BAY 01 // CRAFT & PHILOSOPHY
+              </span>
+            </div>
+          </>
+        )}
+
+        {/* LEFT COLUMN: Dynamic Car Care Garage Telemetry HUD Dashboard */}
+        <div id="philosophy" className="relative z-20 w-full max-w-lg lg:max-w-md px-6 sm:px-10 lg:pl-12 lg:pr-0 pointer-events-none select-none flex flex-col justify-center">
           <div className="p-6 sm:p-7 rounded-3xl bg-[#0e1017]/90 border border-zinc-700/60 backdrop-blur-xl shadow-2xl shadow-black/90 pointer-events-auto transition-all duration-300">
             
-            {/* HUD Status Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-zinc-800 mb-5">
-              <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-slate-300 shadow-[0_0_8px_#ffffff] animate-pulse" />
-                <span className="text-[10px] font-mono tracking-[0.25em] text-slate-200 font-bold uppercase">
-                  GARAGE DETAILING BAY
-                </span>
+            {/* FRAME 01: HERO SECTION */}
+            {!isFrame2Active ? (
+              <div>
+                {/* HUD Status Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-zinc-800 mb-5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2 h-2 rounded-full bg-slate-300 shadow-[0_0_8px_#ffffff] animate-pulse" />
+                    <span className="text-[10px] font-mono tracking-[0.25em] text-slate-200 font-bold uppercase">
+                      GARAGE DETAILING BAY
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono tracking-widest text-zinc-400">
+                    HERO // STAGE 01
+                  </span>
+                </div>
+
+                {/* Aerion Hero Font & Studio Identity */}
+                <div className="mb-5">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-3 pointer-events-auto">
+                    <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
+                    <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] text-zinc-300 uppercase">
+                      STAGE 01 // FRAME 01 ZOOM-IN
+                    </span>
+                  </div>
+
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extralight uppercase tracking-[0.18em] text-white font-display leading-[0.9] drop-shadow-2xl mb-2">
+                    NIHAL MV
+                  </h1>
+
+                  <p className="mt-2 text-[10px] sm:text-xs font-light tracking-[0.3em] sm:tracking-[0.35em] text-zinc-400 uppercase mb-3">
+                    THE ART OF CODE // MERN ARCHITECTURE
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed">
+                    A study in speed, responsive form, and fullstack engineering across modern digital interfaces.
+                  </p>
+                </div>
+
+                {/* Live Telemetry Stats Grid in Polished Silver */}
+                <div className="grid grid-cols-3 gap-2.5 mb-5">
+                  <div className="p-2.5 rounded-xl bg-black/60 border border-zinc-800">
+                    <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                      CAMERA
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold font-mono text-slate-100">
+                      ZOOM-IN
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-black/60 border border-zinc-800">
+                    <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                      ACTIVE CAR
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold font-mono text-slate-100">
+                      FRAME 01
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-black/60 border border-zinc-800">
+                    <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                      TURNTABLE
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold font-mono text-slate-100">
+                      360° STAGE
+                    </span>
+                  </div>
+                </div>
+
+                {/* Real-time 3D Coordinates Readout */}
+                <div className="pt-3.5 pb-4 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-400 mb-4">
+                  <div className="flex items-center gap-3">
+                    <span>YAW: <strong className="text-slate-200">{telemetryCoords.rotY}°</strong></span>
+                    <span>PITCH: <strong className="text-slate-200">{telemetryCoords.rotX}°</strong></span>
+                  </div>
+                  <span className="text-zinc-500">
+                    ZOOM: {telemetryCoords.rotZ}%
+                  </span>
+                </div>
+
+                {/* Transition Trigger CTA */}
+                <button
+                  onClick={scrollToPhilosophy}
+                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-zinc-200 via-slate-100 to-zinc-300 hover:from-white hover:to-zinc-200 text-black font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/60 group pointer-events-auto"
+                >
+                  <span>TRANSITION TO BAY 01 // CRAFT & PHILOSOPHY</span>
+                  <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
+                </button>
               </div>
-              <span className="text-[10px] font-mono tracking-widest text-zinc-400">
-                {!isFrame2Active ? 'HERO // STAGE 01' : 'HERO // STAGE 02'}
-              </span>
-            </div>
+            ) : (
+              /* FRAME 02: BAY 01 // CRAFT & PHILOSOPHY */
+              <div>
+                {/* Detailing Studio Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-zinc-800 mb-4">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-slate-300 shadow-[0_0_8px_#ffffff] animate-pulse" />
+                    <span className="text-[10px] font-mono tracking-[0.25em] text-slate-200 font-bold uppercase">
+                      BAY 01 // CRAFT & PHILOSOPHY
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono tracking-widest text-zinc-400">
+                    PRECISION.STUDIO.2026
+                  </span>
+                </div>
 
-            {/* Aerion Hero Font & Studio Identity */}
-            <div className="mb-5">
-              {/* Concept Study Status Badge matching Aerion */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-3 pointer-events-auto">
-                <span className="w-1.5 h-1.5 rounded-full bg-zinc-300 animate-pulse" />
-                <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] text-zinc-300 uppercase">
-                  {!isFrame2Active ? 'STAGE 01 // FRAME 01 ZOOM-IN' : 'STAGE 02 // FRAME 02 HERO REVEAL'}
-                </span>
+                {/* Title & Philosophy Manifesto */}
+                <div className="mb-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[9px] font-mono tracking-widest uppercase mb-3">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                    <span>STAGE 02 // FRAME 02 UNVEILED</span>
+                  </div>
+
+                  <h2 className="text-3xl sm:text-4xl font-extralight uppercase tracking-[0.16em] text-white font-display leading-[0.95] drop-shadow-2xl mb-1.5">
+                    SCULPTED<br />
+                    <span className="text-zinc-500">BY LOGIC.</span>
+                  </h2>
+
+                  <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.25em] text-zinc-400 font-light mb-3">
+                    THE ART OF CODE // ARCHITECTURAL PURITY
+                  </p>
+
+                  <p className="text-xs text-zinc-300 font-light leading-relaxed">
+                    Every interface and server module is engineered around clarity, performance, and predictable state flow. No ornamental bloat — only pure purpose etched into maintainable code.
+                  </p>
+                </div>
+
+                {/* 3 Performance Specification Pills */}
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="p-2 rounded-xl bg-black/60 border border-zinc-800">
+                    <span className="text-[7.5px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                      PERFORMANCE
+                    </span>
+                    <span className="text-xs font-bold font-mono text-slate-100">
+                      &lt; 50 KB
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-black/60 border border-zinc-800">
+                    <span className="text-[7.5px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                      ARCHITECTURE
+                    </span>
+                    <span className="text-xs font-bold font-mono text-slate-100">
+                      ATOMIC
+                    </span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-black/60 border border-zinc-800">
+                    <span className="text-[7.5px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                      ACTIVE CAR
+                    </span>
+                    <span className="text-xs font-bold font-mono text-slate-100">
+                      FRAME 02
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3 Surface Principles */}
+                <div className="space-y-1.5 mb-4 text-[11px] font-mono">
+                  <div className="p-2 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-start gap-2">
+                    <span className="text-slate-400 font-bold shrink-0">01</span>
+                    <span className="text-zinc-300 font-light">Modular React components with zero duplicate abstractions.</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-start gap-2">
+                    <span className="text-slate-400 font-bold shrink-0">02</span>
+                    <span className="text-zinc-300 font-light">Proportioned visual rhythm & negative spaces for readable UX.</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-zinc-900/60 border border-zinc-800/80 flex items-start gap-2">
+                    <span className="text-slate-400 font-bold shrink-0">03</span>
+                    <span className="text-zinc-300 font-light">Zero technical debt: resilient async controllers & strict REST.</span>
+                  </div>
+                </div>
+
+                {/* Direct Flow to BAY 02 // TELEMETRY CTA */}
+                <button
+                  onClick={scrollToTelemetry}
+                  className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-zinc-200 via-slate-100 to-zinc-300 hover:from-white hover:to-zinc-200 text-black font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/60 group pointer-events-auto"
+                >
+                  <span>PROCEED TO BAY 02 // TELEMETRY</span>
+                  <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
+                </button>
               </div>
-
-              {/* Name Heading matching Aerion: font-extralight uppercase tracking-[0.18em] font-display */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extralight uppercase tracking-[0.18em] text-white font-display leading-[0.9] drop-shadow-2xl mb-2">
-                NIHAL MV
-              </h1>
-
-              {/* Subtitle matching Aerion: font-light tracking-[0.3em] text-zinc-400 */}
-              <p className="mt-2 text-[10px] sm:text-xs font-light tracking-[0.3em] sm:tracking-[0.35em] text-zinc-400 uppercase mb-3">
-                THE ART OF CODE // MERN ARCHITECTURE
-              </p>
-
-              {/* Description matching Aerion: font-light leading-relaxed text-zinc-300 */}
-              <p className="text-xs sm:text-sm text-zinc-300 font-light leading-relaxed">
-                {!isFrame2Active
-                  ? 'Scroll to initiate precision close-up zoom towards Frame 01 on the round turntable stage.'
-                  : 'Frame 02 unveiled at peak zoom as camera pulls back into expansive 3/4 showroom stance.'}
-              </p>
-            </div>
-
-            {/* Live Telemetry Stats Grid in Polished Silver */}
-            <div className="grid grid-cols-3 gap-2.5 mb-5">
-              <div className="p-2.5 rounded-xl bg-black/60 border border-zinc-800">
-                <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
-                  CAMERA
-                </span>
-                <span className="text-xs sm:text-sm font-bold font-mono text-slate-100">
-                  {!isFrame2Active ? 'ZOOM-IN' : 'ZOOM-OUT'}
-                </span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-black/60 border border-zinc-800">
-                <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
-                  ACTIVE CAR
-                </span>
-                <span className="text-xs sm:text-sm font-bold font-mono text-slate-100">
-                  {!isFrame2Active ? 'FRAME 01' : 'FRAME 02'}
-                </span>
-              </div>
-              <div className="p-2.5 rounded-xl bg-black/60 border border-zinc-800">
-                <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
-                  TURNTABLE
-                </span>
-                <span className="text-xs sm:text-sm font-bold font-mono text-slate-100">
-                  360° STAGE
-                </span>
-              </div>
-            </div>
-
-            {/* Real-time 3D Coordinates Readout */}
-            <div className="pt-3.5 pb-4 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-400">
-              <div className="flex items-center gap-3">
-                <span>YAW: <strong className="text-slate-200">{telemetryCoords.rotY}°</strong></span>
-                <span>PITCH: <strong className="text-slate-200">{telemetryCoords.rotX}°</strong></span>
-              </div>
-              <span className="text-zinc-500">
-                ZOOM: {telemetryCoords.rotZ}%
-              </span>
-            </div>
-
-            {/* Direct Flow to BAY 01 // CRAFT & PHILOSOPHY CTA */}
-            <button
-              onClick={scrollToPhilosophy}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-zinc-200 via-slate-100 to-zinc-300 hover:from-white hover:to-zinc-200 text-black font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg shadow-black/60 group pointer-events-auto"
-            >
-              <span>GO TO BAY 01 // CRAFT & PHILOSOPHY</span>
-              <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
-            </button>
+            )}
 
           </div>
 
@@ -799,22 +1001,22 @@ export default function CinematicSequence() {
           </div>
 
           {/* Center Stage Indicators */}
-          <div className="hidden md:flex items-center gap-3 text-[10px] font-mono uppercase tracking-widest">
+          <div className="hidden md:flex items-center gap-2.5 text-[10px] font-mono uppercase tracking-widest">
             <span className={`px-2.5 py-1 rounded-full border transition-all ${!isFrame2Active ? 'border-white text-white bg-white/10' : 'border-zinc-800 text-zinc-600'}`}>
-              01 // ZOOM-IN
+              01 // HERO STUDIO
             </span>
-            <span className="text-zinc-600">→</span>
-            <span className={`px-2.5 py-1 rounded-full border transition-all ${isFrame2Active ? 'border-white text-white bg-white/10' : 'border-zinc-800 text-zinc-600'}`}>
-              02 // ZOOM-OUT
+            <span className="text-cyan-400 font-bold">⚡ LASER SCAN</span>
+            <span className={`px-2.5 py-1 rounded-full border transition-all ${isFrame2Active ? 'border-cyan-400 text-cyan-200 bg-cyan-950/60 shadow-[0_0_10px_rgba(56,189,248,0.3)]' : 'border-zinc-800 text-zinc-600'}`}>
+              02 // BAY 01 PHILOSOPHY
             </span>
           </div>
 
-          {/* Right Scroll Indicator linking directly to BAY 01 */}
+          {/* Right Scroll Indicator */}
           <button
-            onClick={scrollToPhilosophy}
+            onClick={!isFrame2Active ? scrollToPhilosophy : scrollToTelemetry}
             className="flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest uppercase group"
           >
-            <span>SCROLL TO BAY 01 // PHILOSOPHY</span>
+            <span>{!isFrame2Active ? 'SCROLL TO BAY 01' : 'SCROLL TO BAY 02'}</span>
             <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform animate-bounce" />
           </button>
         </div>
