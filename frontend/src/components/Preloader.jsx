@@ -110,7 +110,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
                 />
               </div>
 
-              <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">
+              <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase">
                 INGESTING BMW M4 PROTOTYPE
               </span>
 

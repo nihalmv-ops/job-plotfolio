@@ -122,7 +122,7 @@ export default function Telemetry() {
           <div className="mb-8">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extralight uppercase tracking-[0.16em] text-white leading-[0.95] mb-3">
               PURE<br />
-              <span className="text-zinc-500">VELOCITY.</span>
+              <span className="text-zinc-400">VELOCITY.</span>
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 font-light leading-relaxed max-w-lg">
               Calculated for instantaneous user engagement and high-efficiency data fetching. Real metrics derived from production builds.
@@ -134,7 +134,7 @@ export default function Telemetry() {
             {specs.map((spec, i) => (
               <div
                 key={i}
-                className="p-5 rounded-2xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-xl relative overflow-hidden group hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black"
+                className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 backdrop-blur-xl relative overflow-hidden group hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400">

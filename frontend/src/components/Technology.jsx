@@ -64,7 +64,7 @@ export default function Technology() {
           <div className="mb-8">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extralight uppercase tracking-[0.16em] text-white leading-[0.95] mb-3">
               ENGINEERED<br />
-              <span className="text-zinc-500">FOR PRODUCTION.</span>
+              <span className="text-zinc-400">FOR PRODUCTION.</span>
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 font-light leading-relaxed max-w-lg">
               At the confluence of modern frontend interactivity and resilient server architecture. Every technology in the stack is chosen for performance and reliability.
@@ -76,14 +76,14 @@ export default function Technology() {
             {modules.map((mod, idx) => (
               <div
                 key={idx}
-                className="p-5 rounded-2xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-xl transition-all duration-300 group relative flex flex-col justify-between hover:border-zinc-700 shadow-xl shadow-black"
+                className="p-5 rounded-2xl bg-zinc-900 border border-zinc-800 backdrop-blur-xl transition-all duration-300 group relative flex flex-col justify-between hover:border-zinc-700 shadow-xl shadow-black"
               >
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-400">
                       {mod.subtitle}
                     </span>
-                    <span className="text-[10px] font-mono text-zinc-500 group-hover:text-white transition-colors">
+                    <span className="text-[10px] font-mono text-zinc-400 group-hover:text-white transition-colors">
                       0{idx + 1}
                     </span>
                   </div>
@@ -99,7 +99,7 @@ export default function Technology() {
                 </div>
 
                 {/* Bottom Specs Line */}
-                <div className="mt-4 pt-2.5 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                <div className="mt-4 pt-2.5 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-zinc-400">
                   <span>{mod.spec}</span>
                   <span className="text-zinc-400 font-light">{mod.tolerance}</span>
                 </div>

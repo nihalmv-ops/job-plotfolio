@@ -105,7 +105,7 @@ export default function Transmission({ onReplay }) {
           <div className="w-full lg:max-w-xl xl:max-w-2xl flex flex-col gap-6">
             
             {/* Contact Form Card */}
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-xl shadow-xl shadow-black">
+            <div className="p-6 sm:p-8 rounded-2xl bg-zinc-900 border border-zinc-800 backdrop-blur-xl shadow-xl shadow-black">
               <h3 className="text-2xl sm:text-3xl font-light uppercase tracking-wider text-white mb-2">
                 INITIATE CONTACT.
               </h3>
@@ -215,13 +215,13 @@ export default function Transmission({ onReplay }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <a
                 href="mailto:nihalmv.dev@gmail.com"
-                className="p-4 rounded-xl bg-[#050608]/90 border border-zinc-800/80 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
+                className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
               >
-                <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-lg bg-black border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
                   <Mail size={16} />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-400 block">
                     EMAIL
                   </span>
                   <span className="text-xs font-mono text-zinc-200 group-hover:text-white transition-colors truncate block">
@@ -234,13 +234,13 @@ export default function Transmission({ onReplay }) {
                 href="https://github.com/nihalmv-ops"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 rounded-xl bg-[#050608]/90 border border-zinc-800/80 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
+                className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
               >
-                <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-lg bg-black border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
                   <GithubIcon size={16} />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-400 block">
                     GITHUB
                   </span>
                   <span className="text-xs font-mono text-zinc-200 group-hover:text-white transition-colors truncate block">
@@ -253,13 +253,13 @@ export default function Transmission({ onReplay }) {
                 href="https://linkedin.com/in/nihal-mv-dev/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 rounded-xl bg-[#050608]/90 border border-zinc-800/80 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
+                className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
               >
-                <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-lg bg-black border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
                   <LinkedinIcon size={16} />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-400 block">
                     LINKEDIN
                   </span>
                   <span className="text-xs font-mono text-zinc-200 group-hover:text-white transition-colors truncate block">
@@ -268,12 +268,12 @@ export default function Transmission({ onReplay }) {
                 </div>
               </a>
 
-              <div className="p-4 rounded-xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-xl flex items-center gap-3 shadow-lg shadow-black">
-                <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300">
+              <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 backdrop-blur-xl flex items-center gap-3 shadow-lg shadow-black">
+                <div className="w-9 h-9 rounded-lg bg-black border border-zinc-800 flex items-center justify-center text-zinc-300">
                   <MapPin size={16} />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 block">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-400 block">
                     LOCATION
                   </span>
                   <span className="text-xs font-mono text-zinc-200 truncate block">
@@ -287,7 +287,7 @@ export default function Transmission({ onReplay }) {
             <a
               href="/resume.pdf"
               download="Nihal_MV_Resume.pdf"
-              className="p-4 sm:p-5 rounded-xl bg-[#050608]/90 border border-zinc-800/80 hover:border-zinc-600 backdrop-blur-xl transition-all flex items-center justify-between group shadow-lg shadow-black"
+              className="p-4 sm:p-5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-600 backdrop-blur-xl transition-all flex items-center justify-between group shadow-lg shadow-black"
             >
               <div className="flex items-center gap-3.5">
                 <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
@@ -370,7 +370,7 @@ export default function Transmission({ onReplay }) {
         </div>
 
         {/* Studio Footer Line */}
-        <footer className="w-full border-t border-zinc-800/80 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
+        <footer className="w-full border-t border-zinc-800/80 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-400">
           <div className="flex items-center gap-3">
             <span className="text-slate-200 font-bold tracking-widest">NIHAL MV</span>
             <span>© 2026</span>

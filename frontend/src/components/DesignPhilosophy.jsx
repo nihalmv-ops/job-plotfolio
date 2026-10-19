@@ -4,7 +4,7 @@ export default function DesignPhilosophy() {
   return (
     <section
       id="philosophy"
-      className="relative min-h-screen w-full bg-[#08090d] text-white flex flex-col justify-center px-4 sm:px-6 md:px-16 py-24 sm:py-28 z-20 border-t border-zinc-800/80 scroll-mt-6"
+      className="relative min-h-screen w-full bg-black text-white flex flex-col justify-center px-4 sm:px-6 md:px-16 py-24 sm:py-28 z-20 border-t border-zinc-800/80 scroll-mt-6"
       aria-label="Design Philosophy"
     >
       <div className="max-w-7xl mx-auto w-full">
@@ -16,7 +16,7 @@ export default function DesignPhilosophy() {
               BAY 01 // CRAFT & PHILOSOPHY
             </span>
           </div>
-          <span className="text-xs font-mono tracking-widest text-zinc-500">
+          <span className="text-xs font-mono tracking-widest text-zinc-400">
             PRECISION.STUDIO.2026
           </span>
         </div>
@@ -26,7 +26,7 @@ export default function DesignPhilosophy() {
           <div className="lg:col-span-8">
             <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extralight tracking-[0.15em] sm:tracking-[0.2em] uppercase leading-[0.95] text-white mb-6 sm:mb-8 font-display">
               SCULPTED<br />
-              <span className="text-zinc-500">BY LOGIC.</span>
+              <span className="text-zinc-400">BY LOGIC.</span>
             </h2>
           </div>
 
@@ -36,7 +36,7 @@ export default function DesignPhilosophy() {
             </p>
 
             {/* 3D Telemetry Architecture Card */}
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/60 p-6 relative group flex flex-col justify-between">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6 relative group flex flex-col justify-between shadow-xl shadow-black">
               <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 mb-4">
                 <span className="text-slate-200">BAY 01 // ARCHITECTURE</span>
                 <span className="text-emerald-400">99.9% UPTIME</span>
@@ -47,8 +47,8 @@ export default function DesignPhilosophy() {
             </div>
 
             {/* Spec Box */}
-            <div className="p-6 rounded-2xl border border-white/10 bg-zinc-950/60 backdrop-blur-sm space-y-4">
-              <div className="text-[11px] font-mono tracking-widest text-zinc-500 uppercase">
+            <div className="p-6 rounded-2xl border border-zinc-800 bg-zinc-900 backdrop-blur-sm space-y-4 shadow-xl shadow-black">
+              <div className="text-[11px] font-mono tracking-widest text-zinc-400 uppercase">
                 PERFORMANCE BUDGET
               </div>
               <div className="text-3xl font-light tracking-widest text-white font-mono">
@@ -63,8 +63,8 @@ export default function DesignPhilosophy() {
 
         {/* 3 Surface Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-20">
-          <div className="p-8 rounded-2xl bg-zinc-950/50 border border-white/10 hover:border-white/25 transition-all duration-300">
-            <div className="text-xs font-mono text-zinc-600 tracking-widest uppercase mb-4">
+          <div className="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black">
+            <div className="text-xs font-mono text-zinc-400 tracking-widest uppercase mb-4">
               SURFACE 01
             </div>
             <h3 className="text-lg font-light tracking-[0.2em] text-white uppercase mb-3">
@@ -75,8 +75,8 @@ export default function DesignPhilosophy() {
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-zinc-950/50 border border-white/10 hover:border-white/25 transition-all duration-300">
-            <div className="text-xs font-mono text-zinc-600 tracking-widest uppercase mb-4">
+          <div className="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black">
+            <div className="text-xs font-mono text-zinc-400 tracking-widest uppercase mb-4">
               SURFACE 02
             </div>
             <h3 className="text-lg font-light tracking-[0.2em] text-white uppercase mb-3">
@@ -87,8 +87,8 @@ export default function DesignPhilosophy() {
             </p>
           </div>
 
-          <div className="p-8 rounded-2xl bg-zinc-950/50 border border-white/10 hover:border-white/25 transition-all duration-300">
-            <div className="text-xs font-mono text-zinc-600 tracking-widest uppercase mb-4">
+          <div className="p-8 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black">
+            <div className="text-xs font-mono text-zinc-400 tracking-widest uppercase mb-4">
               SURFACE 03
             </div>
             <h3 className="text-lg font-light tracking-[0.2em] text-white uppercase mb-3">

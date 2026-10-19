@@ -1,17 +1,18 @@
 import { useEffect } from 'react';
 import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 
 export default function SmoothScroll() {
   useEffect(() => {
     // Initialize Lenis for responsive, ultra-smooth momentum scrolling
     const lenis = new Lenis({
-      duration: 0.9,
+      duration: 1.1,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      touchMultiplier: 1.2,
+      touchMultiplier: 1.25,
       infinite: false
     });
 

@@ -49,7 +49,7 @@ export default function EducationTimeline() {
           <div className="mb-8">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extralight uppercase tracking-[0.16em] text-white leading-[0.95] mb-3">
               DISCIPLINED<br />
-              <span className="text-zinc-500">TRAJECTORY.</span>
+              <span className="text-zinc-400">TRAJECTORY.</span>
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 font-light leading-relaxed max-w-lg">
               Combining academic principles in computer science with daily hands-on implementation in production-grade web technologies.
@@ -63,7 +63,7 @@ export default function EducationTimeline() {
               return (
                 <div
                   key={idx}
-                  className="p-6 rounded-2xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-xl relative overflow-hidden group hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black"
+                  className="p-6 rounded-2xl bg-zinc-900 border border-zinc-800 backdrop-blur-xl relative overflow-hidden group hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 tracking-wider">
@@ -80,7 +80,7 @@ export default function EducationTimeline() {
                   </h3>
 
                   <p className="inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400 uppercase tracking-wider mb-3">
-                    <MapPin size={12} className="text-zinc-500" />
+                    <MapPin size={12} className="text-zinc-400" />
                     {item.institution}
                   </p>
 

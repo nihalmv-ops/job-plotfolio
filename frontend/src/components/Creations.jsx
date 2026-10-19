@@ -6,7 +6,7 @@ function ProjectCard({ project, index }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div className="p-5 sm:p-6 rounded-2xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-xl relative overflow-hidden group hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black flex flex-col justify-between">
+    <div className="p-5 sm:p-6 rounded-2xl bg-zinc-900 border border-zinc-800 backdrop-blur-xl relative overflow-hidden group hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black flex flex-col justify-between">
       <div>
         {/* Header with Project Number Badge & Verification */}
         <div className="flex items-center justify-between mb-3">
@@ -130,7 +130,7 @@ export default function Creations() {
           <div className="mb-8">
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extralight uppercase tracking-[0.16em] text-white leading-[0.95] mb-3">
               REAL WORLD<br />
-              <span className="text-zinc-500">APPLICATIONS.</span>
+              <span className="text-zinc-400">APPLICATIONS.</span>
             </h2>
             <p className="text-xs sm:text-sm text-zinc-400 font-light leading-relaxed max-w-lg">
               Real production deployments built with modern web technologies, strict responsive layouts, and verified GitHub repositories.

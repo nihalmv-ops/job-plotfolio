@@ -686,12 +686,12 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       const totalTargetRotY = scrollRotY + dragRotY + mouseX * 0.12;
       const totalTargetRotX = scrollRotX + dragRotX + mouseY * 0.08;
 
-      carRootGroup.rotation.y += (totalTargetRotY - carRootGroup.rotation.y) * 0.07;
-      carRootGroup.rotation.x += (totalTargetRotX - carRootGroup.rotation.x) * 0.07;
+      carRootGroup.rotation.y += (totalTargetRotY - carRootGroup.rotation.y) * 0.1;
+      carRootGroup.rotation.x += (totalTargetRotX - carRootGroup.rotation.x) * 0.1;
 
-      camera.position.x += (targetCamX - camera.position.x) * 0.06;
-      camera.position.y += (targetCamY - camera.position.y) * 0.06;
-      camera.position.z += (targetCamZ - camera.position.z) * 0.06;
+      camera.position.x += (targetCamX - camera.position.x) * 0.1;
+      camera.position.y += (targetCamY - camera.position.y) * 0.1;
+      camera.position.z += (targetCamZ - camera.position.z) * 0.1;
       camera.lookAt(targetLookX, -0.10, 0);
 
       // Direct DOM update for live telemetry HUD (zero React re-render)
@@ -769,7 +769,11 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     if (e) e.preventDefault();
     const el = document.getElementById('philosophy');
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+      if (window.__lenis) {
+        window.__lenis.scrollTo(el, { offset: 0, duration: 1.1 });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -778,7 +782,11 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     if (e) e.preventDefault();
     const el = document.getElementById('telemetry');
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+      if (window.__lenis) {
+        window.__lenis.scrollTo(el, { offset: 0, duration: 1.1 });
+      } else {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -812,7 +820,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
             <span className="text-base sm:text-lg font-light tracking-[0.3em] text-white uppercase font-display leading-none group-hover:text-zinc-200 transition-colors block">
               NIHAL MV
             </span>
-            <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">
+            <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase">
               MERN GARAGE STUDIO
             </span>
           </div>
@@ -921,7 +929,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           
           {/* Left Column: Aerion-Style Non-Bold Typography & Live Telemetry HUD */}
           <div className="w-full lg:max-w-xl">
-            <div className="p-6 sm:p-8 rounded-3xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-2xl shadow-2xl shadow-black">
+            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-900 border border-zinc-800 backdrop-blur-2xl shadow-2xl shadow-black">
               
               {/* Studio Status Header */}
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
@@ -958,26 +966,26 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                 </p>
               </div>
 
-              {/* Live Telemetry Stats Grid in Deep Stealth Black */}
+              {/* Live Telemetry Stats Grid in Deep Stealth Black & Zinc 900 */}
               <div className="grid grid-cols-3 gap-2.5 mb-5">
-                <div className="p-2.5 rounded-xl bg-black/80 border border-zinc-800/80">
-                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     CAMERA
                   </span>
                   <span className="text-xs sm:text-sm font-light font-mono text-zinc-200">
                     ZOOM-IN
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-black/80 border border-zinc-800/80">
-                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     ACTIVE CAR
                   </span>
                   <span className="text-xs sm:text-sm font-light font-mono text-zinc-200 truncate block">
                     BMW M4
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-black/80 border border-zinc-800/80">
-                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     TURNTABLE
                   </span>
                   <span className="text-xs sm:text-sm font-light font-mono text-zinc-200">
@@ -992,7 +1000,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                   <span>YAW: <strong ref={hudYawRef} className="text-zinc-200 font-light">0°</strong></span>
                   <span>PITCH: <strong ref={hudPitchRef} className="text-zinc-200 font-light">0°</strong></span>
                 </div>
-                <span ref={hudZoomRef} className="text-zinc-500">
+                <span ref={hudZoomRef} className="text-zinc-400">
                   ZOOM: 0%
                 </span>
               </div>
@@ -1008,7 +1016,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
             </div>
 
             {/* Interactive 3D Orbit Hint */}
-            <div className="mt-4 flex items-center gap-2 text-[10px] font-mono text-zinc-500 tracking-wider">
+            <div className="mt-4 flex items-center gap-2 text-[10px] font-mono text-zinc-400 tracking-wider">
               <Move3d size={13} className="text-zinc-400 animate-pulse" />
               <span>DRAG 3D CAR • ROTATE 360° ON ROUND STAGE</span>
             </div>
@@ -1065,7 +1073,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           
           {/* Left Column: Full Philosophy Manifesto & Architecture Specifications */}
           <div className="w-full lg:max-w-xl">
-            <div className="p-6 sm:p-8 rounded-3xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-2xl shadow-2xl shadow-black">
+            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-900 border border-zinc-800 backdrop-blur-2xl shadow-2xl shadow-black">
               
               {/* Studio Detailing Header */}
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
@@ -1089,7 +1097,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
                 <h2 className="text-4xl sm:text-5xl font-extralight uppercase tracking-[0.16em] text-white font-display leading-[0.95] drop-shadow-2xl mb-2">
                   SCULPTED<br />
-                  <span className="text-zinc-500">BY LOGIC.</span>
+                  <span className="text-zinc-400">BY LOGIC.</span>
                 </h2>
 
                 <p className="text-[10px] sm:text-xs font-mono uppercase tracking-[0.25em] text-zinc-400 font-light mb-3">
@@ -1103,24 +1111,24 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
               {/* 3 Performance Specification Pills */}
               <div className="grid grid-cols-3 gap-2 mb-5">
-                <div className="p-2.5 rounded-xl bg-black/80 border border-zinc-800/80">
-                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     PERFORMANCE
                   </span>
                   <span className="text-xs sm:text-sm font-light font-mono text-zinc-200">
                     &lt; 50 KB
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-black/80 border border-zinc-800/80">
-                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     ARCHITECTURE
                   </span>
                   <span className="text-xs sm:text-sm font-light font-mono text-zinc-200">
                     ATOMIC
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-black/80 border border-zinc-800/80">
-                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-500 block mb-0.5">
+                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                  <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     ACTIVE CAR
                   </span>
                   <span className="text-xs sm:text-sm font-light font-mono text-zinc-200">
@@ -1131,15 +1139,15 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
               {/* 3 Surface Principles */}
               <div className="space-y-2 mb-5 text-[11px] font-mono">
-                <div className="p-2.5 rounded-lg bg-black/60 border border-zinc-800/80 flex items-start gap-2.5">
+                <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
                   <span className="text-white font-bold shrink-0">01</span>
                   <span className="text-zinc-300 font-light">Modular React components with zero duplicate abstractions.</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-black/60 border border-zinc-800/80 flex items-start gap-2.5">
+                <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
                   <span className="text-white font-bold shrink-0">02</span>
                   <span className="text-zinc-300 font-light">Proportioned visual rhythm & negative spaces for readable UX.</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-black/60 border border-zinc-800/80 flex items-start gap-2.5">
+                <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
                   <span className="text-white font-bold shrink-0">03</span>
                   <span className="text-zinc-300 font-light">Zero technical debt: resilient async controllers & strict REST.</span>
                 </div>
@@ -1156,7 +1164,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
             </div>
 
             {/* Interactive 3D Orbit Hint */}
-            <div className="mt-4 flex items-center gap-2 text-[10px] font-mono text-zinc-500 tracking-wider">
+            <div className="mt-4 flex items-center gap-2 text-[10px] font-mono text-zinc-400 tracking-wider">
               <Move3d size={13} className="text-zinc-400 animate-pulse" />
               <span>STAGE 02 ACTIVE • DRAG TO ROTATE 360°</span>
             </div>
@@ -1208,7 +1216,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               className={`px-2 py-0.5 rounded-full border transition-all ${
                 activeCarSlotIndex === idx 
                   ? 'border-zinc-500 text-white bg-zinc-900 font-bold shadow-md shadow-black' 
-                  : 'border-zinc-800 text-zinc-600'
+                  : 'border-zinc-800 text-zinc-400 bg-zinc-900/40'
               }`}
             >
               0{idx + 1}
