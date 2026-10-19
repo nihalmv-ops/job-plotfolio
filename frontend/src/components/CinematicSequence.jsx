@@ -141,7 +141,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     // 3. Overhead Garage LED Strip Light Rig (Detailing Studio Ceiling)
     const ceilingRig = new THREE.Group();
     const stripGeom = new THREE.BoxGeometry(0.06, 0.03, 7.5);
-    const stripMat = new THREE.MeshBasicMaterial({ color: 0x1e293b });
+    const stripMat = new THREE.MeshBasicMaterial({ color: 0x0f121a });
 
     [-1.8, -0.9, 0, 0.9, 1.8].forEach((xOffset) => {
       const strip = new THREE.Mesh(stripGeom, stripMat);
@@ -150,28 +150,28 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     });
     scene.add(ceilingRig);
 
-    // 4. Matte Stealth Black Automotive Floor (Eliminates blinding white specular glare)
+    // 4. Matte Stealth Black Automotive Floor (Eliminates blinding specular glare)
     const floorGeom = new THREE.PlaneGeometry(45, 45);
     const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x010102,
-      roughness: 0.88,
-      metalness: 0.08
+      color: 0x000000,
+      roughness: 0.95,
+      metalness: 0.04
     });
     const floor = new THREE.Mesh(floorGeom, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -1.15;
     scene.add(floor);
 
-    // 5. Photorealistic Automotive Turntable Round Stage in Brushed Silver & Chrome
+    // 5. Photorealistic Automotive Turntable Round Stage in Pure Stealth Black
     const stageGroup = new THREE.Group();
 
-    // Stage Top / Main Cylindrical Disc Platform (Premium Brushed Silver)
+    // Stage Top / Main Cylindrical Disc Platform (Stealth Obsidian Black)
     const stageGeom = new THREE.CylinderGeometry(3.5, 3.65, 0.16, 64);
     const stageMat = new THREE.MeshStandardMaterial({
-      color: 0xd4d8df,
-      metalness: 0.88,
-      roughness: 0.22,
-      envMapIntensity: 1.2
+      color: 0x050608,
+      metalness: 0.3,
+      roughness: 0.65,
+      envMapIntensity: 0.45
     });
     const stageMesh = new THREE.Mesh(stageGeom, stageMat);
     stageMesh.position.y = -1.07;
@@ -179,21 +179,21 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     stageMesh.castShadow = true;
     stageGroup.add(stageMesh);
 
-    // Beveled Outer Bezel Edge Ring (Polished Chrome Silver)
+    // Beveled Outer Bezel Edge Ring (Dark Graphite / Smoked Black Metal)
     const bezelGeom = new THREE.TorusGeometry(3.51, 0.035, 16, 64);
     const bezelMat = new THREE.MeshStandardMaterial({
-      color: 0xf1f5f9,
-      metalness: 0.96,
-      roughness: 0.08,
-      envMapIntensity: 1.4
+      color: 0x14161b,
+      metalness: 0.65,
+      roughness: 0.35,
+      envMapIntensity: 0.55
     });
     const bezelMesh = new THREE.Mesh(bezelGeom, bezelMat);
     bezelMesh.rotation.x = Math.PI / 2;
     bezelMesh.position.y = -0.99;
     stageGroup.add(bezelMesh);
 
-    // Stage Surface Concentric Detailing Rings (Brushed Platinum Silver)
-    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.55 });
+    // Stage Surface Concentric Detailing Rings (Subtle Dark Technical Grooves)
+    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0x1e2430, transparent: true, opacity: 0.35 });
     
     const stageRing1Geom = new THREE.RingGeometry(2.5, 2.52, 64);
     const stageRing1 = new THREE.Mesh(stageRing1Geom, stageRingMat);
@@ -207,12 +207,12 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     stageRing2.position.y = -0.988;
     stageGroup.add(stageRing2);
 
-    // Stage LED White Halo Underglow Ring on Floor
+    // Stage LED Halo Underglow Ring on Floor (Subtle Ambient Dark Cyan Glow)
     const haloGeom = new THREE.RingGeometry(3.55, 3.7, 64);
     const haloMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+      color: 0x0284c7,
       transparent: true,
-      opacity: 0.75
+      opacity: 0.22
     });
     const haloMesh = new THREE.Mesh(haloGeom, haloMat);
     haloMesh.rotation.x = -Math.PI / 2;
@@ -818,7 +818,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           </div>
         </a>
 
-        {/* Center Silver Monospaced Navigation */}
+        {/* Center Monospaced Navigation */}
         <nav className="hidden lg:flex items-center gap-8" aria-label="Main Navigation">
           <button 
             onClick={scrollToPhilosophy} 

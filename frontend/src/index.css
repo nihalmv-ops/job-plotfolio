@@ -2,9 +2,10 @@
 
 @layer base {
   :root {
-    --bg-main: #08090d;
-    --bg-surface: #0e1017;
-    --border-silver: rgba(226, 232, 240, 0.15);
+    --bg-main: #000000;
+    --bg-surface: #050608;
+    --border-dark: rgba(39, 39, 42, 0.6);
+    --border-silver: rgba(39, 39, 42, 0.6);
     --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
@@ -13,44 +14,45 @@
   html {
     scroll-behavior: smooth;
     font-family: var(--font-sans);
-    background-color: #08090d;
+    background-color: #000000;
     color: #ffffff;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    background-color: #08090d;
+    background-color: #000000;
     color: #ffffff;
     min-height: 100vh;
     overflow-x: hidden;
     font-family: var(--font-sans);
   }
 
-  /* Silver & Black Selection */
+  /* Pure Stealth Selection */
   ::selection {
-    background-color: #e2e8f0;
-    color: #08090d;
+    background-color: #27272a;
+    color: #ffffff;
   }
 
-  /* Custom scrollbar in polished steel */
+  /* Custom scrollbar in stealth black */
   ::-webkit-scrollbar {
     width: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: #08090d;
+    background: #000000;
   }
   ::-webkit-scrollbar-thumb {
-    background: #27272a;
+    background: #18181b;
     border-radius: 3px;
+    border: 1px solid #27272a;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #71717a;
+    background: #3f3f46;
   }
 
   /* Focus ring for accessibility */
   :focus-visible {
-    outline: 2px solid #e2e8f0;
+    outline: 2px solid #52525b;
     outline-offset: 3px;
   }
 }
@@ -75,14 +77,14 @@
   text-transform: uppercase;
 }
 
-/* Carbon & Titanium surface */
+/* Stealth Black & Carbon surface */
 .garage-card {
-  background-color: rgba(14, 16, 23, 0.9);
+  background-color: rgba(5, 6, 8, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.12);
+  border: 1px solid rgba(39, 39, 42, 0.7);
 }
 
 .garage-card:hover {
-  border-color: rgba(226, 232, 240, 0.3);
+  border-color: rgba(82, 82, 91, 0.8);
 }

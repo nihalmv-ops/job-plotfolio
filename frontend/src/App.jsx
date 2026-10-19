@@ -51,7 +51,7 @@ export default function App() {
         onHeroReady={() => setIsHeroReady(true)}
       />
 
-      {/* Content Sections in Silver & Black Detailing Theme */}
+      {/* Content Sections in Pure Stealth Black Theme */}
       <main id="main-content" className="relative z-10">
         {/* 02 / Telemetry & Performance Benchmarks */}
         <Telemetry />
