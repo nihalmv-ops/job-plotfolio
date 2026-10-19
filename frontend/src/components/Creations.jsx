@@ -83,20 +83,20 @@ export default function Creations() {
       githubUrl: 'https://github.com/nihalmv-ops/smartshAI'
     },
     {
+      title: 'GoTravel — Full-Stack Travel Web Application',
+      description: 'A full-stack travel web application built with modern web development technologies, responsive React.js frontend interface, backend API services, and MongoDB database connectivity.',
+      technologies: ['React.js', 'JavaScript', 'Node.js', 'Express.js', 'MongoDB'],
+      image: '/projects/gotravel.png',
+      liveUrl: 'https://rgotravel.vercel.app/',
+      githubUrl: 'https://github.com/nihalmv-ops/rgotravel'
+    },
+    {
       title: 'TrachMart — TechNest Laptops & Mobiles',
       description: 'A high-performance e-commerce frontend built for technology electronics. Features responsive shopping cart management, product filtering, and client-side routing.',
       technologies: ['React.js', 'JavaScript', 'Vite', 'Tailwind CSS'],
       image: '/projects/trachmart.png',
       liveUrl: 'https://trachmartshop.vercel.app/',
       githubUrl: 'https://github.com/nihalmv-ops/trachmartshop'
-    },
-    {
-      title: 'GoTravel — Responsive Travel Platform',
-      description: 'A modern travel discovery website emphasizing fluid layout adaptation, reusable component systems, and clean interactive user experiences across desktop and mobile.',
-      technologies: ['React.js', 'JavaScript', 'Tailwind CSS', 'HTML5', 'CSS3'],
-      image: '/projects/gotravel.png',
-      liveUrl: 'https://rgotravel.vercel.app/',
-      githubUrl: 'https://github.com/nihalmv-ops/rgotravel'
     }
   ];
 

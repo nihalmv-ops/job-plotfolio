@@ -48,7 +48,7 @@ export default function Footer() {
             </a>
 
             <a
-              href="mailto:nihalmv2004@gmail.com"
+              href="mailto:nihalmv.dev@gmail.com"
               className="p-2 rounded-full hover:bg-white/5 hover:text-white transition-colors"
               aria-label="Email Nihal MV"
             >
