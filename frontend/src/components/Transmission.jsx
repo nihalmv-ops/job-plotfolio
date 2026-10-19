@@ -194,7 +194,7 @@ export default function Transmission({ onReplay }) {
                 <button
                   type="submit"
                   disabled={formStatus.submitting}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-white text-black font-semibold text-xs tracking-widest uppercase hover:bg-zinc-200 transition-all self-start disabled:opacity-50 cursor-pointer shadow-lg shadow-white/10"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black hover:bg-zinc-900 text-white font-semibold text-xs tracking-widest uppercase transition-all self-start disabled:opacity-50 cursor-pointer shadow-lg shadow-black border border-zinc-700 hover:border-zinc-500"
                 >
                   {formStatus.submitting ? (
                     <>
@@ -360,7 +360,7 @@ export default function Transmission({ onReplay }) {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.25em] hover:bg-zinc-200 transition-all flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 cursor-pointer"
+              className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-black hover:bg-zinc-900 text-white font-semibold text-xs uppercase tracking-[0.25em] transition-all flex items-center gap-3 shadow-[0_0_35px_rgba(0,0,0,0.9)] border border-zinc-700 hover:border-zinc-500 hover:scale-105 active:scale-95 cursor-pointer"
               aria-label="Replay 3D Experience"
             >
               <span>REPLAY EXPERIENCE</span>

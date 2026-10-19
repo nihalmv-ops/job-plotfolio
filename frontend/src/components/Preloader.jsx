@@ -127,7 +127,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
             <button
               onClick={handleEnter}
               autoFocus
-              className="group px-9 py-3.5 rounded-full bg-white hover:bg-zinc-200 text-black font-semibold text-xs uppercase tracking-[0.3em] transition-all duration-300 flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.25)] border border-white hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
+              className="group px-9 py-3.5 rounded-full bg-black hover:bg-zinc-900 text-white font-semibold text-xs uppercase tracking-[0.3em] transition-all duration-300 flex items-center gap-3 shadow-[0_0_35px_rgba(0,0,0,0.9)] border border-zinc-700 hover:border-zinc-500 hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
               aria-label="Enter Portfolio"
             >
               <span>ENTER GARAGE</span>

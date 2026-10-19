@@ -162,16 +162,16 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     floor.position.y = -1.15;
     scene.add(floor);
 
-    // 5. Stealth Matte Obsidian Turntable Round Stage
+    // 5. Photorealistic Automotive Turntable Round Stage in Brushed Silver & Chrome
     const stageGroup = new THREE.Group();
 
-    // Stage Top / Main Cylindrical Disc Platform
+    // Stage Top / Main Cylindrical Disc Platform (Premium Brushed Silver)
     const stageGeom = new THREE.CylinderGeometry(3.5, 3.65, 0.16, 64);
     const stageMat = new THREE.MeshStandardMaterial({
-      color: 0x08090c,
-      metalness: 0.25,
-      roughness: 0.65,
-      envMapIntensity: 0.6
+      color: 0xd4d8df,
+      metalness: 0.88,
+      roughness: 0.22,
+      envMapIntensity: 1.2
     });
     const stageMesh = new THREE.Mesh(stageGeom, stageMat);
     stageMesh.position.y = -1.07;
@@ -179,20 +179,21 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     stageMesh.castShadow = true;
     stageGroup.add(stageMesh);
 
-    // Beveled Dark Gunmetal Outer Bezel Edge Ring
+    // Beveled Outer Bezel Edge Ring (Polished Chrome Silver)
     const bezelGeom = new THREE.TorusGeometry(3.51, 0.035, 16, 64);
     const bezelMat = new THREE.MeshStandardMaterial({
-      color: 0x1f232b,
-      metalness: 0.5,
-      roughness: 0.45
+      color: 0xf1f5f9,
+      metalness: 0.96,
+      roughness: 0.08,
+      envMapIntensity: 1.4
     });
     const bezelMesh = new THREE.Mesh(bezelGeom, bezelMat);
     bezelMesh.rotation.x = Math.PI / 2;
     bezelMesh.position.y = -0.99;
     stageGroup.add(bezelMesh);
 
-    // Stage Surface Concentric Detailing Rings (Subtle Slate)
-    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0x334155, transparent: true, opacity: 0.25 });
+    // Stage Surface Concentric Detailing Rings (Brushed Platinum Silver)
+    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.55 });
     
     const stageRing1Geom = new THREE.RingGeometry(2.5, 2.52, 64);
     const stageRing1 = new THREE.Mesh(stageRing1Geom, stageRingMat);
@@ -206,12 +207,12 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     stageRing2.position.y = -0.988;
     stageGroup.add(stageRing2);
 
-    // Stage LED Subtle Cyan Underglow Ring on Floor
+    // Stage LED White Halo Underglow Ring on Floor
     const haloGeom = new THREE.RingGeometry(3.55, 3.7, 64);
     const haloMat = new THREE.MeshBasicMaterial({
-      color: 0x0284c7,
+      color: 0xffffff,
       transparent: true,
-      opacity: 0.35
+      opacity: 0.75
     });
     const haloMesh = new THREE.Mesh(haloGeom, haloMat);
     haloMesh.rotation.x = -Math.PI / 2;
@@ -846,7 +847,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
             <button
               onClick={() => setActiveModelMode('auto')}
               className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                activeModelMode === 'auto' ? 'bg-white text-black font-semibold shadow-md shadow-white/20' : 'text-zinc-400 hover:text-white'
+                activeModelMode === 'auto' ? 'bg-zinc-900 text-white font-semibold border border-zinc-600 shadow-md shadow-black' : 'text-zinc-400 hover:text-white'
               }`}
               title="Auto Dynamic Scroll Mode (Cars 1 - 6)"
             >
@@ -862,7 +863,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                   }
                 }}
                 className={`px-2 py-1 rounded-full transition-all cursor-pointer ${
-                  activeModelMode === idx ? 'bg-white text-black font-semibold shadow-md shadow-white/20' : 'text-zinc-400 hover:text-white'
+                  activeModelMode === idx ? 'bg-zinc-900 text-white font-semibold border border-zinc-600 shadow-md shadow-black' : 'text-zinc-400 hover:text-white'
                 }`}
                 title={`Force View ${slot.name}`}
               >
@@ -999,7 +1000,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               {/* Transition Trigger CTA Button */}
               <button
                 onClick={scrollToPhilosophy}
-                className="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl shadow-white/10 border border-white/20 group cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-zinc-900 text-white font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl shadow-black border border-zinc-700 hover:border-zinc-500 group cursor-pointer"
               >
                 <span>SCROLL TO BAY 01 // CRAFT & PHILOSOPHY</span>
                 <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
@@ -1147,7 +1148,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               {/* Direct Flow to BAY 02 // TELEMETRY CTA */}
               <button
                 onClick={scrollToTelemetry}
-                className="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl shadow-white/10 border border-white/20 group cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-zinc-900 text-white font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl shadow-black border border-zinc-700 hover:border-zinc-500 group cursor-pointer"
               >
                 <span>PROCEED TO BAY 02 // TELEMETRY</span>
                 <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
@@ -1206,7 +1207,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               key={slot.id}
               className={`px-2 py-0.5 rounded-full border transition-all ${
                 activeCarSlotIndex === idx 
-                  ? 'border-white text-black bg-white font-bold shadow-md shadow-white/20' 
+                  ? 'border-zinc-500 text-white bg-zinc-900 font-bold shadow-md shadow-black' 
                   : 'border-zinc-800 text-zinc-600'
               }`}
             >

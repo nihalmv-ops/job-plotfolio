@@ -49,7 +49,7 @@ function ProjectCard({ project, index }) {
             href={project.liveUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white hover:bg-zinc-200 text-black font-semibold text-[10px] tracking-wider uppercase shadow-md shadow-white/10 border border-white/20 transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-black hover:bg-zinc-900 text-white font-semibold text-[10px] tracking-wider uppercase shadow-md shadow-black border border-zinc-700 hover:border-zinc-500 transition-all cursor-pointer"
           >
             <span>LIVE DEMO</span>
             <ExternalLink size={12} />
