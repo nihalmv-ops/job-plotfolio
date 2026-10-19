@@ -101,42 +101,21 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     carRootGroupRef.current = carRootGroup;
     scene.add(carRootGroup);
 
-    // Dedicated Car & Stage Studio Key Light directly bound to the turntable
-    const carKeyLight = new THREE.DirectionalLight(0xffffff, 1.8);
-    carKeyLight.position.set(0, 8, 4);
-    carRootGroup.add(carKeyLight);
-
-    const carRimLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    carRimLight.position.set(0, 5, -5);
-    carRootGroup.add(carRimLight);
-
-    const carSideLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    carSideLight.position.set(-5, 4, 2);
-    carRootGroup.add(carSideLight);
-
-    // 2. Pure Automotive Studio Lighting calibrated to prevent washing out authentic car colors
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+    // 2. Pure Automotive Studio Lighting calibrated to faithfully render authentic .glb colors
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
     scene.add(ambientLight);
 
-    const overheadLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    overheadLight.position.set(0, 9, 2);
-    scene.add(overheadLight);
+    const overheadKeyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    overheadKeyLight.position.set(2, 8, 4);
+    scene.add(overheadKeyLight);
 
-    const leftLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    leftLight.position.set(-6, 4, 4);
-    scene.add(leftLight);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    fillLight.position.set(-5, 4, 3);
+    scene.add(fillLight);
 
-    const rightLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    rightLight.position.set(6, 4, 4);
-    scene.add(rightLight);
-
-    const rearLight = new THREE.DirectionalLight(0xffffff, 0.7);
-    rearLight.position.set(0, 5, -6);
-    scene.add(rearLight);
-
-    const groundBounce = new THREE.DirectionalLight(0x1e293b, 0.3);
-    groundBounce.position.set(0, -3, 0);
-    scene.add(groundBounce);
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    rimLight.position.set(0, 4, -5);
+    scene.add(rimLight);
 
     // 3. Overhead Garage LED Strip Light Rig (Detailing Studio Ceiling)
     const ceilingRig = new THREE.Group();
@@ -289,7 +268,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           const materials = Array.isArray(child.material) ? child.material : [child.material];
           materials.forEach((mat) => {
             if (mat && (mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial)) {
-              mat.envMapIntensity = 0.85;
+              mat.envMapIntensity = 0.55;
               // Preserve original colors, textures, and diffuse maps 100% intact
               mat.needsUpdate = true;
             }
@@ -810,10 +789,10 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       {/* ==================================================================== */}
       {/* 2. FIXED AERION-STYLE TOP HEADER HUD                                 */}
       {/* ==================================================================== */}
-      <header className="fixed top-0 left-0 right-0 z-40 px-6 sm:px-12 py-5 flex items-center justify-between pointer-events-auto bg-gradient-to-b from-black/95 via-black/50 to-transparent backdrop-blur-xs">
+      <header className="fixed top-0 left-0 right-0 z-40 px-6 sm:px-12 py-5 flex items-center justify-between pointer-events-auto bg-black/40 backdrop-blur-xl border-b border-white/[0.08]">
         {/* Logo & Status */}
         <a href="#" className="flex items-center gap-3.5 group focus:outline-none" aria-label="Nihal MV - Return to top">
-          <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-700/60 flex items-center justify-center text-white group-hover:scale-105 transition-transform shadow-lg shadow-black/80">
+          <div className="w-8 h-8 rounded-lg bg-black/50 border border-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-105 transition-transform shadow-lg shadow-black/80">
             <span className="text-xs font-mono font-bold">N</span>
           </div>
           <div>
@@ -851,11 +830,11 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
         {/* Right Controls: 6-Frame Fleet Switcher + Scroll to Top */}
         <div className="flex items-center gap-3">
           {/* 3D Mode Switcher supporting all 6 frames */}
-          <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-black/90 border border-zinc-800 backdrop-blur-md text-[9px] font-mono tracking-wider uppercase shadow-xl shadow-black/90">
+          <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-black/50 border border-white/10 backdrop-blur-xl text-[9px] font-mono tracking-wider uppercase shadow-2xl shadow-black">
             <button
               onClick={() => setActiveModelMode('auto')}
               className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                activeModelMode === 'auto' ? 'bg-zinc-900 text-white font-semibold border border-zinc-600 shadow-md shadow-black' : 'text-zinc-400 hover:text-white'
+                activeModelMode === 'auto' ? 'bg-white/10 text-white font-semibold border border-white/20 shadow-md shadow-black' : 'text-zinc-400 hover:text-white'
               }`}
               title="Auto Dynamic Scroll Mode (Cars 1 - 6)"
             >
@@ -871,7 +850,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                   }
                 }}
                 className={`px-2 py-1 rounded-full transition-all cursor-pointer ${
-                  activeModelMode === idx ? 'bg-zinc-900 text-white font-semibold border border-zinc-600 shadow-md shadow-black' : 'text-zinc-400 hover:text-white'
+                  activeModelMode === idx ? 'bg-white/10 text-white font-semibold border border-white/20 shadow-md shadow-black' : 'text-zinc-400 hover:text-white'
                 }`}
                 title={`Force View ${slot.name}`}
               >
@@ -883,7 +862,8 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           {/* Scroll to Top */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-zinc-800 hover:border-zinc-500 bg-zinc-950/80 text-zinc-300 hover:text-white text-xs font-mono tracking-wider uppercase transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/10 hover:border-white/30 bg-black/40 backdrop-blur-md text-zinc-300 hover:text-white text-xs font-mono tracking-wider uppercase transition-colors cursor-pointer shadow-lg shadow-black"
+            title="Scroll to Top"
             aria-label="Scroll to top"
           >
             <span>TOP</span>
@@ -929,7 +909,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           
           {/* Left Column: Aerion-Style Non-Bold Typography & Live Telemetry HUD */}
           <div className="w-full lg:max-w-xl">
-            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-900 border border-zinc-800 backdrop-blur-2xl shadow-2xl shadow-black">
+            <div className="p-6 sm:p-8 rounded-3xl bg-black/40 border border-white/10 backdrop-blur-2xl shadow-2xl shadow-black">
               
               {/* Studio Status Header */}
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
@@ -946,7 +926,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
               {/* Aerion Hero Font & Studio Identity (Clean, Extra-Light, Letterspaced) */}
               <div className="mb-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-700/60 backdrop-blur-md mb-3 text-zinc-300">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-white/10 backdrop-blur-md mb-3 text-zinc-300">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] uppercase">
                     STAGE 01 // FRAME 01 ZOOM-IN
@@ -966,9 +946,9 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                 </p>
               </div>
 
-              {/* Live Telemetry Stats Grid in Deep Stealth Black & Zinc 900 */}
+              {/* Live Telemetry Stats Grid in Deep Stealth Glass */}
               <div className="grid grid-cols-3 gap-2.5 mb-5">
-                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
                   <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     CAMERA
                   </span>
@@ -976,7 +956,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                     ZOOM-IN
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
                   <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     ACTIVE CAR
                   </span>
@@ -984,7 +964,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                     BMW M4
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
                   <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     TURNTABLE
                   </span>
@@ -1008,7 +988,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               {/* Transition Trigger CTA Button */}
               <button
                 onClick={scrollToPhilosophy}
-                className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-zinc-900 text-white font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl shadow-black border border-zinc-700 hover:border-zinc-500 group cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-white font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-2xl shadow-black border border-white/20 hover:border-white/40 group cursor-pointer backdrop-blur-md"
               >
                 <span>SCROLL TO BAY 01 // CRAFT & PHILOSOPHY</span>
                 <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
@@ -1024,13 +1004,13 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
           {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO PNG IMAGES! */}
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[400px] pointer-events-none select-none">
-            <div className="px-4 py-2 rounded-full bg-black/80 border border-zinc-800 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
+            <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
               <span className={`w-2 h-2 rounded-full ${isHeroModelReady ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-cyan-400 shadow-[0_0_8px_#38bdf8]'} animate-pulse`} />
               <span>{isHeroModelReady ? 'STAGE 01 // 360° TURNTABLE PLATFORM' : `CALIBRATING 3D MODEL • ${heroLoadProgress}%`}</span>
             </div>
 
             {!isHeroModelReady ? (
-              <div className="p-4 rounded-2xl bg-black/90 border border-cyan-500/40 backdrop-blur-md flex flex-col gap-2.5 text-right w-64 shadow-[0_0_25px_rgba(56,189,248,0.25)]">
+              <div className="p-4 rounded-2xl bg-black/50 border border-cyan-500/40 backdrop-blur-xl flex flex-col gap-2.5 text-right w-64 shadow-[0_0_25px_rgba(56,189,248,0.25)]">
                 <div className="flex items-center justify-end gap-2 text-[10px] font-mono text-cyan-300 tracking-wider">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
                   <span>STREAMING GLTF MESH</span>
@@ -1047,10 +1027,10 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               </div>
             ) : (
               <div className="space-y-2 text-right">
-                <div className="px-3.5 py-1.5 rounded-xl bg-black/60 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
+                <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl text-[10px] font-mono tracking-widest text-zinc-400">
                   {activeCar.name}
                 </div>
-                <div className="px-3.5 py-1.5 rounded-xl bg-black/60 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
+                <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
                   <Move3d size={13} className="text-zinc-400 animate-pulse" />
                   <span>INTERACTIVE 3D WEBGL • DRAG TO ORBIT</span>
                 </div>
@@ -1067,13 +1047,13 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       {/* ==================================================================== */}
       <section 
         id="philosophy" 
-        className="relative z-10 min-h-screen w-full flex items-center justify-between px-6 sm:px-12 max-w-7xl mx-auto py-24 border-t border-zinc-800/60 scroll-mt-12"
+        className="relative z-10 min-h-screen w-full flex items-center justify-between px-6 sm:px-12 max-w-7xl mx-auto py-24 border-t border-white/[0.08] scroll-mt-12"
       >
         <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-12">
           
           {/* Left Column: Full Philosophy Manifesto & Architecture Specifications */}
           <div className="w-full lg:max-w-xl">
-            <div className="p-6 sm:p-8 rounded-3xl bg-zinc-900 border border-zinc-800 backdrop-blur-2xl shadow-2xl shadow-black">
+            <div className="p-6 sm:p-8 rounded-3xl bg-black/40 border border-white/10 backdrop-blur-2xl shadow-2xl shadow-black">
               
               {/* Studio Detailing Header */}
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
@@ -1090,7 +1070,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
               {/* Title & Philosophy Manifesto */}
               <div className="mb-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900/90 border border-zinc-700/60 text-zinc-300 text-[9px] font-mono tracking-widest uppercase mb-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-white/10 text-zinc-300 text-[9px] font-mono tracking-widest uppercase mb-3 backdrop-blur-md">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>STAGE 02 // FRAME 02 UNVEILED</span>
                 </div>
@@ -1111,7 +1091,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
               {/* 3 Performance Specification Pills */}
               <div className="grid grid-cols-3 gap-2 mb-5">
-                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
                   <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     PERFORMANCE
                   </span>
@@ -1119,7 +1099,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                     &lt; 50 KB
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
                   <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     ARCHITECTURE
                   </span>
@@ -1127,7 +1107,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                     ATOMIC
                   </span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800">
+                <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
                   <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
                     ACTIVE CAR
                   </span>
@@ -1139,15 +1119,15 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
               {/* 3 Surface Principles */}
               <div className="space-y-2 mb-5 text-[11px] font-mono">
-                <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
+                <div className="p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.08] flex items-start gap-2.5 backdrop-blur-md">
                   <span className="text-white font-bold shrink-0">01</span>
                   <span className="text-zinc-300 font-light">Modular React components with zero duplicate abstractions.</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
+                <div className="p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.08] flex items-start gap-2.5 backdrop-blur-md">
                   <span className="text-white font-bold shrink-0">02</span>
                   <span className="text-zinc-300 font-light">Proportioned visual rhythm & negative spaces for readable UX.</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 flex items-start gap-2.5">
+                <div className="p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.08] flex items-start gap-2.5 backdrop-blur-md">
                   <span className="text-white font-bold shrink-0">03</span>
                   <span className="text-zinc-300 font-light">Zero technical debt: resilient async controllers & strict REST.</span>
                 </div>
@@ -1156,7 +1136,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               {/* Direct Flow to BAY 02 // TELEMETRY CTA */}
               <button
                 onClick={scrollToTelemetry}
-                className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-zinc-900 text-white font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-xl shadow-black border border-zinc-700 hover:border-zinc-500 group cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-xl bg-white/[0.08] hover:bg-white/[0.14] text-white font-semibold text-[11px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-2xl shadow-black border border-white/20 hover:border-white/40 group cursor-pointer backdrop-blur-md"
               >
                 <span>PROCEED TO BAY 02 // TELEMETRY</span>
                 <ArrowDown size={14} className="group-hover:translate-y-0.5 transition-transform" />
@@ -1172,16 +1152,16 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
           {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO PNG IMAGES! */}
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[400px] pointer-events-none select-none">
-            <div className="px-4 py-2 rounded-full bg-black/80 border border-zinc-800 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
+            <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
               <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
               <span>STAGE 02 // 360° ROUND TURNTABLE</span>
             </div>
 
             <div className="space-y-2 text-right">
-              <div className="px-3.5 py-1.5 rounded-xl bg-black/60 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
+              <div className="px-3.5 py-1.5 rounded-xl bg-black/50 border border-white/10 backdrop-blur-md text-[10px] font-mono tracking-widest text-zinc-400">
                 {activeCar.name}
               </div>
-              <div className="px-3.5 py-1.5 rounded-xl bg-black/60 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
+              <div className="px-3.5 py-1.5 rounded-xl bg-black/50 border border-white/10 backdrop-blur-md flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
                 <Move3d size={13} className="text-zinc-400 animate-pulse" />
                 <span>FLOWING CONTINUOUSLY TO BAY 02</span>
               </div>
@@ -1194,7 +1174,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       {/* ==================================================================== */}
       {/* 6. BOTTOM HUD FOOTER: Live Frame Status & Flow Indicators            */}
       {/* ==================================================================== */}
-      <div className="fixed bottom-6 left-0 right-0 z-30 px-6 sm:px-12 flex items-center justify-between border-t border-zinc-800/80 pt-4 pointer-events-auto bg-black/90 backdrop-blur-md">
+      <div className="fixed bottom-6 left-0 right-0 z-30 px-6 sm:px-12 flex items-center justify-between border-t border-white/[0.08] pt-4 pointer-events-auto bg-black/40 backdrop-blur-xl">
         {/* Left Frame Status */}
         <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
           <span className="text-white font-light tracking-widest">
@@ -1202,7 +1182,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           </span>
           <span>—</span>
           <span ref={hudFrameRef}>FRAME 001 / 240</span>
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-700/60 text-[10px] text-zinc-200 font-bold">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black/40 border border-white/10 text-[10px] text-zinc-200 font-bold backdrop-blur-md">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             {loadingStatusText}
           </span>
@@ -1213,10 +1193,10 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           {CAR_SLOTS.map((slot, idx) => (
             <span
               key={slot.id}
-              className={`px-2 py-0.5 rounded-full border transition-all ${
+              className={`px-2.5 py-0.5 rounded-full border transition-all ${
                 activeCarSlotIndex === idx 
-                  ? 'border-zinc-500 text-white bg-zinc-900 font-bold shadow-md shadow-black' 
-                  : 'border-zinc-800 text-zinc-400 bg-zinc-900/40'
+                  ? 'border-white/30 text-white bg-black/60 font-bold shadow-md shadow-black backdrop-blur-md' 
+                  : 'border-white/10 text-zinc-400 bg-black/30 backdrop-blur-sm'
               }`}
             >
               0{idx + 1}

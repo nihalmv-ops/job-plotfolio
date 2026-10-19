@@ -76,14 +76,16 @@
   text-transform: uppercase;
 }
 
-/* Stealth Black & Carbon surface */
+/* Sleek Black Glassmorphic surface */
 .garage-card {
-  background-color: rgba(5, 6, 8, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(39, 39, 42, 0.7);
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
 }
 
 .garage-card:hover {
-  border-color: rgba(82, 82, 91, 0.8);
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.55);
 }

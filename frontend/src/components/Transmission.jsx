@@ -78,19 +78,19 @@ export default function Transmission({ onReplay }) {
   return (
     <section
       id="contact"
-      className="relative min-h-screen w-full bg-transparent text-white flex flex-col justify-between px-6 sm:px-12 max-w-7xl mx-auto pt-24 pb-12 z-10 border-t border-zinc-800/60"
+      className="relative min-h-screen w-full bg-transparent text-white flex flex-col justify-between px-6 sm:px-12 max-w-7xl mx-auto pt-24 pb-12 z-10 border-t border-white/[0.08]"
       aria-label="Contact and Transmission"
     >
       <div className="w-full">
         {/* Section Header Line */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800/80 pb-4 mb-8 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/[0.08] pb-4 mb-8 gap-3">
           <div className="flex items-center gap-3">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
             <span className="text-xs font-mono tracking-[0.3em] uppercase text-zinc-300">
               BAY 06 // TRANSMISSION & INQUIRY
             </span>
           </div>
-          <div className="inline-flex items-center gap-2 border border-zinc-700/60 px-3.5 py-1 rounded-full bg-zinc-900/80 backdrop-blur-md w-fit">
+          <div className="inline-flex items-center gap-2 border border-white/10 px-3.5 py-1 rounded-full bg-black/40 backdrop-blur-xl shadow-lg w-fit">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
             <span className="text-[10px] font-mono tracking-widest text-zinc-300 uppercase">
               FRAME 06 // APEX PROTOCOL ACTIVE
@@ -104,8 +104,8 @@ export default function Transmission({ onReplay }) {
           {/* Left Column: Form + Direct Links */}
           <div className="w-full lg:max-w-xl xl:max-w-2xl flex flex-col gap-6">
             
-            {/* Contact Form Card */}
-            <div className="p-6 sm:p-8 rounded-2xl bg-zinc-900 border border-zinc-800 backdrop-blur-xl shadow-xl shadow-black">
+            {/* Contact Form Card - Sleek Glassmorphic Theme */}
+            <div className="p-6 sm:p-8 rounded-2xl bg-black/40 border border-white/10 backdrop-blur-2xl shadow-2xl shadow-black">
               <h3 className="text-2xl sm:text-3xl font-light uppercase tracking-wider text-white mb-2">
                 INITIATE CONTACT.
               </h3>
@@ -140,8 +140,8 @@ export default function Transmission({ onReplay }) {
                     onChange={handleChange}
                     placeholder="e.g. John Doe"
                     disabled={formStatus.submitting}
-                    className={`w-full px-4 py-2.5 rounded-xl bg-black/80 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors ${
-                      fieldErrors.name ? 'border-rose-500' : 'border-zinc-800 focus:border-zinc-500'
+                    className={`w-full px-4 py-2.5 rounded-xl bg-black/50 border text-zinc-100 placeholder-zinc-500 text-sm font-sans focus:outline-none transition-colors backdrop-blur-md ${
+                      fieldErrors.name ? 'border-rose-500' : 'border-white/10 focus:border-white/30'
                     }`}
                   />
                   {fieldErrors.name && (
@@ -161,8 +161,8 @@ export default function Transmission({ onReplay }) {
                     onChange={handleChange}
                     placeholder="e.g. john@company.com"
                     disabled={formStatus.submitting}
-                    className={`w-full px-4 py-2.5 rounded-xl bg-black/80 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors ${
-                      fieldErrors.email ? 'border-rose-500' : 'border-zinc-800 focus:border-zinc-500'
+                    className={`w-full px-4 py-2.5 rounded-xl bg-black/50 border text-zinc-100 placeholder-zinc-500 text-sm font-sans focus:outline-none transition-colors backdrop-blur-md ${
+                      fieldErrors.email ? 'border-rose-500' : 'border-white/10 focus:border-white/30'
                     }`}
                   />
                   {fieldErrors.email && (
@@ -182,8 +182,8 @@ export default function Transmission({ onReplay }) {
                     onChange={handleChange}
                     placeholder="Describe your project, team opportunity, or inquiry..."
                     disabled={formStatus.submitting}
-                    className={`w-full px-4 py-2.5 rounded-xl bg-black/80 border text-zinc-100 placeholder-zinc-600 text-sm font-sans focus:outline-none transition-colors resize-none ${
-                      fieldErrors.message ? 'border-rose-500' : 'border-zinc-800 focus:border-zinc-500'
+                    className={`w-full px-4 py-2.5 rounded-xl bg-black/50 border text-zinc-100 placeholder-zinc-500 text-sm font-sans focus:outline-none transition-colors resize-none backdrop-blur-md ${
+                      fieldErrors.message ? 'border-rose-500' : 'border-white/10 focus:border-white/30'
                     }`}
                   />
                   {fieldErrors.message && (
@@ -194,7 +194,7 @@ export default function Transmission({ onReplay }) {
                 <button
                   type="submit"
                   disabled={formStatus.submitting}
-                  className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-black hover:bg-zinc-900 text-white font-semibold text-xs tracking-widest uppercase transition-all self-start disabled:opacity-50 cursor-pointer shadow-lg shadow-black border border-zinc-700 hover:border-zinc-500"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-white hover:bg-zinc-200 text-black font-semibold text-xs tracking-widest uppercase transition-all self-start disabled:opacity-50 cursor-pointer shadow-lg shadow-black border border-white/20"
                 >
                   {formStatus.submitting ? (
                     <>
@@ -215,9 +215,9 @@ export default function Transmission({ onReplay }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <a
                 href="mailto:nihalmv.dev@gmail.com"
-                className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
+                className="p-4 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 hover:bg-black/50 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-2xl shadow-black"
               >
-                <div className="w-9 h-9 rounded-lg bg-black border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
                   <Mail size={16} />
                 </div>
                 <div className="min-w-0">
@@ -234,9 +234,9 @@ export default function Transmission({ onReplay }) {
                 href="https://github.com/nihalmv-ops"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
+                className="p-4 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 hover:bg-black/50 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-2xl shadow-black"
               >
-                <div className="w-9 h-9 rounded-lg bg-black border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
                   <GithubIcon size={16} />
                 </div>
                 <div className="min-w-0">
@@ -253,9 +253,9 @@ export default function Transmission({ onReplay }) {
                 href="https://linkedin.com/in/nihal-mv-dev/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-lg shadow-black"
+                className="p-4 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 hover:bg-black/50 backdrop-blur-xl transition-all flex items-center gap-3 group shadow-2xl shadow-black"
               >
-                <div className="w-9 h-9 rounded-lg bg-black border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
                   <LinkedinIcon size={16} />
                 </div>
                 <div className="min-w-0">
@@ -268,8 +268,8 @@ export default function Transmission({ onReplay }) {
                 </div>
               </a>
 
-              <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 backdrop-blur-xl flex items-center gap-3 shadow-lg shadow-black">
-                <div className="w-9 h-9 rounded-lg bg-black border border-zinc-800 flex items-center justify-center text-zinc-300">
+              <div className="p-4 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-3 shadow-2xl shadow-black">
+                <div className="w-9 h-9 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-zinc-300">
                   <MapPin size={16} />
                 </div>
                 <div className="min-w-0">
@@ -287,10 +287,10 @@ export default function Transmission({ onReplay }) {
             <a
               href="/resume.pdf"
               download="Nihal_MV_Resume.pdf"
-              className="p-4 sm:p-5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-600 backdrop-blur-xl transition-all flex items-center justify-between group shadow-lg shadow-black"
+              className="p-4 sm:p-5 rounded-xl bg-black/40 border border-white/10 hover:border-white/20 hover:bg-black/50 backdrop-blur-xl transition-all flex items-center justify-between group shadow-2xl shadow-black"
             >
               <div className="flex items-center gap-3.5">
-                <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-white group-hover:scale-105 transition-transform">
                   <FileText size={16} />
                 </div>
                 <div>
@@ -311,16 +311,16 @@ export default function Transmission({ onReplay }) {
 
           {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO OVERLAYS! */}
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[560px] pointer-events-none select-none">
-            <div className="px-4 py-2 rounded-full bg-black/80 border border-zinc-800 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
+            <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
               <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
               <span>STAGE 06 // APEX PROTOCOL UNVEILED</span>
             </div>
 
             <div className="space-y-2 text-right">
-              <div className="px-3.5 py-1.5 rounded-xl bg-black/60 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
+              <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl text-[10px] font-mono tracking-widest text-zinc-400">
                 FRAME 06 // GRAND FINALE SHOWCASE
               </div>
-              <div className="px-3.5 py-1.5 rounded-xl bg-black/60 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
+              <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
                 <Move3d size={13} className="text-zinc-400 animate-pulse" />
                 <span>DRAG TO ROTATE 360°</span>
               </div>
@@ -331,7 +331,7 @@ export default function Transmission({ onReplay }) {
 
         {/* Studio Final Archive Section */}
         <div id="final" className="text-center flex flex-col items-center pt-16 pb-12">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-700/80 backdrop-blur-md mb-8">
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl mb-8 shadow-lg">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-300 shadow-[0_0_6px_rgba(255,255,255,0.7)]" />
             <span className="text-[10px] font-mono tracking-[0.3em] text-slate-300 uppercase">
               GARAGE DETAILING STUDIO ARCHIVE
@@ -360,7 +360,7 @@ export default function Transmission({ onReplay }) {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
-              className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-black hover:bg-zinc-900 text-white font-semibold text-xs uppercase tracking-[0.25em] transition-all flex items-center gap-3 shadow-[0_0_35px_rgba(0,0,0,0.9)] border border-zinc-700 hover:border-zinc-500 hover:scale-105 active:scale-95 cursor-pointer"
+              className="group px-8 sm:px-10 py-4 sm:py-5 rounded-full bg-white text-black hover:bg-zinc-200 font-semibold text-xs uppercase tracking-[0.25em] transition-all flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.15)] border border-white/20 hover:scale-105 active:scale-95 cursor-pointer"
               aria-label="Replay 3D Experience"
             >
               <span>REPLAY EXPERIENCE</span>
@@ -370,7 +370,7 @@ export default function Transmission({ onReplay }) {
         </div>
 
         {/* Studio Footer Line */}
-        <footer className="w-full border-t border-zinc-800/80 pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-400">
+        <footer className="w-full border-t border-white/[0.08] pt-8 mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-400">
           <div className="flex items-center gap-3">
             <span className="text-slate-200 font-bold tracking-widest">NIHAL MV</span>
             <span>© 2026</span>
