@@ -196,7 +196,7 @@ npm run dev
 - **Location**: Kerala, India
 - **GitHub**: [@nihalmv-ops](https://github.com/nihalmv-ops)
 - **LinkedIn**: [nihal-mv-dev](https://linkedin.com/in/nihal-mv-dev/)
-- **Email**: [nihalmv2004@gmail.com](mailto:nihalmv2004@gmail.com)
+- **Email**: [nihalmv.dev@gmail.com](mailto:nihalmv.dev@gmail.com)
 
 ---
 

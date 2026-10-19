@@ -70,7 +70,7 @@ export default function Transmission({ onReplay }) {
       setFormStatus({
         submitting: false,
         success: false,
-        error: 'Unable to reach the server. Please feel free to reach out directly at nihalmv2004@gmail.com!'
+        error: 'Unable to reach the server. Please feel free to reach out directly at nihalmv.dev@gmail.com!'
       });
     }
   };
@@ -214,7 +214,7 @@ export default function Transmission({ onReplay }) {
             {/* Direct Channels Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <a
-                href="mailto:nihalmv2004@gmail.com"
+                href="mailto:nihalmv.dev@gmail.com"
                 className="p-4 rounded-xl bg-[#0e1017]/85 border border-zinc-700/60 hover:border-zinc-500 backdrop-blur-xl transition-all flex items-center gap-3 group"
               >
                 <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
@@ -225,7 +225,7 @@ export default function Transmission({ onReplay }) {
                     EMAIL
                   </span>
                   <span className="text-xs font-mono text-zinc-200 group-hover:text-white transition-colors truncate block">
-                    nihalmv2004@gmail.com
+                    nihalmv.dev@gmail.com
                   </span>
                 </div>
               </a>

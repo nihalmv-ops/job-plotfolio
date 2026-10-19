@@ -58,8 +58,8 @@ export default function About() {
 
                   <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-slate-200 hover:border-violet-500/40 hover:bg-violet-950/20 transition-colors" role="listitem">
                     <Mail size={17} className="text-violet-400" aria-hidden="true" />
-                    <a href="mailto:nihalmv2004@gmail.com" className="hover:text-violet-300 transition-colors">
-                      nihalmv2004@gmail.com
+                    <a href="mailto:nihalmv.dev@gmail.com" className="hover:text-violet-300 transition-colors">
+                      nihalmv.dev@gmail.com
                     </a>
                   </div>
 

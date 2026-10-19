@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { 
   ArrowDown, 
   ArrowUp, 
@@ -66,7 +67,13 @@ export default function CinematicSequence() {
     renderer.toneMappingExposure = 1.35;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
+    // Generate photorealistic procedural studio environment cubemap for reflections across all car bodies
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+    const studioEnvTexture = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+
     const scene = new THREE.Scene();
+    scene.environment = studioEnvTexture;
     scene.fog = new THREE.FogExp2(0x08090d, 0.035);
 
     const camera = new THREE.PerspectiveCamera(
@@ -274,12 +281,46 @@ export default function CinematicSequence() {
         if (child.isMesh && child.material) {
           child.castShadow = true;
           child.receiveShadow = true;
-          if (child.material.isMeshStandardMaterial) {
-            child.material.envMapIntensity = 2.4;
-            child.material.roughness = Math.max(0.06, child.material.roughness * 0.85);
-            child.material.metalness = Math.min(0.96, child.material.metalness * 1.15);
-            child.material.needsUpdate = true;
-          }
+          child.frustumCulled = false;
+
+          const materials = Array.isArray(child.material) ? child.material : [child.material];
+          materials.forEach((mat) => {
+            if (mat && (mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial)) {
+              mat.envMapIntensity = 2.4;
+              // Cap metalness to max 0.72 so diffuse lighting response is retained even on pure metals
+              mat.metalness = Math.min(0.72, (mat.metalness ?? 0.5) * 0.85);
+              mat.roughness = Math.max(0.12, (mat.roughness ?? 0.5) * 0.85);
+
+              const matName = (mat.name || '').toLowerCase();
+              const meshName = (child.name || '').toLowerCase();
+
+              // Explicitly illuminate body panels (CARROSSERIE / body paint)
+              if (
+                matName.includes('carrosserie') ||
+                matName.includes('body') ||
+                matName.includes('paint') ||
+                meshName.includes('carrosserie')
+              ) {
+                // If paint is dark or black, elevate to brilliant metallic titanium silver
+                if (mat.color && mat.color.r < 0.35 && mat.color.g < 0.35 && mat.color.b < 0.35) {
+                  mat.color.setHex(0xb0b8c4);
+                }
+                mat.metalness = 0.65;
+                mat.roughness = 0.22;
+              } else if (
+                mat.color &&
+                mat.color.r < 0.06 &&
+                mat.color.g < 0.06 &&
+                mat.color.b < 0.06 &&
+                mat.metalness >= 0.5
+              ) {
+                // Lift near pitch-black dark metals to sleek charcoal gunmetal
+                mat.color.setHex(0x2d323b);
+              }
+
+              mat.needsUpdate = true;
+            }
+          });
         }
       });
 
@@ -683,6 +724,8 @@ export default function CinematicSequence() {
       laserCurtainMat.dispose();
       groundLineGeom.dispose();
       groundLineMat.dispose();
+      pmremGenerator.dispose();
+      studioEnvTexture.dispose();
     };
   }, []);
 

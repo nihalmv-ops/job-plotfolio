@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "ATS-friendly responsive MERN Stack Developer Portfolio for Nihal MV",
   "private": true,
+  "workspaces": [
+    "frontend"
+  ],
   "scripts": {
     "dev": "concurrently \"npm --prefix frontend run dev\" \"npm --prefix backend run dev\"",
     "dev:frontend": "npm --prefix frontend run dev",

@@ -84,7 +84,7 @@ export default function Contact() {
       setFormStatus({
         submitting: false,
         success: false,
-        error: 'Unable to reach the server. Please feel free to email me directly at nihalmv2004@gmail.com!'
+        error: 'Unable to reach the server. Please feel free to email me directly at nihalmv.dev@gmail.com!'
       });
     }
   };
@@ -217,7 +217,7 @@ export default function Contact() {
                     {/* Email */}
                     <TiltCard maxTilt={5}>
                       <a
-                        href="mailto:nihalmv2004@gmail.com"
+                        href="mailto:nihalmv.dev@gmail.com"
                         className="flex items-center gap-4 p-4 rounded-2xl bg-[#0e0f1a]/80 border border-white/5 hover:border-violet-500/40 hover:bg-violet-950/20 transition-all duration-200 group w-full"
                       >
                         <div className="w-11 h-11 rounded-xl bg-violet-600/15 border border-violet-500/30 flex items-center justify-center text-violet-400 group-hover:scale-105 transition-transform">
@@ -226,7 +226,7 @@ export default function Contact() {
                         <div>
                           <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Email</p>
                           <p className="text-sm font-medium text-white group-hover:text-violet-300 transition-colors">
-                            nihalmv2004@gmail.com
+                            nihalmv.dev@gmail.com
                           </p>
                         </div>
                       </a>
