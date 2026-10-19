@@ -78,7 +78,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
       role="dialog"
     >
       {/* Ambient subtle stealth glow */}
-      <div className="absolute w-[500px] h-[500px] rounded-full bg-cyan-500/[0.04] blur-[140px] pointer-events-none" />
+      <div className="absolute w-[500px] h-[500px] rounded-full bg-white/[0.015] blur-[140px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-lg w-full">
         {/* Name Headline matching Aerion */}
@@ -105,7 +105,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
               
               <div className="w-56 sm:w-64 h-[2px] bg-white/10 relative overflow-hidden rounded-full shadow-inner">
                 <div
-                  className="h-full bg-gradient-to-r from-zinc-400 via-white to-cyan-300 transition-all duration-150 ease-out shadow-[0_0_12px_rgba(255,255,255,0.4)]"
+                  className="h-full bg-gradient-to-r from-zinc-500 via-white to-zinc-300 transition-all duration-150 ease-out shadow-[0_0_12px_rgba(255,255,255,0.4)]"
                   style={{ width: `${Math.max(8, Math.min(100, displayProgress))}%` }}
                 />
               </div>

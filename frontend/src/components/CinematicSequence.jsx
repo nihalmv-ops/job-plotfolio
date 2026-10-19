@@ -70,6 +70,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.0;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.setClearColor(0x000000, 1);
 
     // Generate photorealistic procedural studio environment cubemap for reflections across all car bodies
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
@@ -78,7 +79,8 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
     const scene = new THREE.Scene();
     scene.environment = studioEnvTexture;
-    scene.fog = new THREE.FogExp2(0x000000, 0.04);
+    scene.background = new THREE.Color(0x000000);
+    scene.fog = new THREE.FogExp2(0x000000, 0.045);
 
     const camera = new THREE.PerspectiveCamera(
       42,
@@ -117,10 +119,10 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     rimLight.position.set(0, 4, -5);
     scene.add(rimLight);
 
-    // 3. Overhead Garage LED Strip Light Rig (Detailing Studio Ceiling)
+    // 3. Overhead Garage Fixture Rig in Pure Stealth Black
     const ceilingRig = new THREE.Group();
     const stripGeom = new THREE.BoxGeometry(0.06, 0.03, 7.5);
-    const stripMat = new THREE.MeshBasicMaterial({ color: 0x0f121a });
+    const stripMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
     [-1.8, -0.9, 0, 0.9, 1.8].forEach((xOffset) => {
       const strip = new THREE.Mesh(stripGeom, stripMat);
@@ -129,28 +131,26 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     });
     scene.add(ceilingRig);
 
-    // 4. Matte Stealth Black Automotive Floor (Eliminates blinding specular glare)
-    const floorGeom = new THREE.PlaneGeometry(45, 45);
-    const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x000000,
-      roughness: 0.95,
-      metalness: 0.04
+    // 4. Pure Pitch Black Automotive Floor (Full On Black Theme - Eliminates Gray Glare)
+    const floorGeom = new THREE.PlaneGeometry(80, 80);
+    const floorMat = new THREE.MeshBasicMaterial({
+      color: 0x000000
     });
     const floor = new THREE.Mesh(floorGeom, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -1.15;
     scene.add(floor);
 
-    // 5. Photorealistic Automotive Turntable Round Stage in Pure Stealth Black
+    // 5. Photorealistic Automotive Turntable Round Stage in Pure Black Stealth Theme
     const stageGroup = new THREE.Group();
 
-    // Stage Top / Main Cylindrical Disc Platform (Stealth Obsidian Black)
+    // Stage Top / Main Cylindrical Disc Platform (Pure Solid Obsidian Black)
     const stageGeom = new THREE.CylinderGeometry(3.5, 3.65, 0.16, 64);
     const stageMat = new THREE.MeshStandardMaterial({
-      color: 0x050608,
-      metalness: 0.3,
-      roughness: 0.65,
-      envMapIntensity: 0.45
+      color: 0x000000,
+      metalness: 0.1,
+      roughness: 0.88,
+      envMapIntensity: 0.12
     });
     const stageMesh = new THREE.Mesh(stageGeom, stageMat);
     stageMesh.position.y = -1.07;
@@ -158,21 +158,21 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     stageMesh.castShadow = true;
     stageGroup.add(stageMesh);
 
-    // Beveled Outer Bezel Edge Ring (Dark Graphite / Smoked Black Metal)
+    // Beveled Outer Bezel Edge Ring (Stealth Solid Black Finish)
     const bezelGeom = new THREE.TorusGeometry(3.51, 0.035, 16, 64);
     const bezelMat = new THREE.MeshStandardMaterial({
-      color: 0x14161b,
-      metalness: 0.65,
-      roughness: 0.35,
-      envMapIntensity: 0.55
+      color: 0x000000,
+      metalness: 0.35,
+      roughness: 0.65,
+      envMapIntensity: 0.15
     });
     const bezelMesh = new THREE.Mesh(bezelGeom, bezelMat);
     bezelMesh.rotation.x = Math.PI / 2;
     bezelMesh.position.y = -0.99;
     stageGroup.add(bezelMesh);
 
-    // Stage Surface Concentric Detailing Rings (Subtle Dark Technical Grooves)
-    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0x1e2430, transparent: true, opacity: 0.35 });
+    // Stage Surface Concentric Detailing Rings (Subtle Monochromatic Dark Lines)
+    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0x121214, transparent: true, opacity: 0.4 });
     
     const stageRing1Geom = new THREE.RingGeometry(2.5, 2.52, 64);
     const stageRing1 = new THREE.Mesh(stageRing1Geom, stageRingMat);
@@ -186,12 +186,12 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     stageRing2.position.y = -0.988;
     stageGroup.add(stageRing2);
 
-    // Stage LED Halo Underglow Ring on Floor (Subtle Ambient Dark Cyan Glow)
+    // Stage LED Halo Ring (Full on Black Theme - Zero Unwanted Color Tint)
     const haloGeom = new THREE.RingGeometry(3.55, 3.7, 64);
     const haloMat = new THREE.MeshBasicMaterial({
-      color: 0x0284c7,
+      color: 0x000000,
       transparent: true,
-      opacity: 0.22
+      opacity: 0
     });
     const haloMesh = new THREE.Mesh(haloGeom, haloMat);
     haloMesh.rotation.x = -Math.PI / 2;
@@ -200,14 +200,14 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
     carRootGroup.add(stageGroup);
 
-    // 6. High-Tech 3D Laser Scanning Beam (Transition Effect between Cars)
+    // 6. High-Tech 3D Laser Scanning Beam (Transition Effect between Cars in Pure Monochrome)
     const scanRig = new THREE.Group();
     scanRig.visible = false;
 
     // Glowing laser beam line across stage width
     const laserBeamGeom = new THREE.CylinderGeometry(0.018, 0.018, 7.2, 32);
     const laserBeamMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
+      color: 0xffffff,
       transparent: true,
       opacity: 0
     });
@@ -219,7 +219,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     // Vertical translucent scanning light curtain
     const laserCurtainGeom = new THREE.PlaneGeometry(7.2, 3.2);
     const laserCurtainMat = new THREE.MeshBasicMaterial({
-      color: 0x0284c7,
+      color: 0xffffff,
       transparent: true,
       opacity: 0,
       side: THREE.DoubleSide
@@ -784,7 +784,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       />
 
       {/* Subtle Studio Vignette (Pure black vignette fading into edges) */}
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_30%_50%,transparent_50%,rgba(0,0,0,0.85)_100%)] z-[1]" />
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_70%_50%,transparent_55%,rgba(0,0,0,0.95)_100%)] z-[1]" />
 
       {/* ==================================================================== */}
       {/* 2. FIXED AERION-STYLE TOP HEADER HUD                                 */}
@@ -882,17 +882,17 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
         {/* Glowing Laser Scanline Sweeping Across Viewport */}
         <div
           ref={laserLineRef}
-          className="absolute left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_28px_#38bdf8] will-change-transform"
+          className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_20px_rgba(255,255,255,0.7)] will-change-transform"
         />
         {/* Ambient High-Tech Laser Shimmer Wash */}
-        <div className="absolute inset-0 bg-cyan-500/[0.03] animate-pulse" />
+        <div className="absolute inset-0 bg-white/[0.015] animate-pulse" />
         {/* Floating Quantum Laser Transition Notification */}
         <div className="absolute top-24 left-1/2 -translate-x-1/2 flex flex-col items-center px-4 text-center">
-          <div className="px-5 py-2 rounded-full bg-black/95 border border-cyan-500/50 backdrop-blur-md shadow-[0_0_25px_rgba(56,189,248,0.35)] flex items-center gap-3 text-cyan-200 text-[10px] font-mono tracking-widest uppercase">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#38bdf8] animate-ping" />
+          <div className="px-5 py-2 rounded-full bg-black/95 border border-white/20 backdrop-blur-xl shadow-2xl shadow-black flex items-center gap-3 text-white text-[10px] font-mono tracking-widest uppercase">
+            <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff] animate-ping" />
             <span ref={transitionBadgeRef}>TRANSITION EFFECT // 3D LASER SCAN: FRAME 01 ➔ FRAME 02</span>
           </div>
-          <span ref={transitionSubRef} className="text-[9px] font-mono tracking-[0.3em] text-cyan-300/80 mt-1.5 uppercase drop-shadow-md">
+          <span ref={transitionSubRef} className="text-[9px] font-mono tracking-[0.3em] text-zinc-400 mt-1.5 uppercase drop-shadow-md">
             CALIBRATING DETAILING BAY
           </span>
         </div>
@@ -1005,19 +1005,19 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO PNG IMAGES! */}
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[400px] pointer-events-none select-none">
             <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
-              <span className={`w-2 h-2 rounded-full ${isHeroModelReady ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-cyan-400 shadow-[0_0_8px_#38bdf8]'} animate-pulse`} />
+              <span className={`w-2 h-2 rounded-full ${isHeroModelReady ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-white shadow-[0_0_8px_#ffffff]'} animate-pulse`} />
               <span>{isHeroModelReady ? 'STAGE 01 // 360° TURNTABLE PLATFORM' : `CALIBRATING 3D MODEL • ${heroLoadProgress}%`}</span>
             </div>
 
             {!isHeroModelReady ? (
-              <div className="p-4 rounded-2xl bg-black/50 border border-cyan-500/40 backdrop-blur-xl flex flex-col gap-2.5 text-right w-64 shadow-[0_0_25px_rgba(56,189,248,0.25)]">
-                <div className="flex items-center justify-end gap-2 text-[10px] font-mono text-cyan-300 tracking-wider">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              <div className="p-4 rounded-2xl bg-black/60 border border-white/10 backdrop-blur-xl flex flex-col gap-2.5 text-right w-64 shadow-2xl shadow-black">
+                <div className="flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-300 tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
                   <span>STREAMING GLTF MESH</span>
                 </div>
-                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-black border border-white/10 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-cyan-500 via-white to-cyan-300 transition-all duration-150"
+                    className="h-full bg-gradient-to-r from-zinc-500 via-white to-zinc-300 transition-all duration-150"
                     style={{ width: `${Math.max(8, heroLoadProgress)}%` }}
                   />
                 </div>
