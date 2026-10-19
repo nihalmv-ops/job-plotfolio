@@ -32,14 +32,14 @@ export default function EducationTimeline() {
           {/* Section Header Line */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-zinc-800/80 pb-4 mb-6 gap-3">
             <div className="flex items-center gap-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8] animate-pulse" />
-              <span className="text-xs font-mono tracking-[0.3em] uppercase text-slate-300">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
+              <span className="text-xs font-mono tracking-[0.3em] uppercase text-zinc-300">
                 BAY 05 // FOUNDATION & ACADEMICS
               </span>
             </div>
-            <div className="inline-flex items-center gap-2 border border-cyan-500/40 px-3.5 py-1 rounded-full bg-cyan-950/40 backdrop-blur-md w-fit">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-              <span className="text-[10px] font-mono tracking-widest text-cyan-200 uppercase">
+            <div className="inline-flex items-center gap-2 border border-zinc-700/60 px-3.5 py-1 rounded-full bg-zinc-900/80 backdrop-blur-md w-fit">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              <span className="text-[10px] font-mono tracking-widest text-zinc-300 uppercase">
                 FRAME 06 // APEX PROTOCOL ACTIVE
               </span>
             </div>
@@ -63,19 +63,19 @@ export default function EducationTimeline() {
               return (
                 <div
                   key={idx}
-                  className="p-6 rounded-2xl bg-[#0e1017]/85 border border-zinc-700/60 backdrop-blur-xl relative overflow-hidden group hover:border-zinc-500 transition-all duration-300 shadow-xl"
+                  className="p-6 rounded-2xl bg-[#050608]/90 border border-zinc-800/80 backdrop-blur-xl relative overflow-hidden group hover:border-zinc-700 transition-all duration-300 shadow-xl shadow-black"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <span className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 tracking-wider">
-                      <Calendar size={13} className="text-cyan-400" />
+                      <Calendar size={13} className="text-zinc-400" />
                       {item.period}
                     </span>
-                    <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
+                    <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 group-hover:scale-105 transition-transform">
                       <Icon size={16} />
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-light uppercase tracking-wider text-white mb-1.5 group-hover:text-cyan-200 transition-colors">
+                  <h3 className="text-lg font-light uppercase tracking-wider text-white mb-1.5 group-hover:text-zinc-200 transition-colors">
                     {item.degree}
                   </h3>
 
@@ -95,17 +95,17 @@ export default function EducationTimeline() {
 
         {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO OVERLAYS! */}
         <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[420px] pointer-events-none select-none">
-          <div className="px-4 py-2 rounded-full bg-cyan-950/60 border border-cyan-500/40 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-cyan-200 shadow-2xl">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#38bdf8] animate-pulse" />
+          <div className="px-4 py-2 rounded-full bg-black/80 border border-zinc-800 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
             <span>STAGE 06 // APEX PROTOCOL UNVEILED</span>
           </div>
 
           <div className="space-y-2 text-right">
-            <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
+            <div className="px-3.5 py-1.5 rounded-xl bg-black/60 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
               FRAME 06 // FLAGSHIP 360° TURNTABLE
             </div>
-            <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-cyan-300">
-              <Move3d size={13} className="text-cyan-300 animate-pulse" />
+            <div className="px-3.5 py-1.5 rounded-xl bg-black/60 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
+              <Move3d size={13} className="text-zinc-400 animate-pulse" />
               <span>DRAG TO ROTATE 360°</span>
             </div>
           </div>

@@ -71,14 +71,14 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#08090d] text-white transition-opacity duration-700 ease-out select-none ${
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-black text-white transition-opacity duration-700 ease-out select-none ${
         isFaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       aria-label="Welcome to Nihal MV Portfolio"
       role="dialog"
     >
-      {/* Ambient silver studio light glow */}
-      <div className="absolute w-[500px] h-[500px] rounded-full bg-slate-200/[0.03] blur-[140px] pointer-events-none" />
+      {/* Ambient subtle stealth glow */}
+      <div className="absolute w-[500px] h-[500px] rounded-full bg-cyan-500/[0.04] blur-[140px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center text-center px-6 max-w-lg w-full">
         {/* Name Headline matching Aerion */}
@@ -97,7 +97,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
             /* Loading State with Real Progress Bar */
             <div className="flex flex-col items-center gap-3.5 transition-all duration-300 w-full max-w-xs">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-300">
                   CALIBRATING 3D STUDIO • {Math.round(displayProgress)}%
                 </span>
@@ -105,7 +105,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
               
               <div className="w-56 sm:w-64 h-[2px] bg-white/10 relative overflow-hidden rounded-full shadow-inner">
                 <div
-                  className="h-full bg-gradient-to-r from-zinc-500 via-cyan-400 to-white transition-all duration-150 ease-out shadow-[0_0_10px_#38bdf8]"
+                  className="h-full bg-gradient-to-r from-zinc-400 via-white to-cyan-300 transition-all duration-150 ease-out shadow-[0_0_12px_rgba(255,255,255,0.4)]"
                   style={{ width: `${Math.max(8, Math.min(100, displayProgress))}%` }}
                 />
               </div>
@@ -127,7 +127,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
             <button
               onClick={handleEnter}
               autoFocus
-              className="group px-9 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.3em] hover:bg-zinc-200 transition-all duration-300 flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.35)] hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
+              className="group px-9 py-3.5 rounded-full bg-white hover:bg-zinc-200 text-black font-semibold text-xs uppercase tracking-[0.3em] transition-all duration-300 flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.25)] border border-white hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
               aria-label="Enter Portfolio"
             >
               <span>ENTER GARAGE</span>

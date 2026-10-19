@@ -22,7 +22,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#08090d] text-white flex flex-col font-sans selection:bg-zinc-200 selection:text-black relative overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-zinc-200 selection:text-black relative overflow-x-hidden">
       {/* Detailing Studio Preloader synchronized with 3D Hero Car */}
       <Preloader 
         key={loadKey} 
