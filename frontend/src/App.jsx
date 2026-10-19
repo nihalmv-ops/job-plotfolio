@@ -11,6 +11,8 @@ import Transmission from './components/Transmission';
 
 export default function App() {
   const [loadKey, setLoadKey] = useState(0);
+  const [heroProgress, setHeroProgress] = useState(0);
+  const [isHeroReady, setIsHeroReady] = useState(false);
 
   const handleReplay = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -21,8 +23,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#08090d] text-white flex flex-col font-sans selection:bg-zinc-200 selection:text-black relative overflow-x-hidden">
-      {/* Detailing Studio Preloader */}
-      <Preloader key={loadKey} />
+      {/* Detailing Studio Preloader synchronized with 3D Hero Car */}
+      <Preloader 
+        key={loadKey} 
+        heroProgress={heroProgress} 
+        isHeroReady={isHeroReady} 
+      />
 
       {/* Precision Dual-Ring Cursor */}
       <CustomCursor />
@@ -40,7 +46,10 @@ export default function App() {
 
       {/* Flagship Cinematic 3D WebGL Detailing Bay Sequence */}
       {/* Frame 1: Hero Studio -> 3D Laser Transition Effect -> Frame 2: BAY 01 // CRAFT & PHILOSOPHY */}
-      <CinematicSequence />
+      <CinematicSequence 
+        onHeroProgress={(p) => setHeroProgress(p)}
+        onHeroReady={() => setIsHeroReady(true)}
+      />
 
       {/* Content Sections in Silver & Black Detailing Theme */}
       <main id="main-content" className="relative z-10">

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 
-export default function Preloader({ onLoaded }) {
-  const [progress, setProgress] = useState(10);
+export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = false }) {
+  const [displayProgress, setDisplayProgress] = useState(12);
   const [isReady, setIsReady] = useState(false);
   const [isFaded, setIsFaded] = useState(false);
   const [isUnmounted, setIsUnmounted] = useState(false);
@@ -12,34 +12,38 @@ export default function Preloader({ onLoaded }) {
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    let animFrame;
-    const startTime = performance.now();
-    const duration = 1400; // 1.4 seconds smooth load to 100%
-
-    const updateProgress = (currentTime) => {
-      const elapsed = currentTime - startTime;
-      const ratio = Math.min(1, elapsed / duration);
-      // easeOutCubic curve
-      const eased = 1 - Math.pow(1 - ratio, 3);
-      const currentProgress = 10 + eased * 90;
-
-      setProgress(Math.min(100, currentProgress));
-
-      if (ratio < 1) {
-        animFrame = requestAnimationFrame(updateProgress);
-      } else {
-        setProgress(100);
-        setIsReady(true);
-      }
-    };
-
-    animFrame = requestAnimationFrame(updateProgress);
-
     return () => {
-      cancelAnimationFrame(animFrame);
       document.body.style.overflow = originalOverflow;
     };
   }, []);
+
+  // Smoothly interpolate displayed percentage towards actual download progress
+  useEffect(() => {
+    let animId;
+    const update = () => {
+      setDisplayProgress((prev) => {
+        const target = isHeroReady ? 100 : Math.max(prev, Math.min(99, heroProgress));
+        if (Math.abs(target - prev) < 0.4) return target;
+        return prev + (target - prev) * 0.12;
+      });
+      animId = requestAnimationFrame(update);
+    };
+    animId = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(animId);
+  }, [heroProgress, isHeroReady]);
+
+  // Activate Ready button when 3D Hero Car is loaded or after safety timeout (8.5s max)
+  useEffect(() => {
+    if (isHeroReady) {
+      setDisplayProgress(100);
+      setIsReady(true);
+    }
+    const safetyTimer = setTimeout(() => {
+      setIsReady(true);
+    }, 8500);
+
+    return () => clearTimeout(safetyTimer);
+  }, [isHeroReady]);
 
   const handleEnter = () => {
     setIsFaded(true);
@@ -48,20 +52,20 @@ export default function Preloader({ onLoaded }) {
 
     setTimeout(() => {
       setIsUnmounted(true);
-    }, 700);
+    }, 650);
   };
 
   // Keyboard shortcut: Press Enter or Space to enter when ready
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if ((e.key === 'Enter' || e.key === ' ') && !isFaded) {
+      if ((e.key === 'Enter' || e.key === ' ') && !isFaded && isReady) {
         e.preventDefault();
         handleEnter();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFaded]);
+  }, [isFaded, isReady]);
 
   if (isUnmounted) return null;
 
@@ -88,29 +92,45 @@ export default function Preloader({ onLoaded }) {
         </p>
 
         {/* Dynamic Action Area: Progress Bar or Enter Button */}
-        <div className="h-14 flex items-center justify-center w-full">
+        <div className="min-h-16 flex items-center justify-center w-full">
           {!isReady ? (
-            /* Loading State with Progress Bar */
-            <div className="flex flex-col items-center gap-4 transition-all duration-300">
-              <span className="text-[10px] font-mono uppercase tracking-[0.4em] text-zinc-500">
-                LOADING • {Math.round(progress)}%
-              </span>
-              <div className="w-48 sm:w-64 h-[1px] bg-white/10 relative overflow-hidden rounded-full">
+            /* Loading State with Real Progress Bar */
+            <div className="flex flex-col items-center gap-3.5 transition-all duration-300 w-full max-w-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-300">
+                  CALIBRATING 3D STUDIO • {Math.round(displayProgress)}%
+                </span>
+              </div>
+              
+              <div className="w-56 sm:w-64 h-[2px] bg-white/10 relative overflow-hidden rounded-full shadow-inner">
                 <div
-                  className="h-full bg-gradient-to-r from-zinc-500 via-white to-zinc-400 transition-all duration-150 ease-out"
-                  style={{ width: `${Math.max(10, Math.min(100, progress))}%` }}
+                  className="h-full bg-gradient-to-r from-zinc-500 via-cyan-400 to-white transition-all duration-150 ease-out shadow-[0_0_10px_#38bdf8]"
+                  style={{ width: `${Math.max(8, Math.min(100, displayProgress))}%` }}
                 />
               </div>
+
+              <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">
+                INGESTING BMW M4 PROTOTYPE
+              </span>
+
+              {/* Optional Skip Button */}
+              <button
+                onClick={handleEnter}
+                className="text-[9px] font-mono text-zinc-600 hover:text-zinc-300 uppercase tracking-widest mt-1 cursor-pointer transition-colors"
+              >
+                [ SKIP INTRO ]
+              </button>
             </div>
           ) : (
             /* Ready State: Enter Button */
             <button
               onClick={handleEnter}
               autoFocus
-              className="group px-9 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.3em] hover:bg-zinc-200 transition-all duration-300 flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.25)] hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
+              className="group px-9 py-3.5 rounded-full bg-white text-black font-semibold text-xs uppercase tracking-[0.3em] hover:bg-zinc-200 transition-all duration-300 flex items-center gap-3 shadow-[0_0_35px_rgba(255,255,255,0.35)] hover:scale-105 active:scale-95 cursor-pointer animate-fade-in"
               aria-label="Enter Portfolio"
             >
-              <span>ENTER</span>
+              <span>ENTER GARAGE</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </button>
           )}
@@ -118,8 +138,8 @@ export default function Preloader({ onLoaded }) {
 
         {/* Optional hint when ready */}
         {isReady && (
-          <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-zinc-600 mt-6 animate-pulse">
-            PRESS ENTER OR CLICK TO EXPLORE
+          <p className="text-[9px] font-mono uppercase tracking-[0.3em] text-zinc-400 mt-6 animate-pulse">
+            PRESS ENTER OR CLICK TO EXPLORE 3D STUDIO
           </p>
         )}
       </div>

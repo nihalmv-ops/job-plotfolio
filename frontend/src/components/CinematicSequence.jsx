@@ -27,12 +27,14 @@ export const CAR_SLOTS = [
   { id: 6, name: 'FRAME 06 // APEX PROTOCOL', url: '/sixthfream.glb', targetDim: 5.6, bay: 'BAY 05 & 06 // TRANSMISSION' }
 ];
 
-export default function CinematicSequence() {
+export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
   const canvasRef = useRef(null);
   const [activeCarSlotIndex, setActiveCarSlotIndex] = useState(0);
   const [activeModelMode, setActiveModelMode] = useState('auto'); // 'auto', or 0..5 for manual lock
   const [loadedCount, setLoadedCount] = useState(0);
   const [loadingStatusText, setLoadingStatusText] = useState('CALIBRATING 3D STUDIO');
+  const [heroLoadProgress, setHeroLoadProgress] = useState(0);
+  const [isHeroModelReady, setIsHeroModelReady] = useState(false);
 
   // Direct DOM references for ultra-smooth 120 FPS HUD updates without React re-renders
   const hudFrameRef = useRef(null);
@@ -49,6 +51,8 @@ export default function CinematicSequence() {
   const carRootGroupRef = useRef(null);
   const activeModeRef = useRef('auto');
   activeModeRef.current = activeModelMode;
+  const curActiveIdxRef = useRef(0);
+  const requestCarModelRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -352,33 +356,91 @@ export default function CinematicSequence() {
       });
     };
 
-    // Staggered Concurrent Loader: All 6 models start loading immediately with a tiny 200ms stagger
-    CAR_SLOTS.forEach((slot, index) => {
-      setTimeout(() => {
-        loader.load(
-          slot.url,
-          (gltf) => {
-            const modelWrapper = normalizeModel(gltf.scene, slot.targetDim);
-            modelWrapper.rotation.y = -Math.PI / 2.2;
-            modelWrapper.visible = (index === 0);
-            setMeshOpacity(modelWrapper, 1.0);
+    // Sequential Priority Loader for 3D Fleet:
+    // Frame 01 (Hero BMW M4) loads FIRST with full dedicated bandwidth and real-time progress callbacks.
+    // Once Frame 01 is mounted, subsequent frames load sequentially in the background.
+    // If the user scrolls or selects a frame that isn't loaded yet, it jumps to the front of the queue!
+    const loadingStarted = new Set();
+    let isCurrentlyLoading = false;
 
-            loadedModelsRef.current[index] = modelWrapper;
-            carRootGroup.add(modelWrapper);
+    const loadCarModel = (index) => {
+      if (index < 0 || index >= CAR_SLOTS.length) return;
+      if (loadedModelsRef.current[index] || loadingStarted.has(index)) return;
 
-            setLoadedCount((prev) => {
-              const updated = prev + 1;
-              setLoadingStatusText(`FLEET READY: ${updated} / 6`);
-              return updated;
-            });
-          },
-          undefined,
-          (err) => {
-            console.warn(`Could not load ${slot.url}:`, err);
+      loadingStarted.add(index);
+      isCurrentlyLoading = true;
+      const slot = CAR_SLOTS[index];
+
+      loader.load(
+        slot.url,
+        (gltf) => {
+          const modelWrapper = normalizeModel(gltf.scene, slot.targetDim);
+          modelWrapper.rotation.y = -Math.PI / 2.2;
+          modelWrapper.visible = (index === 0);
+          setMeshOpacity(modelWrapper, 1.0);
+
+          loadedModelsRef.current[index] = modelWrapper;
+          carRootGroup.add(modelWrapper);
+          isCurrentlyLoading = false;
+
+          setLoadedCount((prev) => {
+            const updated = prev + 1;
+            setLoadingStatusText(updated === 6 ? 'ALL 6 CARS READY' : `FLEET READY: ${updated} / 6`);
+            return updated;
+          });
+
+          if (index === 0) {
+            setIsHeroModelReady(true);
+            if (onHeroReady) onHeroReady();
           }
-        );
-      }, index * 200);
-    });
+
+          // Continue queueing next frames sequentially
+          loadNextInQueue();
+        },
+        (xhr) => {
+          if (xhr.lengthComputable && xhr.total > 0) {
+            const percent = Math.min(100, Math.round((xhr.loaded / xhr.total) * 100));
+            if (index === 0) {
+              setHeroLoadProgress(percent);
+              if (onHeroProgress) onHeroProgress(percent, xhr.loaded, xhr.total);
+              setLoadingStatusText(`CALIBRATING HERO: ${percent}%`);
+            } else {
+              setLoadingStatusText(`DOWNLOADING FRAME 0${index + 1}: ${percent}%`);
+            }
+          }
+        },
+        (err) => {
+          console.warn(`Could not load ${slot.url}:`, err);
+          loadingStarted.delete(index);
+          isCurrentlyLoading = false;
+          loadNextInQueue();
+        }
+      );
+    };
+
+    const loadNextInQueue = () => {
+      if (isCurrentlyLoading) return;
+      const active = curActiveIdxRef.current || 0;
+      const next = (active + 1) % CAR_SLOTS.length;
+
+      // Priority order: Hero Frame 01 -> currently active frame -> next frame -> remaining in order
+      const priorityOrder = [0, active, next, 1, 2, 3, 4, 5];
+      for (const idx of priorityOrder) {
+        if (!loadedModelsRef.current[idx] && !loadingStarted.has(idx)) {
+          loadCarModel(idx);
+          return;
+        }
+      }
+    };
+
+    requestCarModelRef.current = (idx) => {
+      if (!loadedModelsRef.current[idx] && !loadingStarted.has(idx)) {
+        loadCarModel(idx);
+      }
+    };
+
+    // Kick off Frame 01 (Hero BMW M4) immediately with 100% bandwidth!
+    loadCarModel(0);
 
     // 8. Interactive Drag to Orbit & Mouse Parallax
     let isDragging = false;
@@ -542,6 +604,15 @@ export default function CinematicSequence() {
       curNextIdx = nextIdx;
       curTransRatio = transRatio;
       curInTrans = transitioning;
+
+      // Update current section index ref and prioritize downloading active / next car if not already loaded
+      curActiveIdxRef.current = activeIdx;
+      if (!loadedModelsRef.current[activeIdx] && !loadingStarted.has(activeIdx)) {
+        loadCarModel(activeIdx);
+      }
+      if (transitioning && !loadedModelsRef.current[nextIdx] && !loadingStarted.has(nextIdx)) {
+        loadCarModel(nextIdx);
+      }
 
       // 3. Direct DOM update for laser scanning transition HUD overlay (hardware accelerated)
       if (transitionOverlayRef.current) {
@@ -823,7 +894,12 @@ export default function CinematicSequence() {
             {CAR_SLOTS.map((slot, idx) => (
               <button
                 key={slot.id}
-                onClick={() => setActiveModelMode(idx)}
+                onClick={() => {
+                  setActiveModelMode(idx);
+                  if (requestCarModelRef.current) {
+                    requestCarModelRef.current(idx);
+                  }
+                }}
                 className={`px-2 py-1 rounded-full transition-all cursor-pointer ${
                   activeModelMode === idx ? 'bg-gradient-to-r from-zinc-100 to-zinc-300 text-black font-semibold shadow' : 'text-zinc-400 hover:text-white'
                 }`}
@@ -978,20 +1054,38 @@ export default function CinematicSequence() {
 
           {/* Right Column: 100% PURE 3D CAR ON STAGE - ZERO PNG IMAGES! */}
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[400px] pointer-events-none select-none">
-            <div className="px-4 py-2 rounded-full bg-black/50 border border-zinc-700/60 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
-              <span>STAGE 01 // 360° TURNTABLE PLATFORM</span>
+            <div className="px-4 py-2 rounded-full bg-black/60 border border-zinc-700/60 backdrop-blur-md flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
+              <span className={`w-2 h-2 rounded-full ${isHeroModelReady ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-cyan-400 shadow-[0_0_8px_#38bdf8]'} animate-pulse`} />
+              <span>{isHeroModelReady ? 'STAGE 01 // 360° TURNTABLE PLATFORM' : `CALIBRATING 3D MODEL • ${heroLoadProgress}%`}</span>
             </div>
 
-            <div className="space-y-2 text-right">
-              <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
-                {activeCar.name}
+            {!isHeroModelReady ? (
+              <div className="p-4 rounded-2xl bg-black/85 border border-cyan-500/40 backdrop-blur-md flex flex-col gap-2.5 text-right w-64 shadow-[0_0_30px_rgba(56,189,248,0.25)]">
+                <div className="flex items-center justify-end gap-2 text-[10px] font-mono text-cyan-300 tracking-wider">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                  <span>STREAMING GLTF MESH</span>
+                </div>
+                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-cyan-500 via-white to-cyan-300 transition-all duration-150"
+                    style={{ width: `${Math.max(8, heroLoadProgress)}%` }}
+                  />
+                </div>
+                <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest">
+                  BMW M4 PROTOTYPE • {heroLoadProgress}%
+                </span>
               </div>
-              <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
-                <Move3d size={13} className="text-slate-300 animate-pulse" />
-                <span>INTERACTIVE 3D WEBGL • DRAG TO ORBIT</span>
+            ) : (
+              <div className="space-y-2 text-right">
+                <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm text-[10px] font-mono tracking-widest text-zinc-400">
+                  {activeCar.name}
+                </div>
+                <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-zinc-800 backdrop-blur-sm flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
+                  <Move3d size={13} className="text-slate-300 animate-pulse" />
+                  <span>INTERACTIVE 3D WEBGL • DRAG TO ORBIT</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
         </div>
