@@ -28,23 +28,20 @@ export const CAR_SLOTS = [
 
 export default function CinematicSequence() {
   const canvasRef = useRef(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [currentFrame, setCurrentFrame] = useState(1);
   const [activeCarSlotIndex, setActiveCarSlotIndex] = useState(0);
   const [activeModelMode, setActiveModelMode] = useState('auto'); // 'auto', or 0..5 for manual lock
   const [loadedCount, setLoadedCount] = useState(0);
   const [loadingStatusText, setLoadingStatusText] = useState('CALIBRATING 3D STUDIO');
 
-  // Dynamic transition state across all 6 frames
-  const [transitionState, setTransitionState] = useState({
-    active: false,
-    fromIndex: 0,
-    toIndex: 1,
-    ratio: 0
-  });
-
-  // Live 3D telemetry coordinates state
-  const [telemetryCoords, setTelemetryCoords] = useState({ rotX: 0, rotY: 0, rotZ: 0 });
+  // Direct DOM references for ultra-smooth 120 FPS HUD updates without React re-renders
+  const hudFrameRef = useRef(null);
+  const hudYawRef = useRef(null);
+  const hudPitchRef = useRef(null);
+  const hudZoomRef = useRef(null);
+  const transitionOverlayRef = useRef(null);
+  const laserLineRef = useRef(null);
+  const transitionBadgeRef = useRef(null);
+  const transitionSubRef = useRef(null);
 
   // References for cross-scope model and interaction control
   const loadedModelsRef = useRef([null, null, null, null, null, null]);
@@ -64,7 +61,7 @@ export default function CinematicSequence() {
       powerPreference: 'high-performance'
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.35;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -424,8 +421,122 @@ export default function CinematicSequence() {
     let animId;
     let lastTelemetryUpdate = 0;
 
+    // Cached section offsets to eliminate forced layout reflows (ZERO getBoundingClientRect calls during scroll)
+    const sectionIds = ['hero', 'philosophy', 'telemetry', 'technology', 'creations', 'education'];
+    let sectionTops = [0, 0, 0, 0, 0, 0];
+
+    const measureSectionTops = () => {
+      sectionTops = sectionIds.map((id) => {
+        const el = document.getElementById(id);
+        if (!el) return 0;
+        let top = 0;
+        let curr = el;
+        while (curr) {
+          top += curr.offsetTop || 0;
+          curr = curr.offsetParent;
+        }
+        return top;
+      });
+    };
+    measureSectionTops();
+    setTimeout(measureSectionTops, 300);
+    setTimeout(measureSectionTops, 1200);
+
+    let lastActiveCarSlot = -1;
+    let lastFrameNum = -1;
+    let needsResetAfterTrans = true;
+    let lastSettledActiveIdx = -1;
+
     const animate = (time) => {
       animId = requestAnimationFrame(animate);
+
+      // 1. Fluid, non-blocking scroll measurement
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      const winH = window.innerHeight || 1;
+      const docH = Math.max(1, document.documentElement.scrollHeight - winH);
+      const globalP = Math.min(1, Math.max(0, scrollY / docH));
+      curGlobalProgress = globalP;
+
+      // Direct DOM update for frame counter (zero React re-render)
+      const frame = Math.min(240, Math.max(1, Math.floor(globalP * 239) + 1));
+      if (lastFrameNum !== frame) {
+        lastFrameNum = frame;
+        if (hudFrameRef.current) {
+          hudFrameRef.current.textContent = `FRAME ${String(frame).padStart(3, '0')} / 240`;
+        }
+      }
+
+      // 2. Section boundary calculations using pre-cached offsets (ZERO getBoundingClientRect calls!)
+      let activeIdx = 0;
+      let nextIdx = 0;
+      let transRatio = 0;
+      let transitioning = false;
+
+      for (let i = 0; i < sectionIds.length; i++) {
+        const top = sectionTops[i] - scrollY;
+        if (top <= winH * 0.55) {
+          activeIdx = i;
+        }
+        if (i < sectionIds.length - 1) {
+          const nextTop = sectionTops[i + 1] - scrollY;
+          const zoneStart = winH * 0.85;
+          const zoneEnd = winH * 0.15;
+          if (nextTop <= zoneStart && nextTop >= zoneEnd) {
+            transitioning = true;
+            activeIdx = i;
+            nextIdx = i + 1;
+            transRatio = 1 - (nextTop - zoneEnd) / (zoneStart - zoneEnd);
+            break;
+          }
+        }
+      }
+
+      const mode = activeModeRef.current;
+      if (typeof mode === 'number' && mode >= 0 && mode < CAR_SLOTS.length) {
+        activeIdx = mode;
+        transitioning = false;
+      }
+
+      curActiveIdx = activeIdx;
+      curNextIdx = nextIdx;
+      curTransRatio = transRatio;
+      curInTrans = transitioning;
+
+      // 3. Direct DOM update for laser scanning transition HUD overlay (hardware accelerated)
+      if (transitionOverlayRef.current) {
+        if (transitioning) {
+          transitionOverlayRef.current.style.opacity = '1';
+          if (laserLineRef.current) {
+            laserLineRef.current.style.transform = `translate3d(0, ${Math.min(95, Math.max(5, transRatio * 100))}vh, 0)`;
+          }
+          if (transitionBadgeRef.current) {
+            transitionBadgeRef.current.textContent = `TRANSITION EFFECT // 3D LASER SCAN: FRAME 0${activeIdx + 1} ➔ FRAME 0${nextIdx + 1}`;
+          }
+          if (transitionSubRef.current) {
+            transitionSubRef.current.textContent = `CALIBRATING ${CAR_SLOTS[nextIdx]?.bay || 'DETAILING BAY'}`;
+          }
+        } else {
+          transitionOverlayRef.current.style.opacity = '0';
+        }
+      }
+
+      // 4. Camera target positions & smooth zoom transitions
+      const isDesktop = window.innerWidth >= 1024;
+      targetCamX = isDesktop ? 0.15 : 0;
+      targetLookX = isDesktop ? 0.75 : 0;
+
+      if (transitioning) {
+        const zoomDip = Math.sin(transRatio * Math.PI) * 1.6;
+        targetCamZ = 5.0 - zoomDip;
+        targetCamY = 0.85 - Math.sin(transRatio * Math.PI) * 0.18;
+        scrollRotY = activeIdx * 0.70 + transRatio * 0.70;
+        scrollRotX = 0.01;
+      } else {
+        targetCamZ = 5.0;
+        targetCamY = activeIdx === 5 ? 1.25 : 0.85;
+        scrollRotY = activeIdx * 0.70;
+        scrollRotX = 0.01;
+      }
 
       const models = loadedModelsRef.current;
 
@@ -439,11 +550,11 @@ export default function CinematicSequence() {
         effectiveNext--;
       }
 
-      // 3D Laser Scan Rig Animation: Active on EVERY frame transition!
+      // 3D Laser Scan Rig Animation
       if (curInTrans && effectiveActive !== effectiveNext) {
         scanRig.visible = true;
-        scanRig.position.z = 2.8 - curTransRatio * 5.6; // Sweeps from front bumper across car to rear
-        const pulse = Math.sin(curTransRatio * Math.PI); // Smooth bell curve
+        scanRig.position.z = 2.8 - curTransRatio * 5.6;
+        const pulse = Math.sin(curTransRatio * Math.PI);
         laserBeamMat.opacity = pulse * 0.95;
         laserCurtainMat.opacity = pulse * 0.45;
         groundLineMat.opacity = pulse * 0.90;
@@ -455,10 +566,12 @@ export default function CinematicSequence() {
         groundLineMat.opacity = 0;
       }
 
-      // Model Visibility and Cross-Fade Handling: GUARANTEES STAGE IS ALWAYS OCCUPIED!
-      models.forEach((m, idx) => {
-        if (!m) return;
-        if (curInTrans && effectiveActive !== effectiveNext) {
+      // Optimized Model Visibility & Opacity Handling:
+      // When in transition, smoothly interpolate opacity and rise.
+      // When settled, set once and DO NOT re-traverse hundreds of meshes every frame!
+      if (curInTrans && effectiveActive !== effectiveNext) {
+        models.forEach((m, idx) => {
+          if (!m) return;
           if (idx === effectiveActive) {
             m.visible = true;
             m.position.y = curTransRatio * 0.7;
@@ -470,19 +583,30 @@ export default function CinematicSequence() {
           } else {
             m.visible = false;
           }
-        } else {
-          if (idx === effectiveActive) {
-            m.visible = true;
-            m.position.y = 0;
-            setMeshOpacity(m, 1.0);
-          } else {
-            m.visible = false;
-          }
+        });
+        needsResetAfterTrans = true;
+      } else {
+        if (needsResetAfterTrans || effectiveActive !== lastSettledActiveIdx) {
+          models.forEach((m, idx) => {
+            if (!m) return;
+            if (idx === effectiveActive) {
+              m.visible = true;
+              m.position.y = 0;
+              setMeshOpacity(m, 1.0);
+            } else {
+              m.visible = false;
+            }
+          });
+          needsResetAfterTrans = false;
+          lastSettledActiveIdx = effectiveActive;
         }
-      });
+      }
 
-      // Update active slot index for UI display
-      setActiveCarSlotIndex(effectiveActive);
+      // Only notify React when active car slot index actually changes! (Max 5 times across whole page)
+      if (effectiveActive !== lastActiveCarSlot) {
+        lastActiveCarSlot = effectiveActive;
+        setActiveCarSlotIndex(effectiveActive);
+      }
 
       // Merge scroll rotation + interactive drag + mouse parallax
       const totalTargetRotY = scrollRotY + dragRotY + mouseX * 0.12;
@@ -496,116 +620,23 @@ export default function CinematicSequence() {
       camera.position.z += (targetCamZ - camera.position.z) * 0.06;
       camera.lookAt(targetLookX, -0.10, 0);
 
-      // Live telemetry coordinates update
+      // Direct DOM update for live telemetry HUD (zero React re-render)
       if (time - lastTelemetryUpdate > 80) {
         lastTelemetryUpdate = time;
         const degY = Math.round((carRootGroup.rotation.y * 180) / Math.PI) % 360;
         const degX = Math.round((carRootGroup.rotation.x * 180) / Math.PI) % 360;
-        setTelemetryCoords({
-          rotX: degX >= 0 ? degX : 360 + degX,
-          rotY: degY >= 0 ? degY : 360 + degY,
-          rotZ: Math.round(curGlobalProgress * 100)
-        });
+        const degYFinal = degY >= 0 ? degY : 360 + degY;
+        const degXFinal = degX >= 0 ? degX : 360 + degX;
+        const zoomVal = Math.round(curGlobalProgress * 100);
+
+        if (hudYawRef.current) hudYawRef.current.textContent = `${degYFinal}°`;
+        if (hudPitchRef.current) hudPitchRef.current.textContent = `${degXFinal}°`;
+        if (hudZoomRef.current) hudZoomRef.current.textContent = `ZOOM: ${zoomVal}%`;
       }
 
       renderer.render(scene, camera);
     };
     animate(0);
-
-    // ========================================================================
-    // 🌐 ALL 6-FRAME SCROLL & SAME MODEL ZOOM EFFECT CHOREOGRAPHY
-    // ========================================================================
-    const sectionIds = ['hero', 'philosophy', 'telemetry', 'technology', 'creations', 'education'];
-
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const winH = window.innerHeight;
-      const docH = Math.max(1, document.documentElement.scrollHeight - winH);
-      const globalP = Math.min(1, Math.max(0, scrollY / docH));
-      curGlobalProgress = globalP;
-      setScrollProgress(globalP);
-
-      // Frame number 001 - 240
-      const frame = Math.min(240, Math.max(1, Math.floor(globalP * 239) + 1));
-      setCurrentFrame(frame);
-
-      let activeIdx = 0;
-      let nextIdx = 0;
-      let transRatio = 0;
-      let transitioning = false;
-
-      // Section boundary measurements
-      for (let i = 0; i < sectionIds.length; i++) {
-        const el = document.getElementById(sectionIds[i]);
-        if (!el) continue;
-        const rect = el.getBoundingClientRect();
-
-        // If this section has crossed above mid-viewport, it is the primary section
-        if (rect.top <= winH * 0.55) {
-          activeIdx = i;
-        }
-
-        // Check transition to next section
-        if (i < sectionIds.length - 1) {
-          const nextEl = document.getElementById(sectionIds[i + 1]);
-          if (nextEl) {
-            const nextRect = nextEl.getBoundingClientRect();
-            // Transition zone: when next section top is between 85% of screen and 15% of screen
-            const zoneStart = winH * 0.85;
-            const zoneEnd = winH * 0.15;
-            if (nextRect.top <= zoneStart && nextRect.top >= zoneEnd) {
-              transitioning = true;
-              activeIdx = i;
-              nextIdx = i + 1;
-              transRatio = 1 - (nextRect.top - zoneEnd) / (zoneStart - zoneEnd);
-              break;
-            }
-          }
-        }
-      }
-
-      // If activeModelMode is manually locked (number), override activeIdx
-      const mode = activeModeRef.current;
-      if (typeof mode === 'number' && mode >= 0 && mode < CAR_SLOTS.length) {
-        activeIdx = mode;
-        transitioning = false;
-      }
-
-      curActiveIdx = activeIdx;
-      curNextIdx = nextIdx;
-      curTransRatio = transRatio;
-      curInTrans = transitioning;
-
-      setTransitionState({
-        active: transitioning,
-        fromIndex: activeIdx,
-        toIndex: nextIdx,
-        ratio: transRatio
-      });
-
-      const isDesktop = window.innerWidth >= 1024;
-      targetCamX = isDesktop ? 0.15 : 0;
-      targetLookX = isDesktop ? 0.75 : 0;
-
-      // Signature Zoom-In -> Laser Scan -> Zoom-Out effect across EVERY frame change:
-      if (transitioning) {
-        // Smooth sine bell curve for zoom dip (dips from 5.0 down to 3.4 at peak)
-        const zoomDip = Math.sin(transRatio * Math.PI) * 1.6;
-        targetCamZ = 5.0 - zoomDip;
-        targetCamY = 0.85 - Math.sin(transRatio * Math.PI) * 0.18;
-        scrollRotY = activeIdx * 0.70 + transRatio * 0.70;
-        scrollRotX = 0.01;
-      } else {
-        // Settled wide showroom stance for current active car
-        targetCamZ = 5.0;
-        targetCamY = activeIdx === 5 ? 1.25 : 0.85; // slightly elevated overview on final section
-        scrollRotY = activeIdx * 0.70;
-        scrollRotX = 0.01;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
 
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -619,12 +650,12 @@ export default function CinematicSequence() {
       } else {
         carRootGroup.position.set(0, -0.2, 0);
       }
+      measureSectionTops();
     };
     window.addEventListener('resize', handleResize);
 
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mousemove', onMouseMove);
@@ -655,7 +686,6 @@ export default function CinematicSequence() {
     };
   }, []);
 
-  const formattedFrame = String(currentFrame).padStart(3, '0');
   const activeCar = CAR_SLOTS[activeCarSlotIndex] || CAR_SLOTS[0];
 
   // Smooth scroll directly to BAY 01 // CRAFT & PHILOSOPHY
@@ -776,27 +806,28 @@ export default function CinematicSequence() {
       {/* ==================================================================== */}
       {/* 3. DYNAMIC TRANSITION EFFECT OVERLAY: Works across ALL 6 Frames!      */}
       {/* ==================================================================== */}
-      {transitionState.active && (
-        <div className="fixed inset-0 pointer-events-none z-30">
-          {/* Glowing Laser Scanline Sweeping Across Viewport */}
-          <div
-            className="absolute left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_28px_#38bdf8] transition-all duration-75"
-            style={{ top: `${Math.min(95, Math.max(5, transitionState.ratio * 100))}%` }}
-          />
-          {/* Ambient High-Tech Laser Shimmer Wash */}
-          <div className="absolute inset-0 bg-cyan-500/[0.04] animate-pulse" />
-          {/* Floating Quantum Laser Transition Notification */}
-          <div className="absolute top-24 left-1/2 -translate-x-1/2 flex flex-col items-center px-4 text-center">
-            <div className="px-5 py-2 rounded-full bg-cyan-950/95 border border-cyan-400/70 backdrop-blur-md shadow-[0_0_30px_rgba(56,189,248,0.55)] flex items-center gap-3 text-cyan-200 text-[10px] font-mono tracking-widest uppercase">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#38bdf8] animate-ping" />
-              <span>TRANSITION EFFECT // 3D LASER SCAN: FRAME 0{transitionState.fromIndex + 1} ➔ FRAME 0{transitionState.toIndex + 1}</span>
-            </div>
-            <span className="text-[9px] font-mono tracking-[0.3em] text-cyan-300/90 mt-1.5 uppercase drop-shadow-md">
-              CALIBRATING {CAR_SLOTS[transitionState.toIndex]?.bay || 'DETAILING BAY'}
-            </span>
+      <div 
+        ref={transitionOverlayRef} 
+        className="fixed inset-0 pointer-events-none z-30 opacity-0 transition-opacity duration-150"
+      >
+        {/* Glowing Laser Scanline Sweeping Across Viewport */}
+        <div
+          ref={laserLineRef}
+          className="absolute left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_28px_#38bdf8] will-change-transform"
+        />
+        {/* Ambient High-Tech Laser Shimmer Wash */}
+        <div className="absolute inset-0 bg-cyan-500/[0.04] animate-pulse" />
+        {/* Floating Quantum Laser Transition Notification */}
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 flex flex-col items-center px-4 text-center">
+          <div className="px-5 py-2 rounded-full bg-cyan-950/95 border border-cyan-400/70 backdrop-blur-md shadow-[0_0_30px_rgba(56,189,248,0.55)] flex items-center gap-3 text-cyan-200 text-[10px] font-mono tracking-widest uppercase">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#38bdf8] animate-ping" />
+            <span ref={transitionBadgeRef}>TRANSITION EFFECT // 3D LASER SCAN: FRAME 01 ➔ FRAME 02</span>
           </div>
+          <span ref={transitionSubRef} className="text-[9px] font-mono tracking-[0.3em] text-cyan-300/90 mt-1.5 uppercase drop-shadow-md">
+            CALIBRATING DETAILING BAY
+          </span>
         </div>
-      )}
+      </div>
 
       {/* ==================================================================== */}
       {/* 4. SECTION 01: HERO SECTION (Pure 3D Car on Stage, NO PNG IMAGE!)   */}
@@ -877,11 +908,11 @@ export default function CinematicSequence() {
               {/* Real-time 3D Coordinates Readout */}
               <div className="pt-3.5 pb-4 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-400 mb-4">
                 <div className="flex items-center gap-3">
-                  <span>YAW: <strong className="text-slate-200 font-light">{telemetryCoords.rotY}°</strong></span>
-                  <span>PITCH: <strong className="text-slate-200 font-light">{telemetryCoords.rotX}°</strong></span>
+                  <span>YAW: <strong ref={hudYawRef} className="text-slate-200 font-light">0°</strong></span>
+                  <span>PITCH: <strong ref={hudPitchRef} className="text-slate-200 font-light">0°</strong></span>
                 </div>
-                <span className="text-zinc-500">
-                  ZOOM: {telemetryCoords.rotZ}%
+                <span ref={hudZoomRef} className="text-zinc-500">
+                  ZOOM: 0%
                 </span>
               </div>
 
@@ -1063,7 +1094,7 @@ export default function CinematicSequence() {
             {activeCar.name}
           </span>
           <span>—</span>
-          <span>FRAME {formattedFrame} / 240</span>
+          <span ref={hudFrameRef}>FRAME 001 / 240</span>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-800/80 border border-zinc-600/50 text-[10px] text-slate-200 font-bold">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             {loadingStatusText}
