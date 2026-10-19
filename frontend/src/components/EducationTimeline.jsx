@@ -6,15 +6,15 @@ export default function EducationTimeline() {
     {
       period: '2023 — 2026',
       degree: 'Bachelor of Computer Applications (BCA)',
-      institution: 'University / College, Kerala, India',
-      description: 'Core foundation in computer applications, programming fundamentals, data structures, algorithms, relational databases, and software lifecycle design.',
+      institution: 'Safa Arts and Science College | University of Calicut, Kerala',
+      description: 'Core coursework in Data Structures & Algorithms, Object-Oriented Programming (OOP), Database Management Systems (DBMS), Web Technologies, and Software Engineering.',
       icon: GraduationCap
     },
     {
       period: '2023 — PRESENT',
       degree: 'Fullstack & MERN Engineering',
-      institution: 'Self-Directed & Project Mastery',
-      description: 'Production implementations across React.js, Node.js, Express.js, MongoDB, RESTful API design, state orchestration, Three.js 3D web graphics, and responsive UI engineering.',
+      institution: 'Specializations & Professional Certifications',
+      description: 'Certifications in Full-Stack MERN Development, Modern React with Hooks & Redux, and JavaScript Algorithms & Data Structures. Production deployments across React.js, Node.js, Express.js, MongoDB, and Three.js.',
       icon: Code2
     }
   ];
