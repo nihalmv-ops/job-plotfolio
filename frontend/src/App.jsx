@@ -45,7 +45,7 @@ export default function App() {
       </a>
 
       {/* Flagship Cinematic 3D WebGL Detailing Bay Sequence */}
-      {/* Frame 1: Hero Studio -> 3D Laser Transition Effect -> Frame 2: BAY 01 // CRAFT & PHILOSOPHY */}
+      {/* Porsche 911 Turbo Dynamic Staging across all sections */}
       <CinematicSequence 
         onHeroProgress={(p) => setHeroProgress(p)}
         onHeroReady={() => setIsHeroReady(true)}

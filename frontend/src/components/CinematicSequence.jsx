@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { 
   ArrowDown, 
@@ -9,29 +10,30 @@ import {
 } from 'lucide-react';
 
 // ============================================================================
-// 🏎️ 6-BAY 3D CAR FLEET CONFIGURATION
-// All 6 GLB models mapped across the entire portfolio journey:
-// 1. Hero: firstfream.glb (BMW M4 Prototype)
-// 2. Bay 01: secondfream.glb (Porsche 911 Turbo)
-// 3. Bay 02: thirdfream.glb (Telemetry Spec)
-// 4. Bay 03: forthfream.glb (Technology Hypercar)
-// 5. Bay 04: fifthfream.glb (Creations Track Machine)
-// 6. Bay 05 & 06: sixthfream.glb (Apex Masterpiece)
+// 🏎️ SINGLE HIGH-PERFORMANCE FLAGSHIP 3D MODEL CONFIGURATION
+// Flagship model: /secondfream.glb (Porsche 911 Turbo)
+// 6-Bay stage angles represent 6 dynamic studio perspectives as the user scrolls
 // ============================================================================
-export const CAR_SLOTS = [
-  { id: 1, name: 'FRAME 01 // BMW M4 COUPE', url: '/firstfream.glb', targetDim: 5.75, bay: 'HERO STUDIO' },
-  { id: 2, name: 'FRAME 02 // PORSCHE 911 TURBO', url: '/secondfream.glb', targetDim: 5.6, bay: 'BAY 01 // PHILOSOPHY' },
-  { id: 3, name: 'FRAME 03 // TELEMETRY GT', url: '/thirdfream.glb', targetDim: 5.6, bay: 'BAY 02 // TELEMETRY' },
-  { id: 4, name: 'FRAME 04 // TECH HYPERCAR', url: '/forthfream.glb', targetDim: 5.6, bay: 'BAY 03 // TECHNOLOGY' },
-  { id: 5, name: 'FRAME 05 // CREATIONS MONSTER', url: '/fifthfream.glb', targetDim: 5.6, bay: 'BAY 04 // CREATIONS' },
-  { id: 6, name: 'FRAME 06 // APEX PROTOCOL', url: '/sixthfream.glb', targetDim: 5.6, bay: 'BAY 05 & 06 // TRANSMISSION' }
+export const CAR_CONFIG = {
+  id: 1,
+  name: 'PORSCHE 911 TURBO',
+  url: '/secondfream.glb',
+  targetDim: 4.1,
+  bay: 'PORSCHE 911 // 360° STEALTH GARAGE'
+};
+
+export const BAY_STAGES = [
+  { id: 1, name: 'STAGE 01 // FRONT THREE-QUARTER', bay: 'HERO STUDIO', angle: -0.45, camY: 0.70, camZ: 5.2, label: '01 HERO' },
+  { id: 2, name: 'STAGE 02 // SIDE PROFILE & AERO', bay: 'BAY 01 // PHILOSOPHY', angle: Math.PI / 2.0, camY: 0.70, camZ: 5.2, label: '02 PHILOSOPHY' },
+  { id: 3, name: 'STAGE 03 // REAR PERFORMANCE ANGLE', bay: 'BAY 02 // TELEMETRY', angle: Math.PI * 0.90, camY: 0.70, camZ: 5.3, label: '03 TELEMETRY' },
+  { id: 4, name: 'STAGE 04 // OVERHEAD COCKPIT & CHASSIS', bay: 'BAY 03 // TECHNOLOGY', angle: Math.PI * 1.35, camY: 1.05, camZ: 5.0, label: '04 TECHNOLOGY' },
+  { id: 5, name: 'STAGE 05 // LOW AGGRESSIVE TRACK STANCE', bay: 'BAY 04 // CREATIONS', angle: Math.PI * 1.75, camY: 0.60, camZ: 5.3, label: '05 CREATIONS' },
+  { id: 6, name: 'STAGE 06 // APEX PROTOCOL 360° FINALE', bay: 'BAY 05 & 06 // APEX', angle: Math.PI * 2.0 - 0.45, camY: 0.95, camZ: 5.2, label: '06 APEX' }
 ];
 
 export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
   const canvasRef = useRef(null);
-  const [activeCarSlotIndex, setActiveCarSlotIndex] = useState(0);
-  const [activeModelMode, setActiveModelMode] = useState('auto'); // 'auto', or 0..5 for manual lock
-  const [loadedCount, setLoadedCount] = useState(0);
+  const [activeStageIndex, setActiveStageIndex] = useState(0);
   const [loadingStatusText, setLoadingStatusText] = useState('CALIBRATING 3D STUDIO');
   const [heroLoadProgress, setHeroLoadProgress] = useState(0);
   const [isHeroModelReady, setIsHeroModelReady] = useState(false);
@@ -41,24 +43,16 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
   const hudYawRef = useRef(null);
   const hudPitchRef = useRef(null);
   const hudZoomRef = useRef(null);
-  const transitionOverlayRef = useRef(null);
-  const laserLineRef = useRef(null);
-  const transitionBadgeRef = useRef(null);
-  const transitionSubRef = useRef(null);
 
   // References for cross-scope model and interaction control
-  const loadedModelsRef = useRef([null, null, null, null, null, null]);
+  const loadedModelRef = useRef(null);
   const carRootGroupRef = useRef(null);
-  const activeModeRef = useRef('auto');
-  activeModeRef.current = activeModelMode;
-  const curActiveIdxRef = useRef(0);
-  const requestCarModelRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // 1. High-Precision WebGL Renderer for Automotive Detailing Studio
+    // 1. High-Precision WebGL Renderer for Automotive Studio
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
@@ -68,11 +62,11 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMappingExposure = 1.05;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000, 1);
 
-    // Generate photorealistic procedural studio environment cubemap for reflections across all car bodies
+    // Generate photorealistic procedural studio environment cubemap for reflections
     const pmremGenerator = new THREE.PMREMGenerator(renderer);
     pmremGenerator.compileEquirectangularShader();
     const studioEnvTexture = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
@@ -83,20 +77,21 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     scene.fog = new THREE.FogExp2(0x000000, 0.045);
 
     const camera = new THREE.PerspectiveCamera(
-      42,
+      43,
       window.innerWidth / window.innerHeight,
       0.1,
       100
     );
-    // Camera is framed to highlight the right-side turntable stage on desktop
-    camera.position.set(0.15, 0.85, 5.0);
+    // Camera initial framing
+    const isInitialDesktop = window.innerWidth >= 1024;
+    camera.position.set(isInitialDesktop ? 0.25 : 0, 0.70, isInitialDesktop ? 5.2 : 6.3);
 
     // Parent group for car & round stage placed in the right side area on desktop
     const carRootGroup = new THREE.Group();
     if (window.innerWidth >= 1024) {
-      carRootGroup.position.set(1.5, 0, 0);
+      carRootGroup.position.set(1.0, 0, 0);
     } else if (window.innerWidth >= 768) {
-      carRootGroup.position.set(0.7, 0, 0);
+      carRootGroup.position.set(0.5, 0, 0);
     } else {
       carRootGroup.position.set(0, -0.2, 0);
     }
@@ -104,172 +99,167 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     scene.add(carRootGroup);
 
     // 2. Pure Automotive Studio Lighting calibrated to faithfully render authentic .glb colors
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
     scene.add(ambientLight);
 
-    const overheadKeyLight = new THREE.DirectionalLight(0xffffff, 1.1);
-    overheadKeyLight.position.set(2, 8, 4);
+    const overheadKeyLight = new THREE.DirectionalLight(0xffffff, 1.3);
+    overheadKeyLight.position.set(2.0, 7.0, 3.0);
     scene.add(overheadKeyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    fillLight.position.set(-5, 4, 3);
+    const fillLight = new THREE.DirectionalLight(0xffffff, 0.65);
+    fillLight.position.set(-4.0, 3.0, 2.0);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    rimLight.position.set(0, 4, -5);
+    const rimLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    rimLight.position.set(0, 3.5, -4.0);
     scene.add(rimLight);
 
-    // 3. Overhead Garage Fixture Rig in Pure Stealth Black
-    const ceilingRig = new THREE.Group();
-    const stripGeom = new THREE.BoxGeometry(0.06, 0.03, 7.5);
-    const stripMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const frontAccent = new THREE.DirectionalLight(0xffffff, 0.65);
+    frontAccent.position.set(2.0, 1.5, 4.0);
+    scene.add(frontAccent);
 
-    [-1.8, -0.9, 0, 0.9, 1.8].forEach((xOffset) => {
-      const strip = new THREE.Mesh(stripGeom, stripMat);
-      strip.position.set(xOffset, 4.2, 0);
-      ceilingRig.add(strip);
-    });
-    scene.add(ceilingRig);
-
-    // 4. Pure Pitch Black Automotive Floor (Full On Black Theme - Eliminates Gray Glare)
+    // 3. Full On Pure Pitch Black Automotive Floor (Zero Glare, Seamless Black Void)
     const floorGeom = new THREE.PlaneGeometry(80, 80);
-    const floorMat = new THREE.MeshBasicMaterial({
-      color: 0x000000
-    });
+    const floorMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
     const floor = new THREE.Mesh(floorGeom, floorMat);
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -1.15;
+    floor.position.y = -0.98;
     scene.add(floor);
 
-    // 5. Photorealistic Automotive Turntable Round Stage in Pure Black Stealth Theme
+    // 4. Photorealistic Automotive Turntable Round Stage in Pure Stealth Black Theme
     const stageGroup = new THREE.Group();
 
-    // Stage Top / Main Cylindrical Disc Platform (Pure Solid Obsidian Black)
-    const stageGeom = new THREE.CylinderGeometry(3.5, 3.65, 0.16, 64);
+    const STAGE_RADIUS = 2.4;
+    const STAGE_HEIGHT = 0.10;
+    const STAGE_Y = -0.93;
+    const STAGE_TOP_Y = STAGE_Y + STAGE_HEIGHT / 2; // -0.88
+
+    // Stage Top / Main Cylindrical Disc Platform (Pure Solid Obsidian Stealth Black)
+    const stageGeom = new THREE.CylinderGeometry(STAGE_RADIUS, STAGE_RADIUS + 0.10, STAGE_HEIGHT, 64);
     const stageMat = new THREE.MeshStandardMaterial({
-      color: 0x000000,
-      metalness: 0.1,
-      roughness: 0.88,
-      envMapIntensity: 0.12
+      color: 0x060608,
+      metalness: 0.15,
+      roughness: 0.8,
+      envMapIntensity: 0.2
     });
     const stageMesh = new THREE.Mesh(stageGeom, stageMat);
-    stageMesh.position.y = -1.07;
-    stageMesh.receiveShadow = true;
-    stageMesh.castShadow = true;
+    stageMesh.position.y = STAGE_Y;
     stageGroup.add(stageMesh);
 
-    // Beveled Outer Bezel Edge Ring (Stealth Solid Black Finish)
-    const bezelGeom = new THREE.TorusGeometry(3.51, 0.035, 16, 64);
+    // Beveled Outer Bezel Edge Ring (Stealth Solid Dark Charcoal Finish)
+    const bezelGeom = new THREE.TorusGeometry(STAGE_RADIUS + 0.01, 0.02, 16, 64);
     const bezelMat = new THREE.MeshStandardMaterial({
-      color: 0x000000,
-      metalness: 0.35,
+      color: 0x0f0f13,
+      metalness: 0.25,
       roughness: 0.65,
-      envMapIntensity: 0.15
+      envMapIntensity: 0.25
     });
     const bezelMesh = new THREE.Mesh(bezelGeom, bezelMat);
     bezelMesh.rotation.x = Math.PI / 2;
-    bezelMesh.position.y = -0.99;
+    bezelMesh.position.y = STAGE_TOP_Y - 0.005;
     stageGroup.add(bezelMesh);
 
-    // Stage Surface Concentric Detailing Rings (Subtle Monochromatic Dark Lines)
-    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0x121214, transparent: true, opacity: 0.4 });
-    
-    const stageRing1Geom = new THREE.RingGeometry(2.5, 2.52, 64);
-    const stageRing1 = new THREE.Mesh(stageRing1Geom, stageRingMat);
-    stageRing1.rotation.x = -Math.PI / 2;
-    stageRing1.position.y = -0.988;
-    stageGroup.add(stageRing1);
-
-    const stageRing2Geom = new THREE.RingGeometry(1.3, 1.315, 64);
-    const stageRing2 = new THREE.Mesh(stageRing2Geom, stageRingMat);
-    stageRing2.rotation.x = -Math.PI / 2;
-    stageRing2.position.y = -0.988;
-    stageGroup.add(stageRing2);
-
-    // Stage LED Halo Ring (Full on Black Theme - Zero Unwanted Color Tint)
-    const haloGeom = new THREE.RingGeometry(3.55, 3.7, 64);
-    const haloMat = new THREE.MeshBasicMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 0
-    });
-    const haloMesh = new THREE.Mesh(haloGeom, haloMat);
-    haloMesh.rotation.x = -Math.PI / 2;
-    haloMesh.position.y = -1.145;
-    stageGroup.add(haloMesh);
+    // Stage Surface Concentric Detailing Ring (Subtle Monochromatic Dark Line)
+    const stageRingMat = new THREE.MeshBasicMaterial({ color: 0x18181d, transparent: true, opacity: 0.4 });
+    const stageRingGeom = new THREE.RingGeometry(STAGE_RADIUS - 0.2, STAGE_RADIUS - 0.185, 64);
+    const stageRing = new THREE.Mesh(stageRingGeom, stageRingMat);
+    stageRing.rotation.x = -Math.PI / 2;
+    stageRing.position.y = STAGE_TOP_Y + 0.0006;
+    stageGroup.add(stageRing);
 
     carRootGroup.add(stageGroup);
 
-    // 6. High-Tech 3D Laser Scanning Beam (Transition Effect between Cars in Pure Monochrome)
-    const scanRig = new THREE.Group();
-    scanRig.visible = false;
+    // 5. Grounding Contact Shadow (Soft Radial Shadow directly under the wheels)
+    const createContactShadowTexture = () => {
+      const c = document.createElement('canvas');
+      c.width = 512;
+      c.height = 512;
+      const ctx = c.getContext('2d');
+      const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.95)');
+      gradient.addColorStop(0.35, 'rgba(0, 0, 0, 0.7)');
+      gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.25)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 512, 512);
+      return new THREE.CanvasTexture(c);
+    };
 
-    // Glowing laser beam line across stage width
-    const laserBeamGeom = new THREE.CylinderGeometry(0.018, 0.018, 7.2, 32);
-    const laserBeamMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+    const contactShadowGeom = new THREE.PlaneGeometry(2.1, 4.3);
+    const contactShadowTexture = createContactShadowTexture();
+    const contactShadowMat = new THREE.MeshBasicMaterial({
+      map: contactShadowTexture,
       transparent: true,
-      opacity: 0
+      opacity: 0.85,
+      depthWrite: false
     });
-    const laserBeam = new THREE.Mesh(laserBeamGeom, laserBeamMat);
-    laserBeam.rotation.z = Math.PI / 2;
-    laserBeam.position.y = 0.05;
-    scanRig.add(laserBeam);
+    const contactShadowMesh = new THREE.Mesh(contactShadowGeom, contactShadowMat);
+    contactShadowMesh.rotation.x = -Math.PI / 2;
+    contactShadowMesh.position.set(0, STAGE_TOP_Y + 0.0005, 0);
+    carRootGroup.add(contactShadowMesh);
 
-    // Vertical translucent scanning light curtain
-    const laserCurtainGeom = new THREE.PlaneGeometry(7.2, 3.2);
-    const laserCurtainMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0,
-      side: THREE.DoubleSide
-    });
-    const laserCurtain = new THREE.Mesh(laserCurtainGeom, laserCurtainMat);
-    laserCurtain.position.y = 0.65;
-    scanRig.add(laserCurtain);
-
-    // Stage surface contact laser line
-    const groundLineGeom = new THREE.PlaneGeometry(7.2, 0.08);
-    const groundLineMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      transparent: true,
-      opacity: 0,
-      side: THREE.DoubleSide
-    });
-    const groundLine = new THREE.Mesh(groundLineGeom, groundLineMat);
-    groundLine.rotation.x = -Math.PI / 2;
-    groundLine.position.y = -0.985;
-    scanRig.add(groundLine);
-
-    carRootGroup.add(scanRig);
-
-    // 7. GLTF Loader Setup with Safe Material Normalization
+    // 6. GLTF Loader Setup with Native Meshopt Compression Support
     const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
 
-    // Helper: Normalize & center 3D model onto the round stage
-    const normalizeModel = (gltfScene, targetDim = 5.6) => {
-      const box = new THREE.Box3().setFromObject(gltfScene);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
+    // Helper: Normalize, center and precisely ground 3D model onto the round stage
+    const normalizeModel = (gltfScene, targetDim = 4.1) => {
+      // 1. Hide Sketchfab baked shadow plane (material_0 / Object_140)
+      gltfScene.traverse((child) => {
+        if (child.isMesh && child.material && child.material.name === 'material_0') {
+          child.visible = false;
+        }
+      });
+
+      // 2. Force matrix update and compute EXACT vertex-level bounding box
+      // (Using expandByPoint per vertex avoids AABB inflation from rotated node matrices)
+      gltfScene.updateMatrixWorld(true);
+      const carBox = new THREE.Box3();
+      const tempVec = new THREE.Vector3();
+
+      gltfScene.traverse((child) => {
+        if (child.isMesh && child.visible && child.geometry && child.geometry.attributes.position) {
+          const pos = child.geometry.attributes.position;
+          const mw = child.matrixWorld;
+          for (let i = 0; i < pos.count; i++) {
+            tempVec.set(pos.getX(i), pos.getY(i), pos.getZ(i));
+            tempVec.applyMatrix4(mw);
+            carBox.expandByPoint(tempVec);
+          }
+        }
+      });
+
+      const center = carBox.getCenter(new THREE.Vector3());
+      const size = carBox.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = targetDim / maxDim;
 
       gltfScene.scale.setScalar(scale);
+
+      // Dead-center the car horizontally on the turntable (X=0, Z=0)
       gltfScene.position.x = -center.x * scale;
       gltfScene.position.z = -center.z * scale;
-      gltfScene.position.y = -box.min.y * scale - 0.99;
 
+      // Rest tires flush on top of the turntable stage disc (STAGE_TOP_Y = -0.880)
+      gltfScene.position.y = -carBox.min.y * scale + STAGE_TOP_Y + 0.001;
+
+      // 3. Materials clearcoat & reflection enhancement (Preserves authentic car colors 100%)
       gltfScene.traverse((child) => {
         if (child.isMesh && child.material) {
-          child.castShadow = true;
-          child.receiveShadow = true;
           child.frustumCulled = false;
 
           const materials = Array.isArray(child.material) ? child.material : [child.material];
           materials.forEach((mat) => {
             if (mat && (mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial)) {
-              mat.envMapIntensity = 0.55;
-              // Preserve original colors, textures, and diffuse maps 100% intact
+              mat.envMapIntensity = 0.95;
+              const name = (mat.name || '').toLowerCase();
+              if (name.includes('glass') || name.includes('window') || name.includes('windshield')) {
+                mat.roughness = 0.05;
+                mat.metalness = 0.1;
+                mat.envMapIntensity = 1.35;
+              } else if (name.includes('wheel') || name.includes('rim') || name.includes('caliper')) {
+                mat.envMapIntensity = 1.15;
+              }
               mat.needsUpdate = true;
             }
           });
@@ -281,116 +271,35 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       return wrapper;
     };
 
-    // Helper to safely set mesh opacity without leaving models in an invisible or sorting-glitched state
-    const setMeshOpacity = (obj, opacity) => {
-      if (!obj) return;
-      obj.traverse((child) => {
-        if (child.isMesh && child.material) {
-          const mats = Array.isArray(child.material) ? child.material : [child.material];
-          mats.forEach((mat) => {
-            if (mat.userData.origTransparent === undefined) {
-              mat.userData.origTransparent = !!mat.transparent;
-              mat.userData.origOpacity = typeof mat.opacity === 'number' ? mat.opacity : 1.0;
-            }
-            if (opacity < 0.98) {
-              mat.transparent = true;
-              mat.opacity = opacity * (mat.userData.origOpacity || 1.0);
-            } else {
-              mat.transparent = mat.userData.origTransparent;
-              mat.opacity = mat.userData.origOpacity;
-            }
-          });
+    // Load the Single High-Quality Porsche 911 Turbo Model
+    loader.load(
+      CAR_CONFIG.url,
+      (gltf) => {
+        const modelWrapper = normalizeModel(gltf.scene, CAR_CONFIG.targetDim);
+        modelWrapper.rotation.y = 0; // Perfectly aligned with the turntable stage
+        modelWrapper.visible = true;
+
+        loadedModelRef.current = modelWrapper;
+        carRootGroup.add(modelWrapper);
+
+        setIsHeroModelReady(true);
+        setLoadingStatusText('PORSCHE 911 TURBO // GARAGE READY');
+        if (onHeroReady) onHeroReady();
+      },
+      (xhr) => {
+        if (xhr.lengthComputable && xhr.total > 0) {
+          const percent = Math.min(100, Math.round((xhr.loaded / xhr.total) * 100));
+          setHeroLoadProgress(percent);
+          if (onHeroProgress) onHeroProgress(percent, xhr.loaded, xhr.total);
+          setLoadingStatusText(`INGESTING PORSCHE 911: ${percent}%`);
         }
-      });
-    };
-
-    // Sequential Priority Loader for 3D Fleet:
-    // Frame 01 (Hero BMW M4) loads FIRST with full dedicated bandwidth and real-time progress callbacks.
-    // Once Frame 01 is mounted, subsequent frames load sequentially in the background.
-    // If the user scrolls or selects a frame that isn't loaded yet, it jumps to the front of the queue!
-    const loadingStarted = new Set();
-    let isCurrentlyLoading = false;
-
-    const loadCarModel = (index) => {
-      if (index < 0 || index >= CAR_SLOTS.length) return;
-      if (loadedModelsRef.current[index] || loadingStarted.has(index)) return;
-
-      loadingStarted.add(index);
-      isCurrentlyLoading = true;
-      const slot = CAR_SLOTS[index];
-
-      loader.load(
-        slot.url,
-        (gltf) => {
-          const modelWrapper = normalizeModel(gltf.scene, slot.targetDim);
-          modelWrapper.rotation.y = -Math.PI / 2.2;
-          modelWrapper.visible = (index === 0);
-          setMeshOpacity(modelWrapper, 1.0);
-
-          loadedModelsRef.current[index] = modelWrapper;
-          carRootGroup.add(modelWrapper);
-          isCurrentlyLoading = false;
-
-          setLoadedCount((prev) => {
-            const updated = prev + 1;
-            setLoadingStatusText(updated === 6 ? 'ALL 6 CARS READY' : `FLEET READY: ${updated} / 6`);
-            return updated;
-          });
-
-          if (index === 0) {
-            setIsHeroModelReady(true);
-            if (onHeroReady) onHeroReady();
-          }
-
-          // Continue queueing next frames sequentially
-          loadNextInQueue();
-        },
-        (xhr) => {
-          if (xhr.lengthComputable && xhr.total > 0) {
-            const percent = Math.min(100, Math.round((xhr.loaded / xhr.total) * 100));
-            if (index === 0) {
-              setHeroLoadProgress(percent);
-              if (onHeroProgress) onHeroProgress(percent, xhr.loaded, xhr.total);
-              setLoadingStatusText(`CALIBRATING HERO: ${percent}%`);
-            } else {
-              setLoadingStatusText(`DOWNLOADING FRAME 0${index + 1}: ${percent}%`);
-            }
-          }
-        },
-        (err) => {
-          console.warn(`Could not load ${slot.url}:`, err);
-          loadingStarted.delete(index);
-          isCurrentlyLoading = false;
-          loadNextInQueue();
-        }
-      );
-    };
-
-    const loadNextInQueue = () => {
-      if (isCurrentlyLoading) return;
-      const active = curActiveIdxRef.current || 0;
-      const next = (active + 1) % CAR_SLOTS.length;
-
-      // Priority order: Hero Frame 01 -> currently active frame -> next frame -> remaining in order
-      const priorityOrder = [0, active, next, 1, 2, 3, 4, 5];
-      for (const idx of priorityOrder) {
-        if (!loadedModelsRef.current[idx] && !loadingStarted.has(idx)) {
-          loadCarModel(idx);
-          return;
-        }
+      },
+      (err) => {
+        console.warn(`Could not load ${CAR_CONFIG.url}:`, err);
       }
-    };
+    );
 
-    requestCarModelRef.current = (idx) => {
-      if (!loadedModelsRef.current[idx] && !loadingStarted.has(idx)) {
-        loadCarModel(idx);
-      }
-    };
-
-    // Kick off Frame 01 (Hero BMW M4) immediately with 100% bandwidth!
-    loadCarModel(0);
-
-    // 8. Interactive Drag to Orbit & Mouse Parallax
+    // 7. Interactive Drag to Orbit & Mouse Parallax
     let isDragging = false;
     let dragStartX = 0;
     let dragStartY = 0;
@@ -455,22 +364,19 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     window.addEventListener('touchend', onTouchEnd);
 
     // Animation & Choreography Targets
-    let curActiveIdx = 0;
-    let curNextIdx = 1;
-    let curTransRatio = 0;
-    let curInTrans = false;
-
     let curGlobalProgress = 0;
     let scrollRotY = 0;
     let scrollRotX = 0;
     const isDesk = window.innerWidth >= 1024;
-    let targetCamX = isDesk ? 0.15 : 0;
-    let targetLookX = isDesk ? 0.75 : 0;
-    let targetCamY = 0.85;
-    let targetCamZ = 5.0;
+    let targetCamX = isDesk ? 0.25 : 0;
+    let targetLookX = isDesk ? 0.85 : 0;
+    let targetCamY = 0.70;
+    let targetCamZ = isDesk ? 5.2 : 6.3;
 
-    let animId;
+    let animId = null;
     let lastTelemetryUpdate = 0;
+    let isTabVisible = !document.hidden;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Cached section offsets to eliminate forced layout reflows (ZERO getBoundingClientRect calls during scroll)
     const sectionIds = ['hero', 'philosophy', 'telemetry', 'technology', 'creations', 'education'];
@@ -493,12 +399,14 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     setTimeout(measureSectionTops, 300);
     setTimeout(measureSectionTops, 1200);
 
-    let lastActiveCarSlot = -1;
+    let lastActiveStageSlot = -1;
     let lastFrameNum = -1;
-    let needsResetAfterTrans = true;
-    let lastSettledActiveIdx = -1;
 
     const animate = (time) => {
+      if (!isTabVisible) {
+        animId = null;
+        return;
+      }
       animId = requestAnimationFrame(animate);
 
       // 1. Fluid, non-blocking scroll measurement
@@ -517,11 +425,9 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
         }
       }
 
-      // 2. Section boundary calculations using pre-cached offsets (ZERO getBoundingClientRect calls!)
+      // 2. Section boundary calculations using pre-cached offsets
       let activeIdx = 0;
-      let nextIdx = 0;
       let transRatio = 0;
-      let transitioning = false;
 
       for (let i = 0; i < sectionIds.length; i++) {
         const top = sectionTops[i] - scrollY;
@@ -533,137 +439,37 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           const zoneStart = winH * 0.85;
           const zoneEnd = winH * 0.15;
           if (nextTop <= zoneStart && nextTop >= zoneEnd) {
-            transitioning = true;
-            activeIdx = i;
-            nextIdx = i + 1;
             transRatio = 1 - (nextTop - zoneEnd) / (zoneStart - zoneEnd);
             break;
           }
         }
       }
 
-      const mode = activeModeRef.current;
-      if (typeof mode === 'number' && mode >= 0 && mode < CAR_SLOTS.length) {
-        activeIdx = mode;
-        transitioning = false;
-      }
+      // Smooth section-to-section camera and angle interpolation
+      const currentStage = BAY_STAGES[activeIdx] || BAY_STAGES[0];
+      const nextStage = BAY_STAGES[Math.min(activeIdx + 1, BAY_STAGES.length - 1)];
 
-      curActiveIdx = activeIdx;
-      curNextIdx = nextIdx;
-      curTransRatio = transRatio;
-      curInTrans = transitioning;
-
-      // Update current section index ref and prioritize downloading active / next car if not already loaded
-      curActiveIdxRef.current = activeIdx;
-      if (!loadedModelsRef.current[activeIdx] && !loadingStarted.has(activeIdx)) {
-        loadCarModel(activeIdx);
-      }
-      if (transitioning && !loadedModelsRef.current[nextIdx] && !loadingStarted.has(nextIdx)) {
-        loadCarModel(nextIdx);
-      }
-
-      // 3. Direct DOM update for laser scanning transition HUD overlay (hardware accelerated)
-      if (transitionOverlayRef.current) {
-        if (transitioning) {
-          transitionOverlayRef.current.style.opacity = '1';
-          if (laserLineRef.current) {
-            laserLineRef.current.style.transform = `translate3d(0, ${Math.min(95, Math.max(5, transRatio * 100))}vh, 0)`;
-          }
-          if (transitionBadgeRef.current) {
-            transitionBadgeRef.current.textContent = `TRANSITION EFFECT // 3D LASER SCAN: FRAME 0${activeIdx + 1} ➔ FRAME 0${nextIdx + 1}`;
-          }
-          if (transitionSubRef.current) {
-            transitionSubRef.current.textContent = `CALIBRATING ${CAR_SLOTS[nextIdx]?.bay || 'DETAILING BAY'}`;
-          }
-        } else {
-          transitionOverlayRef.current.style.opacity = '0';
-        }
-      }
-
-      // 4. Camera target positions & smooth zoom transitions
       const isDesktop = window.innerWidth >= 1024;
-      targetCamX = isDesktop ? 0.15 : 0;
-      targetLookX = isDesktop ? 0.75 : 0;
+      targetCamX = isDesktop ? 0.25 : 0;
+      targetLookX = isDesktop ? 0.85 : 0;
 
-      if (transitioning) {
-        const zoomDip = Math.sin(transRatio * Math.PI) * 1.6;
-        targetCamZ = 5.0 - zoomDip;
-        targetCamY = 0.85 - Math.sin(transRatio * Math.PI) * 0.18;
-        scrollRotY = activeIdx * 0.70 + transRatio * 0.70;
-        scrollRotX = 0.01;
-      } else {
-        targetCamZ = 5.0;
-        targetCamY = activeIdx === 5 ? 1.25 : 0.85;
-        scrollRotY = activeIdx * 0.70;
-        scrollRotX = 0.01;
-      }
+      // Smooth rotational staging for Porsche 911 Turbo
+      const baseAngle = currentStage.angle + (nextStage.angle - currentStage.angle) * transRatio;
+      scrollRotY = prefersReducedMotion ? currentStage.angle : baseAngle;
+      scrollRotX = 0.01;
 
-      const models = loadedModelsRef.current;
+      targetCamY = currentStage.camY + (nextStage.camY - currentStage.camY) * transRatio;
+      targetCamZ = (isDesktop ? currentStage.camZ : currentStage.camZ + 1.1) + (nextStage.camZ - currentStage.camZ) * transRatio;
 
-      // Check if target model is loaded; if not loaded, fallback to closest loaded model
-      let effectiveActive = curActiveIdx;
-      while (effectiveActive > 0 && !models[effectiveActive]) {
-        effectiveActive--;
-      }
-      let effectiveNext = curNextIdx;
-      while (effectiveNext > 0 && !models[effectiveNext]) {
-        effectiveNext--;
-      }
-
-      // 3D Laser Scan Rig Animation
-      if (curInTrans && effectiveActive !== effectiveNext) {
-        scanRig.visible = true;
-        scanRig.position.z = 2.8 - curTransRatio * 5.6;
-        const pulse = Math.sin(curTransRatio * Math.PI);
-        laserBeamMat.opacity = pulse * 0.95;
-        laserCurtainMat.opacity = pulse * 0.45;
-        groundLineMat.opacity = pulse * 0.90;
-        laserBeam.scale.y = 1 + Math.sin(time * 0.05) * 0.03;
-      } else {
-        scanRig.visible = false;
-        laserBeamMat.opacity = 0;
-        laserCurtainMat.opacity = 0;
-        groundLineMat.opacity = 0;
-      }
-
-      // Ultra-Smooth 60/120 FPS Laser Scan Car Transition (ZERO shader recompile, ZERO lag):
-      // The 3D laser scan beam sweeps across the turntable (Z = 2.8 -> -2.8).
-      // We cleanly switch active/next model visibility at the laser sweep midpoint.
-      if (curInTrans && effectiveActive !== effectiveNext) {
-        const showNext = curTransRatio >= 0.5;
-        models.forEach((m, idx) => {
-          if (!m) return;
-          const shouldBeVisible = showNext ? (idx === effectiveNext) : (idx === effectiveActive);
-          if (m.visible !== shouldBeVisible) {
-            m.visible = shouldBeVisible;
-          }
-          m.position.y = 0;
-        });
-        needsResetAfterTrans = true;
-      } else {
-        if (needsResetAfterTrans || effectiveActive !== lastSettledActiveIdx) {
-          models.forEach((m, idx) => {
-            if (!m) return;
-            const shouldBeVisible = (idx === effectiveActive);
-            if (m.visible !== shouldBeVisible) {
-              m.visible = shouldBeVisible;
-            }
-            m.position.y = 0;
-          });
-          needsResetAfterTrans = false;
-          lastSettledActiveIdx = effectiveActive;
-        }
-      }
-
-      // Only notify React when active car slot index actually changes! (Max 5 times across whole page)
-      if (effectiveActive !== lastActiveCarSlot) {
-        lastActiveCarSlot = effectiveActive;
-        setActiveCarSlotIndex(effectiveActive);
+      // Notify React only when stage actually changes
+      if (activeIdx !== lastActiveStageSlot) {
+        lastActiveStageSlot = activeIdx;
+        setActiveStageIndex(activeIdx);
       }
 
       // Merge scroll rotation + interactive drag + mouse parallax
-      const totalTargetRotY = scrollRotY + dragRotY + mouseX * 0.12;
-      const totalTargetRotX = scrollRotX + dragRotX + mouseY * 0.08;
+      const totalTargetRotY = scrollRotY + dragRotY + (prefersReducedMotion ? 0 : mouseX * 0.12);
+      const totalTargetRotX = scrollRotX + dragRotX + (prefersReducedMotion ? 0 : mouseY * 0.08);
 
       carRootGroup.rotation.y += (totalTargetRotY - carRootGroup.rotation.y) * 0.1;
       carRootGroup.rotation.x += (totalTargetRotX - carRootGroup.rotation.x) * 0.1;
@@ -671,7 +477,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       camera.position.x += (targetCamX - camera.position.x) * 0.1;
       camera.position.y += (targetCamY - camera.position.y) * 0.1;
       camera.position.z += (targetCamZ - camera.position.z) * 0.1;
-      camera.lookAt(targetLookX, -0.10, 0);
+      camera.lookAt(targetLookX, isDesktop ? -0.1 : -0.2, 0);
 
       // Direct DOM update for live telemetry HUD (zero React re-render)
       if (time - lastTelemetryUpdate > 80) {
@@ -689,7 +495,17 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
       renderer.render(scene, camera);
     };
-    animate(0);
+
+    // Pause animation when tab is inactive to save battery and GPU
+    const handleVisibilityChange = () => {
+      isTabVisible = !document.hidden;
+      if (isTabVisible && !animId) {
+        animId = requestAnimationFrame(animate);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    animId = requestAnimationFrame(animate);
 
     const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -697,9 +513,9 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       renderer.setSize(window.innerWidth, window.innerHeight);
 
       if (window.innerWidth >= 1024) {
-        carRootGroup.position.set(1.5, 0, 0);
+        carRootGroup.position.set(1.0, 0, 0);
       } else if (window.innerWidth >= 768) {
-        carRootGroup.position.set(0.7, 0, 0);
+        carRootGroup.position.set(0.5, 0, 0);
       } else {
         carRootGroup.position.set(0, -0.2, 0);
       }
@@ -708,7 +524,8 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     window.addEventListener('resize', handleResize);
 
     return () => {
-      cancelAnimationFrame(animId);
+      if (animId) cancelAnimationFrame(animId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mousemove', onMouseMove);
@@ -717,31 +534,21 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onTouchEnd);
       renderer.dispose();
+      contactShadowGeom.dispose();
+      contactShadowTexture.dispose();
+      contactShadowMat.dispose();
       floorGeom.dispose();
       floorMat.dispose();
-      stripGeom.dispose();
-      stripMat.dispose();
       stageGeom.dispose();
       stageMat.dispose();
       bezelGeom.dispose();
       bezelMat.dispose();
-      stageRing1Geom.dispose();
-      stageRing2Geom.dispose();
+      stageRingGeom.dispose();
       stageRingMat.dispose();
-      haloGeom.dispose();
-      haloMat.dispose();
-      laserBeamGeom.dispose();
-      laserBeamMat.dispose();
-      laserCurtainGeom.dispose();
-      laserCurtainMat.dispose();
-      groundLineGeom.dispose();
-      groundLineMat.dispose();
       pmremGenerator.dispose();
       studioEnvTexture.dispose();
     };
   }, []);
-
-  const activeCar = CAR_SLOTS[activeCarSlotIndex] || CAR_SLOTS[0];
 
   // Smooth scroll directly to BAY 01 // CRAFT & PHILOSOPHY
   const scrollToPhilosophy = (e) => {
@@ -769,30 +576,31 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
     }
   };
 
+  const activeStage = BAY_STAGES[activeStageIndex] || BAY_STAGES[0];
+
   return (
     <div id="cinematic-container" className="relative w-full">
       
       {/* ==================================================================== */}
-      {/* 1. PERSISTENT FULLSCREEN 3D WEBGL STUDIO CANVAS (NEVER UNPINS!)     */}
-      {/* Zero empty black screen! 3D car remains active throughout entire site*/}
+      {/* 1. PERSISTENT FULLSCREEN 3D WEBGL FULL BLACK GARAGE CANVAS           */}
       {/* ==================================================================== */}
       <canvas
         ref={canvasRef}
         role="img"
-        aria-label="3D Supercar Detailing Garage Canvas"
+        aria-label="3D Supercar Garage Canvas"
         className="fixed inset-0 w-full h-full block object-cover z-0 pointer-events-none"
       />
 
-      {/* Subtle Studio Vignette (Pure black vignette fading into edges) */}
-      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_70%_50%,transparent_55%,rgba(0,0,0,0.95)_100%)] z-[1]" />
+      {/* Subtle Pure Black Studio Vignette (Deep pure pitch black edge fade) */}
+      <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_65%_50%,transparent_50%,rgba(0,0,0,0.98)_100%)] z-[1]" />
 
       {/* ==================================================================== */}
-      {/* 2. FIXED AERION-STYLE TOP HEADER HUD                                 */}
+      {/* 2. FIXED TOP HEADER HUD                                              */}
       {/* ==================================================================== */}
       <header className="fixed top-0 left-0 right-0 z-40 px-6 sm:px-12 py-5 flex items-center justify-between pointer-events-auto bg-black/40 backdrop-blur-xl border-b border-white/[0.08]">
         {/* Logo & Status */}
         <a href="#" className="flex items-center gap-3.5 group focus:outline-none" aria-label="Nihal MV - Return to top">
-          <div className="w-8 h-8 rounded-lg bg-black/50 border border-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-105 transition-transform shadow-lg shadow-black/80">
+          <div className="w-8 h-8 rounded-lg bg-black/60 border border-white/10 backdrop-blur-md flex items-center justify-center text-white group-hover:scale-105 transition-transform shadow-lg shadow-black/80">
             <span className="text-xs font-mono font-bold">N</span>
           </div>
           <div>
@@ -827,36 +635,11 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           </a>
         </nav>
 
-        {/* Right Controls: 6-Frame Fleet Switcher + Scroll to Top */}
+        {/* Right Controls: Single Model Studio Badge + Scroll to Top */}
         <div className="flex items-center gap-3">
-          {/* 3D Mode Switcher supporting all 6 frames */}
-          <div className="hidden sm:inline-flex items-center p-1 rounded-full bg-black/50 border border-white/10 backdrop-blur-xl text-[9px] font-mono tracking-wider uppercase shadow-2xl shadow-black">
-            <button
-              onClick={() => setActiveModelMode('auto')}
-              className={`px-2.5 py-1 rounded-full transition-all cursor-pointer ${
-                activeModelMode === 'auto' ? 'bg-white/10 text-white font-semibold border border-white/20 shadow-md shadow-black' : 'text-zinc-400 hover:text-white'
-              }`}
-              title="Auto Dynamic Scroll Mode (Cars 1 - 6)"
-            >
-              AUTO FLEET
-            </button>
-            {CAR_SLOTS.map((slot, idx) => (
-              <button
-                key={slot.id}
-                onClick={() => {
-                  setActiveModelMode(idx);
-                  if (requestCarModelRef.current) {
-                    requestCarModelRef.current(idx);
-                  }
-                }}
-                className={`px-2 py-1 rounded-full transition-all cursor-pointer ${
-                  activeModelMode === idx ? 'bg-white/10 text-white font-semibold border border-white/20 shadow-md shadow-black' : 'text-zinc-400 hover:text-white'
-                }`}
-                title={`Force View ${slot.name}`}
-              >
-                F0{idx + 1}
-              </button>
-            ))}
+          <div className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 border border-white/10 backdrop-blur-xl text-[9px] font-mono tracking-wider uppercase text-zinc-300 shadow-2xl shadow-black">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]" />
+            <span>PORSCHE 911 TURBO // 360° GARAGE</span>
           </div>
 
           {/* Scroll to Top */}
@@ -873,33 +656,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       </header>
 
       {/* ==================================================================== */}
-      {/* 3. DYNAMIC TRANSITION EFFECT OVERLAY: Works across ALL 6 Frames!      */}
-      {/* ==================================================================== */}
-      <div 
-        ref={transitionOverlayRef} 
-        className="fixed inset-0 pointer-events-none z-30 opacity-0 transition-opacity duration-150"
-      >
-        {/* Glowing Laser Scanline Sweeping Across Viewport */}
-        <div
-          ref={laserLineRef}
-          className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white to-transparent shadow-[0_0_20px_rgba(255,255,255,0.7)] will-change-transform"
-        />
-        {/* Ambient High-Tech Laser Shimmer Wash */}
-        <div className="absolute inset-0 bg-white/[0.015] animate-pulse" />
-        {/* Floating Quantum Laser Transition Notification */}
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 flex flex-col items-center px-4 text-center">
-          <div className="px-5 py-2 rounded-full bg-black/95 border border-white/20 backdrop-blur-xl shadow-2xl shadow-black flex items-center gap-3 text-white text-[10px] font-mono tracking-widest uppercase">
-            <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_#ffffff] animate-ping" />
-            <span ref={transitionBadgeRef}>TRANSITION EFFECT // 3D LASER SCAN: FRAME 01 ➔ FRAME 02</span>
-          </div>
-          <span ref={transitionSubRef} className="text-[9px] font-mono tracking-[0.3em] text-zinc-400 mt-1.5 uppercase drop-shadow-md">
-            CALIBRATING DETAILING BAY
-          </span>
-        </div>
-      </div>
-
-      {/* ==================================================================== */}
-      {/* 4. SECTION 01: HERO SECTION (Pure 3D Car on Stage, NO PNG IMAGE!)   */}
+      {/* 3. SECTION 01: HERO SECTION (Pure 3D Car on Stage, NO PNG IMAGE!)   */}
       {/* ==================================================================== */}
       <section 
         id="hero" 
@@ -929,7 +686,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-white/10 backdrop-blur-md mb-3 text-zinc-300">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span className="text-[9px] sm:text-[10px] font-mono tracking-[0.25em] uppercase">
-                    STAGE 01 // FRAME 01 ZOOM-IN
+                    STAGE 01 // PORSCHE 911 TURBO
                   </span>
                 </div>
 
@@ -950,10 +707,10 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               <div className="grid grid-cols-3 gap-2.5 mb-5">
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
                   <span className="text-[8px] font-mono uppercase tracking-wider text-zinc-400 block mb-0.5">
-                    CAMERA
+                    GARAGE
                   </span>
                   <span className="text-xs sm:text-sm font-light font-mono text-zinc-200">
-                    ZOOM-IN
+                    BLACK
                   </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
@@ -961,7 +718,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                     ACTIVE CAR
                   </span>
                   <span className="text-xs sm:text-sm font-light font-mono text-zinc-200 truncate block">
-                    BMW M4
+                    PORSCHE 911
                   </span>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white/[0.04] border border-white/10 backdrop-blur-md">
@@ -1006,7 +763,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[400px] pointer-events-none select-none">
             <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
               <span className={`w-2 h-2 rounded-full ${isHeroModelReady ? 'bg-emerald-400 shadow-[0_0_8px_#34d399]' : 'bg-white shadow-[0_0_8px_#ffffff]'} animate-pulse`} />
-              <span>{isHeroModelReady ? 'STAGE 01 // 360° TURNTABLE PLATFORM' : `CALIBRATING 3D MODEL • ${heroLoadProgress}%`}</span>
+              <span>{isHeroModelReady ? 'STAGE 01 // 360° OBSIDIAN TURNTABLE' : `CALIBRATING 3D MODEL • ${heroLoadProgress}%`}</span>
             </div>
 
             {!isHeroModelReady ? (
@@ -1022,13 +779,13 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                   />
                 </div>
                 <span className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest">
-                  BMW M4 PROTOTYPE • {heroLoadProgress}%
+                  PORSCHE 911 TURBO • {heroLoadProgress}%
                 </span>
               </div>
             ) : (
               <div className="space-y-2 text-right">
                 <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl text-[10px] font-mono tracking-widest text-zinc-400">
-                  {activeCar.name}
+                  {CAR_CONFIG.name}
                 </div>
                 <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
                   <Move3d size={13} className="text-zinc-400 animate-pulse" />
@@ -1042,8 +799,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       </section>
 
       {/* ==================================================================== */}
-      {/* 5. SECTION 02: BAY 01 // CRAFT & PHILOSOPHY (Zero Empty Black Screen!)*/}
-      {/* Frame 02 Porsche 911 Turbo on Round Stage in Heroic Showroom Stance */}
+      {/* 4. SECTION 02: BAY 01 // CRAFT & PHILOSOPHY                          */}
       {/* ==================================================================== */}
       <section 
         id="philosophy" 
@@ -1064,7 +820,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
                   </span>
                 </div>
                 <span className="text-[10px] font-mono tracking-widest text-zinc-400">
-                  PRECISION.STUDIO.2026
+                  PRECISION.GARAGE.2026
                 </span>
               </div>
 
@@ -1072,7 +828,7 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
               <div className="mb-5">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/50 border border-white/10 text-zinc-300 text-[9px] font-mono tracking-widest uppercase mb-3 backdrop-blur-md">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>STAGE 02 // FRAME 02 UNVEILED</span>
+                  <span>STAGE 02 // SIDE PROFILE & AERO</span>
                 </div>
 
                 <h2 className="text-4xl sm:text-5xl font-extralight uppercase tracking-[0.16em] text-white font-display leading-[0.95] drop-shadow-2xl mb-2">
@@ -1154,12 +910,12 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
           <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[400px] pointer-events-none select-none">
             <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
               <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
-              <span>STAGE 02 // 360° ROUND TURNTABLE</span>
+              <span>STAGE 02 // 360° OBSIDIAN TURNTABLE</span>
             </div>
 
             <div className="space-y-2 text-right">
               <div className="px-3.5 py-1.5 rounded-xl bg-black/50 border border-white/10 backdrop-blur-md text-[10px] font-mono tracking-widest text-zinc-400">
-                {activeCar.name}
+                {CAR_CONFIG.name}
               </div>
               <div className="px-3.5 py-1.5 rounded-xl bg-black/50 border border-white/10 backdrop-blur-md flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
                 <Move3d size={13} className="text-zinc-400 animate-pulse" />
@@ -1172,13 +928,13 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
       </section>
 
       {/* ==================================================================== */}
-      {/* 6. BOTTOM HUD FOOTER: Live Frame Status & Flow Indicators            */}
+      {/* 5. BOTTOM HUD FOOTER: Live Stage Status & Quick Stage Jumps          */}
       {/* ==================================================================== */}
       <div className="fixed bottom-6 left-0 right-0 z-30 px-6 sm:px-12 flex items-center justify-between border-t border-white/[0.08] pt-4 pointer-events-auto bg-black/40 backdrop-blur-xl">
         {/* Left Frame Status */}
         <div className="flex items-center gap-3 text-xs font-mono text-zinc-400">
           <span className="text-white font-light tracking-widest">
-            {activeCar.name}
+            {CAR_CONFIG.name}
           </span>
           <span>—</span>
           <span ref={hudFrameRef}>FRAME 001 / 240</span>
@@ -1190,16 +946,16 @@ export default function CinematicSequence({ onHeroProgress, onHeroReady }) {
 
         {/* Center Stage Indicators */}
         <div className="hidden md:flex items-center gap-2.5 text-[10px] font-mono uppercase tracking-widest">
-          {CAR_SLOTS.map((slot, idx) => (
+          {BAY_STAGES.map((stage, idx) => (
             <span
-              key={slot.id}
+              key={stage.id}
               className={`px-2.5 py-0.5 rounded-full border transition-all ${
-                activeCarSlotIndex === idx 
+                activeStageIndex === idx 
                   ? 'border-white/30 text-white bg-black/60 font-bold shadow-md shadow-black backdrop-blur-md' 
                   : 'border-white/10 text-zinc-400 bg-black/30 backdrop-blur-sm'
               }`}
             >
-              0{idx + 1}
+              {stage.label}
             </span>
           ))}
         </div>

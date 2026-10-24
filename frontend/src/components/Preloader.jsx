@@ -32,7 +32,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
     return () => cancelAnimationFrame(animId);
   }, [heroProgress, isHeroReady]);
 
-  // Activate Ready button when 3D Hero Car is loaded or after safety timeout (8.5s max)
+  // Activate Ready button when 3D Hero Car is loaded or after safety timeout (2.5s max)
   useEffect(() => {
     if (isHeroReady) {
       setDisplayProgress(100);
@@ -40,7 +40,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
     }
     const safetyTimer = setTimeout(() => {
       setIsReady(true);
-    }, 8500);
+    }, 2500);
 
     return () => clearTimeout(safetyTimer);
   }, [isHeroReady]);
@@ -111,7 +111,7 @@ export default function Preloader({ onLoaded, heroProgress = 0, isHeroReady = fa
               </div>
 
               <span className="text-[9px] font-mono tracking-widest text-zinc-400 uppercase">
-                INGESTING BMW M4 PROTOTYPE
+                INGESTING PORSCHE 911 TURBO
               </span>
 
               {/* Optional Skip Button */}

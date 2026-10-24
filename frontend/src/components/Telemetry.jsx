@@ -113,7 +113,7 @@ export default function Telemetry() {
             <div className="inline-flex items-center gap-2 border border-white/10 px-3.5 py-1 rounded-full bg-black/40 backdrop-blur-xl shadow-lg w-fit">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
               <span className="text-[10px] font-mono tracking-widest text-zinc-300 uppercase">
-                FRAME 03 // TELEMETRY GT ACTIVE
+                PORSCHE 911 // TELEMETRY ACTIVE
               </span>
             </div>
           </div>
@@ -167,7 +167,7 @@ export default function Telemetry() {
         <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[420px] pointer-events-none select-none">
           <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
-            <span>STAGE 03 // TELEMETRY GT UNVEILED</span>
+            <span>STAGE 03 // PORSCHE 911 TELEMETRY</span>
           </div>
 
           <div className="space-y-2 text-right">

@@ -121,7 +121,7 @@ export default function Creations() {
             <div className="inline-flex items-center gap-2 border border-white/10 px-3.5 py-1 rounded-full bg-black/40 backdrop-blur-xl shadow-lg w-fit">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
               <span className="text-[10px] font-mono tracking-widest text-zinc-300 uppercase">
-                FRAME 05 // CREATIONS MONSTER ACTIVE
+                PORSCHE 911 // SHOWCASE ACTIVE
               </span>
             </div>
           </div>
@@ -149,12 +149,12 @@ export default function Creations() {
         <div className="hidden lg:flex flex-col items-end justify-between w-full max-w-md h-[520px] pointer-events-none select-none">
           <div className="px-4 py-2 rounded-full bg-black/40 border border-white/10 backdrop-blur-xl flex items-center gap-2.5 text-[10px] font-mono tracking-widest text-zinc-300 shadow-2xl">
             <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse" />
-            <span>STAGE 05 // CREATIONS MONSTER UNVEILED</span>
+            <span>STAGE 05 // PORSCHE 911 SHOWCASE</span>
           </div>
 
           <div className="space-y-2 text-right">
             <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl text-[10px] font-mono tracking-widest text-zinc-400">
-              FRAME 05 // TURNTABLE ROTATION
+              PORSCHE 911 // TURNTABLE ROTATION
             </div>
             <div className="px-3.5 py-1.5 rounded-xl bg-black/40 border border-white/10 backdrop-blur-xl flex items-center justify-end gap-2 text-[10px] font-mono text-zinc-400">
               <Move3d size={13} className="text-zinc-400 animate-pulse" />

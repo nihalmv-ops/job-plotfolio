@@ -17,5 +17,19 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/three')) {
+            return 'three';
+          }
+          if (id.includes('node_modules/lucide-react') || id.includes('node_modules/lenis')) {
+            return 'vendor-ui';
+          }
+        }
+      }
+    }
   }
 });
